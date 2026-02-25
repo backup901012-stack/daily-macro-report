@@ -1,0 +1,13 @@
+{
+  "groups": {
+    "default": {
+      "description": "預設收件群組",
+      "to": [
+        "jamieho@htsc.com"
+      ],
+      "cc": [],
+      "bcc": []
+    }
+  },
+  "active_group": "default"
+}
