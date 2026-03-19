@@ -47,10 +47,14 @@ SECTOR_ETFS = {
 }
 
 BOND_ETFS = {
+    'SHY': {'name': '1-3年國債', 'name_en': '1-3Y Treasury'},
+    'IEI': {'name': '3-7年國債', 'name_en': '3-7Y Treasury'},
+    'IEF': {'name': '7-10年國債', 'name_en': '7-10Y Treasury'},
+    'TLH': {'name': '10-20年國債', 'name_en': '10-20Y Treasury'},
+    'TLT': {'name': '20年+國債', 'name_en': '20Y+ Treasury'},
     'LQD': {'name': '投資級債', 'name_en': 'Inv. Grade'},
     'HYG': {'name': '非投資等債', 'name_en': 'High Yield'},
     'EMB': {'name': '新興債', 'name_en': 'EM Bond'},
-    'TLT': {'name': '公債', 'name_en': 'Treasury'},
     'VWOB': {'name': '新興美元債', 'name_en': 'EM USD Bond'},
     'EMLC': {'name': '新興本地債', 'name_en': 'EM Local Bond'},
 }
