@@ -603,9 +603,7 @@ def _gen_index_table(indices_data):
     html += '<th>指數</th><th>收盤價</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th>'
     html += '</tr></thead>\n<tbody>\n'
 
-    sorted_items = sorted(indices_data.items(), key=lambda x: x[1]['change_pct'], reverse=True)
-
-    for name, data in sorted_items:
+    for name, data in indices_data.items():
         cls = _change_class(data['change_pct'])
         html += '<tr>'
         html += f'<td class="name-cell">{name}</td>'
@@ -1269,9 +1267,7 @@ def _gen_crypto_section(crypto_data):
     html += '<th>幣種</th><th>價格（USD）</th><th>24h 漲跌</th><th>漲跌幅</th><th>趨勢</th>'
     html += '</tr></thead>\n<tbody>\n'
 
-    sorted_items = sorted(crypto_data.items(), key=lambda x: x[1].get('change_pct', 0), reverse=True)
-
-    for name, data in sorted_items:
+    for name, data in crypto_data.items():
         cls = _change_class(data['change_pct'])
         html += '<tr>'
         html += f'<td class="name-cell">{name}</td>'

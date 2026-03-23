@@ -156,15 +156,25 @@ def fetch_quote(symbol, name=None):
                         'timestamp': timestamps[-1],
                     }
     except Exception as e:
-        pass
+        print(f"  [WARN] fetch_quote({symbol}, {name}) exception: {e}")
     return None
 
 
-def fetch_batch(symbols_dict):
-    """批量獲取行情數據"""
+def fetch_batch(symbols_dict, max_retries=3):
+    """批量獲取行情數據，失敗時自動重試"""
+    import time
     results = {}
     for name, symbol in symbols_dict.items():
-        data = fetch_quote(symbol, name)
+        data = None
+        for attempt in range(1, max_retries + 1):
+            data = fetch_quote(symbol, name)
+            if data:
+                break
+            if attempt < max_retries:
+                print(f"  [RETRY] {name}({symbol}) attempt {attempt}/{max_retries} failed, retrying in 2s...")
+                time.sleep(2)
+            else:
+                print(f"  [FAIL] {name}({symbol}) failed after {max_retries} attempts, skipping")
         if data:
             results[name] = data
     return results
