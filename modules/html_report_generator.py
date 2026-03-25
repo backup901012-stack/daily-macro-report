@@ -600,17 +600,21 @@ def _gen_index_table(indices_data):
         return ""
 
     html = '<table>\n<thead><tr>'
-    html += '<th>指數</th><th>收盤價</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th>'
+    html += '<th>指數</th><th>收盤價</th><th>昨日漲跌</th><th>昨日漲跌幅</th><th>昨日趨勢</th><th>年初至今(%)</th>'
     html += '</tr></thead>\n<tbody>\n'
 
     for name, data in indices_data.items():
         cls = _change_class(data['change_pct'])
+        ytd_pct = data.get('ytd_pct')
+        ytd_cls = _change_class(ytd_pct) if ytd_pct is not None else 'flat'
+        ytd_str = _format_pct(ytd_pct) if ytd_pct is not None else '<span class="flat">N/A</span>'
         html += '<tr>'
         html += f'<td class="name-cell">{name}</td>'
         html += f'<td>{data["current"]:,.2f}</td>'
         html += f'<td class="{cls}">{_format_change(data["change"])}</td>'
         html += f'<td class="{cls}">{_format_pct(data["change_pct"])}</td>'
         html += f'<td class="{cls}">{_trend_arrow(data["change_pct"])}</td>'
+        html += f'<td>{ytd_str}</td>'
         html += '</tr>\n'
 
     html += '</tbody></table>\n'

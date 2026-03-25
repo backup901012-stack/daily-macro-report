@@ -10,6 +10,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from data_api import ApiClient
+import yfinance as yf
 
 client = ApiClient()
 
@@ -96,6 +97,31 @@ EMERGING_INDICES = {
 }
 
 
+# ==================== YTD 年初價格快取 ====================
+
+_ytd_cache = {}
+
+def _get_ytd_close(symbol):
+    """獲取該標的年初第一個交易日的收盤價（帶快取）"""
+    if symbol in _ytd_cache:
+        return _ytd_cache[symbol]
+    try:
+        year = datetime.now().year
+        # 從 1/1 開始搜尋，取第一個交易日的收盤價
+        start = f"{year}-01-01"
+        end = f"{year}-01-15"  # 留足夠空間找到第一個交易日
+        ticker = yf.Ticker(symbol)
+        hist = ticker.history(start=start, end=end)
+        if not hist.empty:
+            ytd_close = hist.iloc[0]['Close']
+            _ytd_cache[symbol] = ytd_close
+            return ytd_close
+    except Exception as e:
+        pass
+    _ytd_cache[symbol] = None
+    return None
+
+
 def fetch_quote(symbol, name=None):
     """獲取單個標的的最新行情數據"""
     try:
@@ -143,6 +169,12 @@ def fetch_quote(symbol, name=None):
                     change = curr_close - prev_close
                     change_pct = (change / prev_close * 100) if prev_close else 0
 
+                    # 計算 YTD 漲跌幅
+                    ytd_close = _get_ytd_close(symbol)
+                    ytd_pct = None
+                    if ytd_close is not None and ytd_close != 0:
+                        ytd_pct = round((curr_close - ytd_close) / ytd_close * 100, 2)
+
                     return {
                         'name': name or meta.get('longName', symbol),
                         'symbol': symbol,
@@ -150,6 +182,7 @@ def fetch_quote(symbol, name=None):
                         'previous': round(prev_close, 4),
                         'change': round(change, 4),
                         'change_pct': round(change_pct, 2),
+                        'ytd_pct': ytd_pct,
                         'volume': quotes['volume'][-1] if quotes['volume'][-1] else 0,
                         'high': round(quotes['high'][-1], 4) if quotes['high'][-1] else None,
                         'low': round(quotes['low'][-1], 4) if quotes['low'][-1] else None,
