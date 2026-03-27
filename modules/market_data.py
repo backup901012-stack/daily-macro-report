@@ -3,16 +3,10 @@
 市場數據收集模組
 負責獲取全球股市指數、大宗商品、外匯、債券殖利率、加密貨幣數據
 """
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-
 import json
 import os
 from datetime import datetime, timedelta
-from data_api import ApiClient
 import yfinance as yf
-
-client = ApiClient()
 
 # ==================== 全球股市指數定義 ====================
 
@@ -123,71 +117,46 @@ def _get_ytd_close(symbol):
 
 
 def fetch_quote(symbol, name=None):
-    """獲取單個標的的最新行情數據"""
+    """獲取單個標的的最新行情數據（純 yfinance 版本）"""
     try:
-        response = client.call_api('YahooFinance/get_stock_chart', query={
+        ticker = yf.Ticker(symbol)
+        hist = ticker.history(period='5d')
+
+        if hist.empty or len(hist) < 2:
+            return None
+
+        # 取最近兩個交易日
+        curr = hist.iloc[-1]
+        prev = hist.iloc[-2]
+
+        curr_close = float(curr['Close'])
+        prev_close = float(prev['Close'])
+
+        if curr_close <= 0 or prev_close <= 0:
+            return None
+
+        change = curr_close - prev_close
+        change_pct = (change / prev_close * 100) if prev_close else 0
+
+        # 計算 YTD 漲跌幅
+        ytd_close = _get_ytd_close(symbol)
+        ytd_pct = None
+        if ytd_close is not None and ytd_close != 0:
+            ytd_pct = round((curr_close - ytd_close) / ytd_close * 100, 2)
+
+        return {
+            'name': name or symbol,
             'symbol': symbol,
-            'region': 'US',
-            'interval': '1d',
-            'range': '5d'
-        })
-
-        if response and 'chart' in response and 'result' in response['chart']:
-            result = response['chart']['result'][0]
-            meta = result['meta']
-            timestamps = result.get('timestamp', [])
-            quotes = result['indicators']['quote'][0]
-
-            if len(timestamps) >= 2:
-                # 找到最新的有效 close 和前一個有效 close
-                curr_close = None
-                prev_close = None
-                closes = quotes['close']
-                
-                # 去重：API 在週末/非交易時段可能在最後追加一個重複的數據點
-                # 用 UTC 日期去重，只保留每個交易日的第一個數據點
-                from datetime import datetime as _dt, timezone as _tz
-                seen_dates = set()
-                unique_closes = []
-                for i in range(len(closes)):
-                    if closes[i] is not None:
-                        day = _dt.fromtimestamp(timestamps[i], tz=_tz.utc).strftime('%Y-%m-%d')
-                        if day not in seen_dates:
-                            seen_dates.add(day)
-                            unique_closes.append(closes[i])
-                
-                # 從後往前找最新的有效數據
-                for i in range(len(unique_closes) - 1, -1, -1):
-                    if unique_closes[i] is not None:
-                        if curr_close is None:
-                            curr_close = unique_closes[i]
-                        elif prev_close is None:
-                            prev_close = unique_closes[i]
-                            break
-                
-                if curr_close is not None and prev_close is not None:
-                    change = curr_close - prev_close
-                    change_pct = (change / prev_close * 100) if prev_close else 0
-
-                    # 計算 YTD 漲跌幅
-                    ytd_close = _get_ytd_close(symbol)
-                    ytd_pct = None
-                    if ytd_close is not None and ytd_close != 0:
-                        ytd_pct = round((curr_close - ytd_close) / ytd_close * 100, 2)
-
-                    return {
-                        'name': name or meta.get('longName', symbol),
-                        'symbol': symbol,
-                        'current': round(curr_close, 4),
-                        'previous': round(prev_close, 4),
-                        'change': round(change, 4),
-                        'change_pct': round(change_pct, 2),
-                        'ytd_pct': ytd_pct,
-                        'volume': quotes['volume'][-1] if quotes['volume'][-1] else 0,
-                        'high': round(quotes['high'][-1], 4) if quotes['high'][-1] else None,
-                        'low': round(quotes['low'][-1], 4) if quotes['low'][-1] else None,
-                        'timestamp': timestamps[-1],
-                    }
+            'current': round(curr_close, 4),
+            'previous': round(prev_close, 4),
+            'change': round(change, 4),
+            'change_pct': round(change_pct, 2),
+            'ytd_pct': ytd_pct,
+            'volume': int(curr['Volume']) if curr['Volume'] else 0,
+            'high': round(float(curr['High']), 4) if curr['High'] else None,
+            'low': round(float(curr['Low']), 4) if curr['Low'] else None,
+            'timestamp': int(hist.index[-1].timestamp()),
+        }
     except Exception as e:
         print(f"  [WARN] fetch_quote({symbol}, {name}) exception: {e}")
     return None

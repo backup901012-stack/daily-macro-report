@@ -20,7 +20,7 @@ REPORT_CSS = """
         content: counter(page) " / " counter(pages);
         font-size: 8pt;
         color: #95a5a6;
-        font-family: 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', sans-serif;
+        font-family: 'PingFang TC', 'PingFang SC', 'Heiti TC', 'Noto Sans TC', sans-serif;
     }
 }
 @page :first {
@@ -34,7 +34,7 @@ REPORT_CSS = """
 }
 
 body {
-    font-family: 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'PingFang TC', 'PingFang SC', 'Heiti TC', 'Noto Sans TC', 'Helvetica Neue', Arial, sans-serif;
     font-size: 10pt;
     line-height: 1.65;
     color: #2c3e50;
@@ -137,12 +137,15 @@ table {
 }
 
 table thead th {
-    background: #34495e;
-    color: #ffffff;
-    font-weight: 600;
-    padding: 7px 8px;
+    background: #f1f3f5;
+    color: #2c3e50;
+    font-weight: 700;
+    padding: 8px 8px;
     text-align: left;
-    font-size: 9pt;
+    font-size: 8.5pt;
+    border-bottom: 2px solid #dee2e6;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 table thead th:not(:first-child) {
@@ -261,9 +264,10 @@ td.name-cell {
 
 /* ===== 熱門股票 ===== */
 .stock-analysis {
-    font-size: 10pt;
+    font-size: 8.5pt;
     color: #666;
     line-height: 1.4;
+    max-width: 280px;
 }
 
 .filter-note {
@@ -327,7 +331,8 @@ td.name-cell {
 }
 
 .section-new-page {
-    page-break-before: always;
+    page-break-before: auto;
+    margin-top: 12px;
 }
 
 /* ===== 情緒指標卡片 ===== */
@@ -429,10 +434,10 @@ td.name-cell {
     margin-left: 4px;
 }
 .flow-val-cell .bar.positive {
-    background: #3498db;
+    background: #27ae60;
 }
 .flow-val-cell .bar.negative {
-    background: #e67e22;
+    background: #e74c3c;
 }
 .bond-flow-table td:first-child {
     font-weight: 600;

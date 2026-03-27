@@ -101,11 +101,40 @@ def main():
         f.write(html_content)
     print(f"HTML saved: {html_path}")
 
-    # Convert to PDF with WeasyPrint
-    print("Converting to PDF...")
+    # Convert to PDF — prefer Chrome headless (correct CJK fonts), fallback to WeasyPrint
     pdf_path = f"reports/daily_report_{report_date}.pdf"
-    HTML(string=html_content).write_pdf(pdf_path)
-    print(f"PDF saved: {pdf_path}")
+    html_abs = os.path.abspath(html_path)
+
+    chrome_paths = [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium-browser',
+    ]
+    chrome_bin = None
+    for p in chrome_paths:
+        if os.path.exists(p):
+            chrome_bin = p
+            break
+
+    if chrome_bin:
+        import subprocess
+        print(f"Converting to PDF with Chrome headless...")
+        result = subprocess.run([
+            chrome_bin, '--headless', '--disable-gpu', '--no-sandbox',
+            f'--print-to-pdf={os.path.abspath(pdf_path)}',
+            '--print-to-pdf-no-header',
+            f'file://{html_abs}'
+        ], capture_output=True, text=True, timeout=60)
+        if os.path.exists(pdf_path) and os.path.getsize(pdf_path) > 1000:
+            print(f"PDF saved (Chrome): {pdf_path}")
+        else:
+            print(f"Chrome PDF failed, fallback to WeasyPrint...")
+            HTML(string=html_content).write_pdf(pdf_path)
+            print(f"PDF saved (WeasyPrint): {pdf_path}")
+    else:
+        print("Converting to PDF with WeasyPrint...")
+        HTML(string=html_content).write_pdf(pdf_path)
+        print(f"PDF saved (WeasyPrint): {pdf_path}")
 
     print("Done!")
 

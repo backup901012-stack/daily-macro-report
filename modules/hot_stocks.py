@@ -25,9 +25,6 @@ v4 變更：
   - 解決 Polygon 免費方案無法取得當天數據的問題
   - 所有市場統一使用 yfinance，數據即時且穩定
 """
-import sys
-sys.path.append('/opt/.manus/.sandbox-runtime')
-
 import json
 import os
 import time
@@ -265,6 +262,26 @@ def apply_funnel_filter(stocks, market_name):
     # 第二層：按漲跌幅絕對值排序
     inflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
     outflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
+
+    # 動態門檻回退：如果嚴格篩選結果為空，使用寬鬆門檻
+    if not inflow and not outflow and len(stocks) > 50:
+        RELAXED_VOL_BUY = 1.2
+        RELAXED_VOL_SELL = 1.5
+        RELAXED_CHG_BUY = 1.0
+        RELAXED_CHG_SELL = -1.0
+        for stock in stocks:
+            cp = stock['change_pct']
+            vr = stock['volume_ratio']
+            if cp >= RELAXED_CHG_BUY and vr >= RELAXED_VOL_BUY:
+                stock['flow'] = FLOW_BUY
+                inflow.append(stock)
+            elif cp <= RELAXED_CHG_SELL and vr >= RELAXED_VOL_SELL:
+                stock['flow'] = FLOW_SELL
+                outflow.append(stock)
+        inflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
+        outflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
+        if inflow or outflow:
+            print(f"  [{market_name}] 寬鬆門檻啟用 (vol≥{RELAXED_VOL_BUY}x/漲≥{RELAXED_CHG_BUY}%, vol≥{RELAXED_VOL_SELL}x/跌≤{RELAXED_CHG_SELL}%)")
 
     print(f"  [{market_name}] 篩選結果: 買入放量 {len(inflow)} 支, 賣出放量 {len(outflow)} 支, 淘汰 {skipped} 支")
 

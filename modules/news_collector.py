@@ -33,6 +33,8 @@ SOURCE_TIERS = {
     # Tier 2: 優質財經媒體
     'CNBC': 2, 'CNN': 2, 'CNN Business': 2, 'MarketWatch': 2,
     'Barron\'s': 2, 'The Economist': 2, 'Forbes': 2,
+    'Nikkei Asia': 2, 'Nikkei': 2, 'SCMP': 2,
+    'South China Morning Post': 2,
     # Tier 3: 一般來源
 }
 
@@ -100,6 +102,9 @@ PREMIUM_RSS_SOURCES = {
     'Financial Times': 'https://news.google.com/rss/search?q=site:ft.com+when:1d&hl=en-US&gl=US&ceid=US:en',
     'WSJ': 'https://news.google.com/rss/search?q=site:wsj.com+when:1d&hl=en-US&gl=US&ceid=US:en',
     'CNN Business': 'https://news.google.com/rss/search?q=site:cnn.com+business+when:1d&hl=en-US&gl=US&ceid=US:en',
+    # 亞洲媒體
+    'Nikkei Asia': 'https://news.google.com/rss/search?q=site:asia.nikkei.com+when:1d&hl=en-US&gl=US&ceid=US:en',
+    'SCMP': 'https://news.google.com/rss/search?q=site:scmp.com+business+when:1d&hl=en-US&gl=US&ceid=US:en',
 }
 
 
