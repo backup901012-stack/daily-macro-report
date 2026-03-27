@@ -21,7 +21,7 @@ SMTP_CONFIG = {
     'server': 'smtp.gmail.com',
     'port': 587,
     'sender_email': 'cbe566@gmail.com',
-    'app_password': 'bpwsgyocnsurevdc',  # Google 應用程式密碼
+    'app_password': 'bpws gyoc nsur evdc',  # Google 應用程式密碼
     'sender_name': '何宣逸'
 }
 
