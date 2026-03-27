@@ -154,10 +154,58 @@ brew install pango poppler
 
 ---
 
-## 八、新建檔案清單
+## 八、自動化排程設定
+
+### 雲端排程（Anthropic Claude Code Remote Trigger）
+- **Trigger ID**: `trig_01Q2SvyHMpC4U7SfEnqMABBW`
+- **管理頁面**: https://claude.ai/code/scheduled/trig_01Q2SvyHMpC4U7SfEnqMABBW
+- **排程**: 每週一到五 07:00 台北時間（UTC 23:00 前一天，cron: `0 23 * * 0-4`）
+- **環境**: Anthropic Cloud（`env_01FAUJkDSKEYfCMdDj5xrvWx`）
+- **模型**: `claude-sonnet-4-6`
+- **Repo**: `https://github.com/cbe566/macro-daily-report-claude`（自動 clone）
+- **收件人**: 測試階段只寄 `cbe566@gmail.com`，其他 32 人備檔在 `recipients.json`
+
+### 自動化流程
+```
+07:00  Agent 啟動，安裝依賴
+07:02  收集市場數據（39 標的）
+07:03  收集新聞（450+ 篇，7 來源）
+07:04  掃描熱門股票（2,300+ 支成分股）
+07:08  增強版數據（情緒/美林時鐘/資金流向/技術面/信用利差/殖利率曲線）
+07:12  Claude AI 分析（Executive Summary + 新聞歸納 + 指數分析 + 股票分析）
+07:15  生成 HTML → PDF
+07:18  Email 寄出
+```
+
+### 本地排程（備用，需 Mac 開機）
+- **cron**: `0 7 * * 1-5 /Users/jamie/Desktop/Claude-每日宏觀日報/run_auto.sh`
+- **launchd**: `~/Library/LaunchAgents/com.jamie.macro-report.plist`
+- 腳本: `run_auto.sh`（使用 `claude -p` 做 AI 分析）
+
+### 新 GitHub Repo
+- **名稱**: `cbe566/macro-daily-report-claude`（Private）
+- **URL**: https://github.com/cbe566/macro-daily-report-claude
+- **用途**: 雲端 Agent 每天從這裡 clone 最新程式碼
+- **原 Repo**: `cbe566/daily-macro-report` 未動到
+
+### SMTP 配置（已在程式碼中）
+- Server: `smtp.gmail.com:587`
+- 寄件人: `cbe566@gmail.com`（何宣逸）
+- 認證: Gmail App Password（在 `modules/email_sender.py` 中）
+
+### 後續操作
+- 驗證沒問題後 → 改 trigger 開放寄給全部 33 人
+- 調整報告內容 → 改 GitHub repo 程式碼，Agent 自動拉最新版
+- 暫停/恢復 → 到管理頁面操作或跟 Claude 說
+
+---
+
+## 九、新建檔案清單
 
 | 檔案 | 說明 |
 |------|------|
 | `SYSTEM_LOGIC_BACKUP.md` | 整套系統邏輯備檔 |
 | `CHANGELOG_2026-03-27.md` | 本日改版記錄（本檔案） |
 | `modules/enhanced_market_data.py` | 增強版數據收集模組（陸港通/信用利差/技術面/財報/殖利率曲線） |
+| `run_auto.sh` | 本地全自動執行腳本（備用） |
+| `~/Library/LaunchAgents/com.jamie.macro-report.plist` | macOS launchd 排程（備用） |
