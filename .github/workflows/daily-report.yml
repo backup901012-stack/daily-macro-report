@@ -2,8 +2,9 @@ name: 每日宏觀資訊報告
 
 on:
   schedule:
-    # 台北時間 07:30 = UTC 23:30（前一天），週一到週五
-    - cron: '30 23 * * 0-4'
+    # 台北時間 07:00 = UTC 23:00（前一天），週一到週五
+    # 先跑數據收集，07:30 Claude agent 會接手 AI 分析
+    - cron: '0 23 * * 0-4'
   workflow_dispatch:  # 手動觸發
 
 env:
@@ -119,48 +120,11 @@ jobs:
           print('Alternative data collected')
           "
 
-      - name: Generate AI analysis and report
-        run: python3 scripts/generate_full_report.py
-
-      - name: Generate PDF
+      - name: Commit collected data to repo
         run: |
           DATE=$(TZ='Asia/Taipei' date +%Y-%m-%d)
-          HTML_FILE="reports/daily_report_${DATE}.html"
-          PDF_FILE="reports/daily_report_${DATE}.pdf"
-          if command -v chromium-browser &>/dev/null; then
-            chromium-browser --headless --no-sandbox --disable-gpu \
-              --print-to-pdf="${PDF_FILE}" --print-to-pdf-no-header \
-              "file://$(pwd)/${HTML_FILE}" || true
-          fi
-          if [ ! -f "${PDF_FILE}" ] || [ $(stat -c%s "${PDF_FILE}" 2>/dev/null || echo 0) -lt 1000 ]; then
-            python3 -c "
-          from weasyprint import HTML
-          HTML('${HTML_FILE}').write_pdf('${PDF_FILE}')
-          print('PDF generated with WeasyPrint')
-          "
-          fi
-          ls -la "${PDF_FILE}"
-
-      - name: Setup Gmail OAuth2 credentials
-        env:
-          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
-          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
-        run: |
-          mkdir -p credentials
-          echo "$GMAIL_CLIENT_SECRET" > credentials/client_secret.json
-          echo "$GMAIL_TOKEN_JSON" > credentials/token.json
-
-      - name: Send email
-        env:
-          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
-        run: |
-          python3 -c "
-          import sys, os
-          from datetime import datetime
-          sys.path.insert(0, '.')
-          DATE = datetime.now().strftime('%Y-%m-%d')
-          PDF_PATH = f'reports/daily_report_{DATE}.pdf'
-          JSON_PATH = f'reports/raw_data_{DATE}.json'
-          from modules.email_sender import send_report_email
-          send_report_email(DATE, PDF_PATH, JSON_PATH)
-          "
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add reports/market_data_today.json reports/news_today.json reports/hot_stocks_today.json reports/enhanced_today.json reports/enhanced_v2_today.json reports/fred_today.json reports/alternative_today.json
+          git commit -m "data: ${DATE} 市場數據收集完成（等待 Claude AI 分析）" || echo "No changes to commit"
+          git push origin master
