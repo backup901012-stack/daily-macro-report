@@ -12,6 +12,9 @@ env:
   POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
+permissions:
+  contents: write
+
 jobs:
   generate-and-send:
     runs-on: ubuntu-latest
