@@ -4,16 +4,8 @@
     "US": {
       "name": "美股",
       "indices": "道瓊30 + S&P 500 + NASDAQ 100",
-      "count": 519,
+      "count": 517,
       "stocks": [
-        {
-          "symbol": "Retailing",
-          "name": "NASDAQ"
-        },
-        {
-          "symbol": "Insurance",
-          "name": "NYSE"
-        },
         {
           "symbol": "MMM",
           "name": "3M",

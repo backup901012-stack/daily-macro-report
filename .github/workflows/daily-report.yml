@@ -9,6 +9,7 @@ on:
 env:
   TZ: Asia/Taipei
   POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+  FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
 jobs:
   generate-and-send:
@@ -26,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yfinance requests beautifulsoup4 exchange_calendars numpy pandas weasyprint
+          pip install yfinance requests beautifulsoup4 exchange_calendars numpy pandas weasyprint google-auth google-auth-oauthlib google-api-python-client
           sudo apt-get update && sudo apt-get install -y fonts-noto-cjk chromium-browser || true
 
       - name: Collect market data
@@ -93,6 +94,31 @@ jobs:
           print('Enhanced data collected')
           "
 
+      - name: Collect FRED economic data
+        run: |
+          python3 -c "
+          import sys, json
+          sys.path.insert(0, '.')
+          from modules.fred_data import collect_fred_data
+          data = collect_fred_data()
+          with open('reports/fred_today.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+          meta = data.get('metadata', {})
+          print(f'FRED data: {meta.get(\"series_fetched\",0)}/{meta.get(\"series_total\",0)} series')
+          "
+
+      - name: Collect alternative data
+        run: |
+          python3 -c "
+          import sys, json
+          sys.path.insert(0, '.')
+          from modules.alternative_data import collect_alternative_data
+          data = collect_alternative_data()
+          with open('reports/alternative_today.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+          print('Alternative data collected')
+          "
+
       - name: Generate AI analysis and report
         run: python3 scripts/generate_full_report.py
 
@@ -115,53 +141,26 @@ jobs:
           fi
           ls -la "${PDF_FILE}"
 
-      - name: Send email
+      - name: Setup Gmail OAuth2 credentials
+        env:
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
         run: |
-          python3 << 'EMAILEOF'
-          import smtplib, os, sys
-          from email.mime.multipart import MIMEMultipart
-          from email.mime.text import MIMEText
-          from email.mime.base import MIMEBase
-          from email import encoders
-          from datetime import datetime
+          mkdir -p credentials
+          echo "$GMAIL_CLIENT_SECRET" > credentials/client_secret.json
+          echo "$GMAIL_TOKEN_JSON" > credentials/token.json
 
+      - name: Send email
+        env:
+          GMAIL_TOKEN_JSON: ${{ secrets.GMAIL_TOKEN_JSON }}
+        run: |
+          python3 -c "
+          import sys, os
+          from datetime import datetime
           sys.path.insert(0, '.')
           DATE = datetime.now().strftime('%Y-%m-%d')
-          JSON_PATH = f'reports/raw_data_{DATE}.json'
           PDF_PATH = f'reports/daily_report_{DATE}.pdf'
-
-          # Read SMTP config from the repo's email_sender module
-          from modules.email_sender import SMTP_CONFIG
-
-          # Generate email body
-          try:
-              from modules.email_sender import generate_email_summary
-              content = generate_email_summary(JSON_PATH)
-          except Exception as e:
-              print(f'Summary generation failed: {e}')
-              content = f'{DATE} 每日宏觀資訊綜合早報，完整報告請見附件 PDF。'
-
-          msg = MIMEMultipart()
-          msg['From'] = f"{SMTP_CONFIG['sender_name']} <{SMTP_CONFIG['sender_email']}>"
-          msg['To'] = 'cbe566@gmail.com'
-          msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
-          msg.attach(MIMEText(content, 'plain', 'utf-8'))
-
-          if os.path.exists(PDF_PATH):
-              with open(PDF_PATH, 'rb') as f:
-                  att = MIMEBase('application', 'pdf')
-                  att.set_payload(f.read())
-                  encoders.encode_base64(att)
-                  att.add_header('Content-Disposition', 'attachment', filename=os.path.basename(PDF_PATH))
-                  msg.attach(att)
-              print(f'PDF attached: {os.path.getsize(PDF_PATH)/1024:.0f} KB')
-          else:
-              print(f'WARNING: PDF not found at {PDF_PATH}')
-
-          server = smtplib.SMTP(SMTP_CONFIG['server'], SMTP_CONFIG['port'])
-          server.starttls()
-          server.login(SMTP_CONFIG['sender_email'], SMTP_CONFIG['app_password'])
-          server.sendmail(SMTP_CONFIG['sender_email'], ['cbe566@gmail.com'], msg.as_string())
-          server.quit()
-          print(f'Email sent to cbe566@gmail.com')
-          EMAILEOF
+          JSON_PATH = f'reports/raw_data_{DATE}.json'
+          from modules.email_sender import send_report_email
+          send_report_email(DATE, PDF_PATH, JSON_PATH)
+          "

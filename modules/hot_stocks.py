@@ -263,25 +263,50 @@ def apply_funnel_filter(stocks, market_name):
     inflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
     outflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
 
-    # 動態門檻回退：如果嚴格篩選結果為空，使用寬鬆門檻
-    if not inflow and not outflow and len(stocks) > 50:
-        RELAXED_VOL_BUY = 1.2
-        RELAXED_VOL_SELL = 1.5
-        RELAXED_CHG_BUY = 1.0
-        RELAXED_CHG_SELL = -1.0
+    # 動態門檻回退：如果任一方向篩選結果不足，使用寬鬆門檻補充
+    if (len(inflow) < 3 or len(outflow) < 3) and len(stocks) > 50:
+        RELAXED_VOL_BUY = 1.1
+        RELAXED_VOL_SELL = 1.3
+        RELAXED_CHG_BUY = 0.3
+        RELAXED_CHG_SELL = -0.3
+        existing_symbols = {s['symbol'] for s in inflow + outflow}
         for stock in stocks:
+            if stock['symbol'] in existing_symbols:
+                continue
             cp = stock['change_pct']
             vr = stock['volume_ratio']
-            if cp >= RELAXED_CHG_BUY and vr >= RELAXED_VOL_BUY:
+            if len(inflow) < MAX_PER_FLOW and cp >= RELAXED_CHG_BUY and vr >= RELAXED_VOL_BUY:
                 stock['flow'] = FLOW_BUY
                 inflow.append(stock)
-            elif cp <= RELAXED_CHG_SELL and vr >= RELAXED_VOL_SELL:
+            elif len(outflow) < MAX_PER_FLOW and cp <= RELAXED_CHG_SELL and vr >= RELAXED_VOL_SELL:
                 stock['flow'] = FLOW_SELL
                 outflow.append(stock)
         inflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
         outflow.sort(key=lambda x: abs(x['change_pct']), reverse=True)
+        added = len(inflow) + len(outflow) - len(existing_symbols)
+        if added > 0:
+            print(f"  [{market_name}] 寬鬆門檻補充 {added} 支 (vol≥{RELAXED_VOL_BUY}x/漲≥{RELAXED_CHG_BUY}%, vol≥{RELAXED_VOL_SELL}x/跌≤{RELAXED_CHG_SELL}%)")
+
+    # ��三層回退：最活躍��股（量加權��量排序）
+    if (len(inflow) < 3 or len(outflow) < 3) and len(stocks) > 50:
+        existing_symbols2 = {s['symbol'] for s in inflow + outflow}
+        candidates = [
+            s for s in stocks
+            if s['volume_ratio'] >= 1.0 and s['change_pct'] != 0 and s['symbol'] not in existing_symbols2
+        ]
+        # 按 abs(change_pct) * volume_ratio 排序
+        candidates.sort(key=lambda x: abs(x['change_pct']) * x['volume_ratio'], reverse=True)
+        for s in candidates:
+            if s['change_pct'] > 0 and len(inflow) < 5:
+                s['flow'] = FLOW_BUY
+                inflow.append(s)
+            elif s['change_pct'] < 0 and len(outflow) < 5:
+                s['flow'] = FLOW_SELL
+                outflow.append(s)
+            if len(inflow) >= 5 and len(outflow) >= 5:
+                break
         if inflow or outflow:
-            print(f"  [{market_name}] 寬鬆門檻啟用 (vol≥{RELAXED_VOL_BUY}x/漲≥{RELAXED_CHG_BUY}%, vol≥{RELAXED_VOL_SELL}x/跌≤{RELAXED_CHG_SELL}%)")
+            print(f"  [{market_name}] 最活躍個股 fallback 啟用 (vol≥1.0x, 按量加權動量排序)")
 
     print(f"  [{market_name}] 篩選結果: 買入放量 {len(inflow)} 支, 賣出放量 {len(outflow)} 支, 淘汰 {skipped} 支")
 

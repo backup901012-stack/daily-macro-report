@@ -256,6 +256,118 @@ def gen_yield_curve_analysis(enh2):
     return interp
 
 
+def _gen_fred_data_html(fred):
+    """生成 FRED 經濟數據 HTML 區塊"""
+    snapshot = fred.get('snapshot', {})
+    if not snapshot:
+        return ''
+
+    rows = ''
+    for cat_key, cat in snapshot.items():
+        cat_label = cat.get('label', '')
+        for sid, s in cat.get('data', {}).items():
+            if s.get('latest_value') is None:
+                continue
+            val = s['latest_value']
+            chg = s.get('change')
+            chg_str = f'{chg:+.4f}' if chg is not None else '-'
+            color = '#e74c3c' if chg and chg < 0 else '#27ae60' if chg and chg > 0 else '#666'
+            rows += f'<tr><td style="text-align:left;">{s["name"]}</td><td style="text-align:center;color:#888;font-size:8pt;">{sid}</td><td style="text-align:right;font-weight:600;">{val:,.4f}</td><td style="text-align:right;color:{color};">{chg_str}</td><td style="text-align:center;color:#999;font-size:8pt;">{s.get("latest_date","")}</td></tr>'
+
+    if not rows:
+        return ''
+
+    bs = fred.get('balance_sheet_trend', {})
+    bs_line = ''
+    if bs.get('latest_value_trillion'):
+        wc = bs.get('week_change')
+        wc_str = f'（週變化 {wc:+,.0f}M）' if wc else ''
+        bs_line = f'<div style="margin-top:8px;font-size:9pt;color:#555;">Fed 資產負債表: <strong>${bs["latest_value_trillion"]:.2f}T</strong>{wc_str}</div>'
+
+    return (
+        '<div class="section-new-page"></div>'
+        '<div style="margin:16px 0 20px 0;page-break-inside:avoid;">'
+        '<div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #2980b9;padding-bottom:6px;margin-bottom:10px;">FRED 聯準會經濟數據</div>'
+        f'<table><thead><tr><th style="text-align:left;">指標</th><th style="text-align:center;">代碼</th><th style="text-align:right;">最新值</th><th style="text-align:right;">變化</th><th style="text-align:center;">日期</th></tr></thead><tbody>{rows}</tbody></table>'
+        f'{bs_line}</div>\n'
+    )
+
+
+def _gen_alternative_data_html(alt):
+    """生成替代數據 HTML 區塊"""
+    if not alt:
+        return ''
+
+    parts = []
+
+    # 板塊輪動
+    sr = alt.get('sector_rotation', {})
+    if sr and 'sectors' in sr:
+        rows = ''
+        for s in sr['sectors']:
+            m = s.get('momentum', 0)
+            mc = '#27ae60' if m > 0 else '#e74c3c'
+            rows += f'<tr><td style="text-align:left;font-weight:600;">{s["name"]} ({s["ticker"]})</td><td style="text-align:right;">{s.get("return_1w",0):+.2f}%</td><td style="text-align:right;">{s.get("return_1m",0):+.2f}%</td><td style="text-align:right;color:{mc};font-weight:700;">{m:+.2f}</td></tr>'
+        regime = sr.get('regime', '')
+        spread = sr.get('risk_spread', 0)
+        parts.append(
+            '<div style="margin:16px 0;page-break-inside:avoid;">'
+            '<div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #e67e22;padding-bottom:6px;margin-bottom:10px;">板塊輪動分析 Sector Rotation</div>'
+            f'<div style="background:linear-gradient(135deg,#fff8f0,#ffecd2);border-left:4px solid #e67e22;padding:10px 16px;margin-bottom:10px;font-size:9.5pt;border-radius:0 6px 6px 0;"><strong>市場態勢：</strong>{regime}（Risk Spread: {spread:+.2f}）</div>'
+            f'<table><thead><tr><th style="text-align:left;">板塊</th><th style="text-align:right;">1週</th><th style="text-align:right;">1月</th><th style="text-align:right;">動量</th></tr></thead><tbody>{rows}</tbody></table></div>'
+        )
+
+    # Put/Call + 波動率 + 市場寬度 — 一行摘要
+    summaries = []
+    pc = alt.get('put_call_ratio', {})
+    if pc.get('volume_pcr'):
+        summaries.append(f'SPY Put/Call Ratio: <strong>{pc["volume_pcr"]:.3f}</strong>（{pc.get("signal","")}）')
+
+    vs = alt.get('volatility_term_structure', {})
+    if vs.get('ratio'):
+        summaries.append(f'VIX/VIX3M: <strong>{vs["ratio"]:.4f}</strong>（{vs.get("structure","")}）')
+
+    mb = alt.get('market_breadth', {})
+    rsp = mb.get('rsp_spy', {})
+    if rsp.get('signal'):
+        summaries.append(f'RSP/SPY（市場寬度）: {rsp.get("signal","")}（1月 {rsp.get("change_1m_pct",0):+.2f}%）')
+
+    iwm = mb.get('iwm_spy', {})
+    if iwm.get('signal'):
+        summaries.append(f'IWM/SPY（大小型股）: {iwm.get("signal","")}')
+
+    vg = mb.get('iwd_iwf', {})
+    if vg.get('signal'):
+        summaries.append(f'IWD/IWF（價值/成長）: {vg.get("signal","")}')
+
+    if summaries:
+        items = ''.join(f'<div style="margin:4px 0;">• {s}</div>' for s in summaries)
+        parts.append(
+            '<div style="background:linear-gradient(135deg,#f0fff4,#e6ffed);border-left:4px solid #27ae60;padding:14px 18px;margin:14px 0;font-size:9.5pt;line-height:1.8;border-radius:0 6px 6px 0;page-break-inside:avoid;">'
+            f'<strong style="color:#27ae60;font-size:10.5pt;">市場微觀結構指標</strong>{items}</div>'
+        )
+
+    # EM 貨幣壓力
+    em = alt.get('em_currency_stress', {})
+    if em.get('currencies'):
+        rows = ''
+        for c in em['currencies']:
+            sc = c.get('stress_score', 0)
+            sc_color = '#e74c3c' if sc > 5 else '#f39c12' if sc > 2 else '#27ae60'
+            rows += f'<tr><td style="text-align:left;">{c["name"]}</td><td style="text-align:right;">{c.get("rate",0):.4f}</td><td style="text-align:right;">{c.get("change_1w_pct",0):+.2f}%</td><td style="text-align:right;">{c.get("change_1m_pct",0):+.2f}%</td><td style="text-align:right;">{c.get("vol_20d",0):.1f}%</td><td style="text-align:right;color:{sc_color};font-weight:700;">{sc:.1f}</td></tr>'
+        level = em.get('level', '')
+        parts.append(
+            '<div style="margin:16px 0;page-break-inside:avoid;">'
+            '<div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #e74c3c;padding-bottom:6px;margin-bottom:10px;">新興市場貨幣壓力 EM Currency Stress</div>'
+            f'<div style="font-size:9.5pt;margin-bottom:8px;">綜合壓力: <strong>{em.get("avg_stress",0):.1f}</strong> — {level}</div>'
+            f'<table><thead><tr><th style="text-align:left;">貨幣</th><th style="text-align:right;">匯率</th><th style="text-align:right;">1週</th><th style="text-align:right;">1月</th><th style="text-align:right;">波動率</th><th style="text-align:right;">壓力分</th></tr></thead><tbody>{rows}</tbody></table></div>'
+        )
+
+    if not parts:
+        return ''
+    return '<div class="section-new-page"></div>' + '\n'.join(parts)
+
+
 def main():
     print(f"Generating report for {DATE}...")
 
@@ -265,6 +377,8 @@ def main():
     hot_stocks = load_json(f'{REPORTS}/hot_stocks_today.json')
     enh = load_json(f'{REPORTS}/enhanced_today.json')
     enh2 = load_json(f'{REPORTS}/enhanced_v2_today.json')
+    fred = load_json(f'{REPORTS}/fred_today.json')
+    alt = load_json(f'{REPORTS}/alternative_today.json')
 
     # Generate analysis
     executive_summary = gen_executive_summary(md, enh, enh2)
@@ -308,6 +422,8 @@ def main():
         'credit_spreads': enh2.get('credit_spreads', {}),
         'northbound_southbound': enh2.get('northbound_southbound', {}),
         'yield_curve': enh2.get('yield_curve', {}),
+        'fred_data': fred,
+        'alternative_data': alt,
         'report_date': DATE, 'generated_at': datetime.now().isoformat(),
         'fact_check_report': {'total_events_checked': len(news_events), 'corrections_applied': 0, 'status': '通過'}
     }
@@ -367,6 +483,19 @@ def main():
     if sector_analysis:
         html = insert_before_section(html, '六、GICS 11大板塊資金流向',
             f'<div style="background:linear-gradient(135deg,#fff8f0 0%,#ffecd2 100%);border-left:4px solid #e67e22;padding:14px 18px;margin:14px 0;font-size:9.5pt;line-height:1.8;border-radius:0 6px 6px 0;page-break-inside:avoid;"><strong style="color:#d35400;font-size:10.5pt;">行業輪動解讀</strong><br>{sector_analysis}</div>\n')
+
+    # ── 新增：替代數據區塊 ──
+    alt_blocks = _gen_alternative_data_html(alt)
+    fred_block = _gen_fred_data_html(fred)
+
+    # 在報告末尾（</body>前）插入新區塊
+    if alt_blocks or fred_block:
+        insert_content = ''
+        if fred_block:
+            insert_content += fred_block
+        if alt_blocks:
+            insert_content += alt_blocks
+        html = html.replace('</body>', insert_content + '</body>')
 
     html_path = f'{REPORTS}/daily_report_{DATE}.html'
     with open(html_path, 'w', encoding='utf-8') as f:
