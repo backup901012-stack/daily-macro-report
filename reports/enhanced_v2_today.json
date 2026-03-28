@@ -1,0 +1,198 @@
+{
+  "northbound_southbound": {
+    "northbound": {
+      "FXI": {
+        "name": "中國大型股",
+        "name_en": "China Large-Cap",
+        "close": 34.85,
+        "change_pct": -0.23,
+        "1d": -458415611.65884966,
+        "5d": -1839846996.7487776,
+        "20d": -1947450663.033226
+      },
+      "KWEB": {
+        "name": "中國科技",
+        "name_en": "China Internet",
+        "close": 27.91,
+        "change_pct": -1.03,
+        "1d": -325095058.03884584,
+        "5d": -1349008013.2903848,
+        "20d": -1410193028.0203784
+      },
+      "MCHI": {
+        "name": "中國MSCI",
+        "name_en": "MSCI China",
+        "close": 54.82,
+        "change_pct": -0.4,
+        "1d": -124713720.76746595,
+        "5d": -327974551.53520966,
+        "20d": 376963115.8496824
+      }
+    },
+    "southbound": {
+      "EWH": {
+        "name": "香港",
+        "name_en": "Hong Kong",
+        "close": 22.38,
+        "change_pct": -0.84,
+        "1d": -71376601.5234771,
+        "5d": -127257101.13411552,
+        "20d": -112834367.67098024
+      },
+      "2800.HK": {
+        "name": "盈富基金",
+        "name_en": "Tracker Fund HK",
+        "close": 25.2,
+        "change_pct": 0.24,
+        "1d": 1085529195.9857237,
+        "5d": 41073549801.79039,
+        "20d": 30849250582.394318
+      }
+    }
+  },
+  "credit_spreads": {
+    "IG": {
+      "current": 0.72,
+      "1w_ago": 0.47,
+      "1m_ago": 0.35,
+      "1w_change": 0.25,
+      "1m_change": 0.375,
+      "direction": "擴大"
+    },
+    "HY": {
+      "current": -0.04,
+      "1w_ago": -0.34,
+      "1m_ago": 0.63,
+      "1w_change": 0.298,
+      "1m_change": -0.671,
+      "direction": "擴大"
+    }
+  },
+  "technical_levels": {
+    "S&P 500": {
+      "symbol": "^GSPC",
+      "current": 6368.85,
+      "ma50": 6814.16,
+      "ma200": 6634.83,
+      "rsi": 23.8,
+      "high_52w": 6978.6,
+      "low_52w": 4982.77,
+      "pct_from_high": -8.74,
+      "pct_from_low": 27.82,
+      "cross": "黃金交叉",
+      "support_20d": 6368.85,
+      "resistance_20d": 6881.62,
+      "above_ma50": false,
+      "above_ma200": false
+    },
+    "納斯達克": {
+      "symbol": "^IXIC",
+      "current": 20948.36,
+      "ma50": 22760.52,
+      "ma200": 22300.95,
+      "rsi": 24.8,
+      "high_52w": 23958.47,
+      "low_52w": 15267.91,
+      "pct_from_high": -12.56,
+      "pct_from_low": 37.21,
+      "cross": "黃金交叉",
+      "support_20d": 20948.36,
+      "resistance_20d": 22807.48,
+      "above_ma50": false,
+      "above_ma200": false
+    },
+    "道瓊斯": {
+      "symbol": "^DJI",
+      "current": 45166.64,
+      "ma50": 48406.57,
+      "ma200": 46646.59,
+      "rsi": 25.8,
+      "high_52w": 50188.14,
+      "low_52w": 37645.59,
+      "pct_from_high": -10.01,
+      "pct_from_low": 19.98,
+      "cross": "黃金交叉",
+      "support_20d": 45166.64,
+      "resistance_20d": 48904.78,
+      "above_ma50": false,
+      "above_ma200": false
+    },
+    "香港恆生": {
+      "symbol": "^HSI",
+      "current": 24951.88,
+      "ma50": 26322.17,
+      "ma200": 25727.5,
+      "rsi": 45.2,
+      "high_52w": 27968.09,
+      "low_52w": 19828.3,
+      "pct_from_high": -10.78,
+      "pct_from_low": 25.84,
+      "cross": "黃金交叉",
+      "support_20d": 24382.47,
+      "resistance_20d": 26059.85,
+      "above_ma50": false,
+      "above_ma200": false
+    },
+    "台灣加權": {
+      "symbol": "^TWII",
+      "current": 33112.59,
+      "ma50": 32664.45,
+      "ma200": 27210.76,
+      "rsi": 57.5,
+      "high_52w": 35414.49,
+      "low_52w": 17391.76,
+      "pct_from_high": -6.5,
+      "pct_from_low": 90.39,
+      "cross": "黃金交叉",
+      "support_20d": 32110.42,
+      "resistance_20d": 35095.09,
+      "above_ma50": true,
+      "above_ma200": true
+    },
+    "日經225": {
+      "symbol": "^N225",
+      "current": 53373.07,
+      "ma50": 54850.35,
+      "ma200": 47564.01,
+      "rsi": 42.2,
+      "high_52w": 58850.27,
+      "low_52w": 31136.58,
+      "pct_from_high": -9.31,
+      "pct_from_low": 71.42,
+      "cross": "黃金交叉",
+      "support_20d": 51515.49,
+      "resistance_20d": 58850.27,
+      "above_ma50": false,
+      "above_ma200": true
+    },
+    "德國DAX": {
+      "symbol": "^GDAXI",
+      "current": 22300.75,
+      "ma50": 24277.65,
+      "ma200": 24107.82,
+      "rsi": 36.1,
+      "high_52w": 25420.66,
+      "low_52w": 19670.88,
+      "pct_from_high": -12.27,
+      "pct_from_low": 13.37,
+      "cross": "黃金交叉",
+      "support_20d": 22300.75,
+      "resistance_20d": 24638.0,
+      "above_ma50": false,
+      "above_ma200": false
+    }
+  },
+  "earnings_calendar": [],
+  "yield_curve": {
+    "yields": {
+      "3M": 3.6070001125335693,
+      "5Y": 4.070000171661377,
+      "10Y": 4.440000057220459,
+      "30Y": 4.98199987411499
+    },
+    "spread_3m10y": 0.833,
+    "spread_5y10y": 0.37,
+    "shape": "正常偏平",
+    "interpretation": "殖利率曲線正常但偏平坦，長期利率溫和高於短期，反映市場對經濟增長持謹慎樂觀態度。"
+  }
+}
