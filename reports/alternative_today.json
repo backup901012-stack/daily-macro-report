@@ -1,5 +1,5 @@
 {
-  "date": "2026-03-28",
+  "date": "2026-03-30",
   "put_call_ratio": {
     "error": "Too Many Requests. Rate limited. Try after a while."
   },
@@ -139,11 +139,21 @@
         "ticker": "ZAR=X",
         "name": "美元/南非蘭特",
         "name_en": "USD/ZAR",
-        "rate": 17.0988,
-        "change_1w_pct": 0.12,
-        "change_1m_pct": 7.42,
-        "vol_20d": 21.66,
-        "stress_score": 8.77
+        "rate": 17.0777,
+        "change_1w_pct": 2.12,
+        "change_1m_pct": 7.79,
+        "vol_20d": 21.74,
+        "stress_score": 9.71
+      },
+      {
+        "ticker": "BRL=X",
+        "name": "美元/巴西雷亞爾",
+        "name_en": "USD/BRL",
+        "rate": 5.243,
+        "change_1w_pct": -1.3,
+        "change_1m_pct": 2.07,
+        "vol_20d": 18.1,
+        "stress_score": 6.57
       },
       {
         "ticker": "MXN=X",
@@ -156,38 +166,28 @@
         "stress_score": 6.28
       },
       {
-        "ticker": "BRL=X",
-        "name": "美元/巴西雷亞爾",
-        "name_en": "USD/BRL",
-        "rate": 5.2351,
-        "change_1w_pct": 0.29,
-        "change_1m_pct": 2.16,
-        "vol_20d": 18.12,
-        "stress_score": 6.2
-      },
-      {
         "ticker": "INR=X",
         "name": "美元/印度盧比",
         "name_en": "USD/INR",
-        "rate": 94.3095,
-        "change_1w_pct": 1.32,
-        "change_1m_pct": 3.69,
-        "vol_20d": 8.67,
-        "stress_score": 4.23
+        "rate": 94.757,
+        "change_1w_pct": 0.92,
+        "change_1m_pct": 4.12,
+        "vol_20d": 8.72,
+        "stress_score": 4.22
       },
       {
         "ticker": "TRY=X",
         "name": "美元/土耳其里拉",
         "name_en": "USD/TRY",
-        "rate": 44.4556,
-        "change_1w_pct": 0.34,
-        "change_1m_pct": 1.35,
-        "vol_20d": 1.48,
-        "stress_score": 0.98
+        "rate": 44.4138,
+        "change_1w_pct": 0.27,
+        "change_1m_pct": 1.04,
+        "vol_20d": 1.55,
+        "stress_score": 0.89
       }
     ],
-    "avg_stress": 5.3,
-    "max_stress": 8.77,
+    "avg_stress": 5.53,
+    "max_stress": 9.71,
     "most_stressed": "USD/ZAR",
     "level": "中度壓力 — 關注新興市場動態",
     "level_en": "Moderate Stress — Monitor EM Developments"
