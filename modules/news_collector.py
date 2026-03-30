@@ -18,12 +18,15 @@ import re
 import json
 import requests
 import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from collections import Counter
 from email.utils import parsedate_to_datetime
 
 POLYGON_API_KEY = os.environ.get('POLYGON_API_KEY', '')
 NEWSAPI_KEY = os.environ.get('NEWSAPI_KEY', '919b1fdb80a340f2b3080464664d7178')
+FINNHUB_API_KEY = os.environ.get('FINNHUB_API_KEY', 'd6nsik9r01qse5qmtl4gd6nsik9r01qse5qmtl50')
+MARKETAUX_API_KEY = os.environ.get('MARKETAUX_API_KEY', 'V8xTWZIiaj2dtxt2ULUyS6Z7gQKARSygVRoYXQg6')
 
 # ─── 來源品質分級 ─────────────────────────────────────────────────
 SOURCE_TIERS = {
@@ -529,6 +532,34 @@ def get_news_for_date(target_date=None):
     print(f"    Polygon 新聞: {len(polygon_articles)} 篇")
     all_articles.extend(polygon_articles)
 
+    # ── 來源 5-7：爬蟲（帶文章描述，不做日期過濾因為爬到的都是最新的） ──
+    print(f"  [CNBC Scraper] 抓取 CNBC 文章描述...")
+    cnbc_scraped = _scrape_cnbc_articles()
+    print(f"    CNBC Scraper: {len(cnbc_scraped)} 篇（帶描述）")
+    all_articles.extend(cnbc_scraped)
+
+    print(f"  [BBC Scraper] 抓取 BBC Business...")
+    bbc_scraped = _scrape_bbc_business()
+    print(f"    BBC Scraper: {len(bbc_scraped)} 篇（帶描述）")
+    all_articles.extend(bbc_scraped)
+
+    print(f"  [Al Jazeera Scraper] 抓取 Al Jazeera Economy...")
+    aj_scraped = _scrape_aljazeera_economy()
+    print(f"    Al Jazeera Scraper: {len(aj_scraped)} 篇（帶描述）")
+    all_articles.extend(aj_scraped)
+
+    # ── 來源 8：Finnhub（帶新聞摘要） ──
+    print(f"  [Finnhub] 抓取市場新聞...")
+    finnhub_articles = _get_finnhub_news(target_date)
+    print(f"    Finnhub 新聞: {len(finnhub_articles)} 篇")
+    all_articles.extend(finnhub_articles)
+
+    # ── 來源 6：MarketAux（帶完整描述+情緒） ──
+    print(f"  [MarketAux] 抓取全球新聞...")
+    marketaux_articles = _get_marketaux_news(target_date)
+    print(f"    MarketAux 新聞: {len(marketaux_articles)} 篇")
+    all_articles.extend(marketaux_articles)
+
     # ── 品質過濾：移除垃圾新聞 ──
     before_filter = len(all_articles)
     all_articles = [a for a in all_articles if not _is_junk_article(a)]
@@ -559,8 +590,13 @@ def get_news_for_date(target_date=None):
         source_order = {
             'premium_rss': 0,
             'cnbc_rss': 1,
-            'newsapi': 2,
-            'polygon': 3,
+            'cnbc_scraper': 1,
+            'bbc_scraper': 1,
+            'aj_scraper': 2,
+            'finnhub': 2,
+            'marketaux': 2,
+            'newsapi': 3,
+            'polygon': 4,
         }
         src = source_order.get(a.get('source', ''), 4)
         # 有 ticker 關聯的排前面
@@ -594,6 +630,232 @@ def get_news_for_date(target_date=None):
             'top_publishers': dict(source_stats.most_common(10)),
         },
     }
+
+
+def _scrape_cnbc_articles():
+    """爬取 CNBC 文章列表，抓取每篇的 meta description 作為描述"""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'}
+        r = requests.get('https://www.cnbc.com/world/?region=world', headers=headers, timeout=15)
+        if r.status_code != 200:
+            return []
+        soup = BeautifulSoup(r.text, 'html.parser')
+
+        articles = []
+        seen = set()
+        for card in soup.select('.Card-titleContainer a, .Card-title a'):
+            title = card.get_text(strip=True)
+            href = card.get('href', '')
+            if not title or len(title) < 15 or title in seen:
+                continue
+            seen.add(title)
+            if not href.startswith('http'):
+                href = 'https://www.cnbc.com' + href
+
+            # 抓單篇的 meta description
+            desc = ''
+            try:
+                r2 = requests.get(href, headers=headers, timeout=8)
+                if r2.status_code == 200:
+                    soup2 = BeautifulSoup(r2.text, 'html.parser')
+                    og = soup2.find('meta', attrs={'property': 'og:description'})
+                    if og and og.get('content'):
+                        desc = og['content'][:300]
+                    # 也抓發布時間
+                    time_tag = soup2.find('time')
+                    pub_time = time_tag.get('datetime', '') if time_tag else ''
+            except Exception:
+                pass
+
+            articles.append({
+                'title': title,
+                'description': desc,
+                'publisher': 'CNBC',
+                'published_utc': pub_time if 'pub_time' in dir() else '',
+                'tickers': [], 'keywords': [], 'insights': [],
+                'url': href, 'source': 'cnbc_scraper',
+                'source_tier': 2,
+            })
+
+            if len(articles) >= 15:  # 限制請求數量
+                break
+
+        return articles
+    except Exception as e:
+        print(f"    CNBC Scraper 錯誤: {e}")
+        return []
+
+
+def _scrape_bbc_business():
+    """爬取 BBC Business 新聞列表（標題+描述）"""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'}
+        r = requests.get('https://www.bbc.com/news/business', headers=headers, timeout=15)
+        if r.status_code != 200:
+            return []
+        soup = BeautifulSoup(r.text, 'html.parser')
+
+        articles = []
+        seen = set()
+        for card in soup.select('[data-testid="card-text-wrapper"]'):
+            title_el = card.find('h2')
+            desc_el = card.find('p')
+            if not title_el:
+                continue
+            title = title_el.get_text(strip=True)
+            if not title or len(title) < 10 or title in seen:
+                continue
+            seen.add(title)
+            desc = desc_el.get_text(strip=True) if desc_el else ''
+
+            # 找連結
+            link = card.find_parent('a') or card.find('a')
+            href = ''
+            if link:
+                href = link.get('href', '')
+                if href and not href.startswith('http'):
+                    href = 'https://www.bbc.com' + href
+
+            articles.append({
+                'title': title,
+                'description': desc,
+                'publisher': 'BBC News',
+                'published_utc': '',
+                'tickers': [], 'keywords': [], 'insights': [],
+                'url': href, 'source': 'bbc_scraper',
+                'source_tier': 2,
+            })
+
+        return articles
+    except Exception as e:
+        print(f"    BBC Scraper 錯誤: {e}")
+        return []
+
+
+def _scrape_aljazeera_economy():
+    """爬取 Al Jazeera Economy 新聞"""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'}
+        r = requests.get('https://www.aljazeera.com/economy/', headers=headers, timeout=15)
+        if r.status_code != 200:
+            return []
+        soup = BeautifulSoup(r.text, 'html.parser')
+
+        articles = []
+        seen = set()
+        for article in soup.select('article'):
+            title_el = article.find('h3') or article.find('h2')
+            if not title_el:
+                continue
+            title = title_el.get_text(strip=True)
+            if not title or len(title) < 10 or title in seen:
+                continue
+            seen.add(title)
+
+            # 找描述
+            desc_el = article.find('p')
+            desc = desc_el.get_text(strip=True) if desc_el else ''
+
+            # 找連結
+            link = article.find('a')
+            href = ''
+            if link:
+                href = link.get('href', '')
+                if href and not href.startswith('http'):
+                    href = 'https://www.aljazeera.com' + href
+
+            articles.append({
+                'title': title,
+                'description': desc,
+                'publisher': 'Al Jazeera English',
+                'published_utc': '',
+                'tickers': [], 'keywords': [], 'insights': [],
+                'url': href, 'source': 'aj_scraper',
+                'source_tier': 2,
+            })
+
+        return articles
+    except Exception as e:
+        print(f"    Al Jazeera Scraper 錯誤: {e}")
+        return []
+
+
+def _get_finnhub_news(target_date):
+    """從 Finnhub 獲取市場新聞（帶摘要）"""
+    if not FINNHUB_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            f'https://finnhub.io/api/v1/news?category=general&token={FINNHUB_API_KEY}',
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+        articles = []
+        for item in r.json()[:80]:
+            headline = item.get('headline', '')
+            summary = item.get('summary', '')
+            source = item.get('source', '')
+            # Finnhub summary 常常跟 headline 一樣，只取真正有內容的
+            if summary and summary != headline and len(summary) > len(headline) + 20:
+                desc = summary[:500]
+            else:
+                desc = ''
+            articles.append({
+                'title': headline,
+                'description': desc,
+                'publisher': source,
+                'published_utc': datetime.fromtimestamp(item.get('datetime', 0)).isoformat() if item.get('datetime') else '',
+                'tickers': [],
+                'keywords': [],
+                'insights': [],
+                'url': item.get('url', ''),
+                'source': 'finnhub',
+                'source_tier': _get_source_tier(source),
+            })
+        return articles
+    except Exception as e:
+        print(f"    Finnhub 錯誤: {e}")
+        return []
+
+
+def _get_marketaux_news(target_date):
+    """從 MarketAux 獲取全球新聞（帶完整描述）"""
+    if not MARKETAUX_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            f'https://api.marketaux.com/v1/news/all',
+            params={
+                'language': 'en',
+                'filter_entities': 'true',
+                'published_on': target_date,
+                'limit': 50,
+                'api_token': MARKETAUX_API_KEY,
+            },
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+        data = r.json()
+        articles = []
+        for item in data.get('data', []):
+            articles.append({
+                'title': item.get('title', ''),
+                'description': item.get('description', '') or item.get('snippet', ''),
+                'publisher': item.get('source', ''),
+                'published_utc': item.get('published_at', ''),
+                'tickers': [e.get('symbol', '') for e in item.get('entities', []) if e.get('symbol')],
+                'keywords': [],
+                'insights': [],
+                'url': item.get('url', ''),
+                'source': 'marketaux',
+                'source_tier': _get_source_tier(item.get('source', '')),
+            })
+        return articles
+    except Exception as e:
+        print(f"    MarketAux 錯誤: {e}")
+        return []
 
 
 if __name__ == '__main__':

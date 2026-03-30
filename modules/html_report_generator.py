@@ -173,8 +173,18 @@ table tbody tr {
     page-break-inside: avoid;
 }
 
+/* 整張表格不可跨頁切斷 */
+table {
+    page-break-inside: avoid;
+}
+
 thead {
     display: table-header-group;
+}
+
+/* 子區塊（含標題+表格）不可跨頁切斷 */
+.sub-section-block {
+    page-break-inside: avoid;
 }
 
 td.name-cell {
@@ -310,15 +320,18 @@ td.name-cell {
     margin: 18px 0;
 }
 
-/* ===== 底部 ===== */
+/* ===== 底部（名片+聲明不分頁）===== */
+.footer-wrapper {
+    page-break-inside: avoid;
+    margin-top: 20px;
+}
 .footer {
-    margin-top: 15px;
+    margin-top: 10px;
     padding-top: 8px;
     border-top: 1px solid #ddd;
     font-size: 7.5pt;
     color: #95a5a6;
     text-align: left;
-    page-break-before: avoid;
 }
 
 .footer strong {
@@ -326,6 +339,13 @@ td.name-cell {
 }
 
 /* ===== 頁面控制 ===== */
+@page {
+    margin: 15mm;
+    @top-left { content: ''; }
+    @top-right { content: ''; }
+    @bottom-left { content: ''; }
+    @bottom-right { content: ''; }
+}
 .page-break {
     page-break-before: always;
 }
@@ -346,7 +366,7 @@ td.name-cell {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 6px;
-    padding: 12px;
+    padding: 8px;
     text-align: center;
 }
 .sentiment-card .label {
@@ -628,7 +648,7 @@ def _gen_index_table(indices_data):
 
 def _gen_indices_section(market_data, index_analysis):
     """生成各國指數表現章節"""
-    html = '<div class="section-title">一、各國指數表現</div>\n'
+    html = '<div class="section-title">二、全球指數表現</div>\n'
 
     regions = [
         ('亞洲市場', 'asia_indices', 'asia_analysis'),
@@ -643,10 +663,12 @@ def _gen_indices_section(market_data, index_analysis):
     for region, key, analysis_key in regions:
         data = market_data.get(key, {})
         if data:
+            html += '<div class="sub-section-block">\n'
             html += f'<div class="sub-section-title">{region}</div>\n'
             if index_analysis and analysis_key in index_analysis:
                 html += f'<p class="analysis-text">{index_analysis[analysis_key]}</p>\n'
             html += _gen_index_table(data)
+            html += '</div>\n'
 
     html += '<hr class="divider">\n'
     return html
@@ -655,83 +677,182 @@ def _gen_indices_section(market_data, index_analysis):
 # ==================== 宏觀新聞 ====================
 
 def _gen_news_section(events):
-    """生成宏觀重點新聞章節"""
+    """生成宏觀重點新聞
+
+    每組新聞三層結構：
+    1. 敘事摘要（narrative）— 讀完就知道發生什麼事
+    2. 重點標題（headlines）— 各個面向的具體報導
+    3. 數據佐證（data_points）— 市場如何反應
+    """
     if not events:
         return ""
 
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">二、宏觀重點新聞</div>\n'
+    html += '<div class="section-title">一、宏觀重點新聞</div>\n'
 
-    for i, event in enumerate(events, 1):
-        impact = event.get('impact_level', '中')
-        if impact == '高':
-            badge_cls = 'badge-high'
-            badge_text = '高影響'
-        elif impact == '中':
-            badge_cls = 'badge-medium'
-            badge_text = '中影響'
-        else:
-            badge_cls = 'badge-low'
-            badge_text = '低影響'
+    headlines = [e for e in events if e.get('is_headline', False)]
+    briefs = [e for e in events if not e.get('is_headline', False)]
 
+    # === 頭條主題（詳細版）===
+    for i, event in enumerate(headlines, 1):
         direction = event.get('market_direction', '中性')
-        if direction == '利多':
-            dir_cls = 'badge-bullish'
-            dir_text = '▲ 利多'
-            border_color = '#27ae60'
-        elif direction == '利空':
-            dir_cls = 'badge-bearish'
-            dir_text = '▼ 利空'
-            border_color = '#e74c3c'
-        else:
-            dir_cls = 'badge-neutral'
-            dir_text = '— 中性'
-            border_color = '#3498db'
+        impact = event.get('impact_level', '中')
 
-        affected = event.get('affected_markets', '')
+        # 顏色
+        colors = {
+            '利空': ('#e74c3c', '#e74c3c', '▼ 利空'),
+            '利多': ('#27ae60', '#27ae60', '▲ 利多'),
+            '中性': ('#3498db', '#7f8c8d', '— 中性'),
+        }
+        border_color, dir_bg, dir_label = colors.get(direction, colors['中性'])
+        impact_bg = '#c0392b' if impact == '高' else '#e67e22' if impact == '中' else '#95a5a6'
 
-        html += f'<div class="news-card" style="border-left-color:{border_color};">\n'
-        html += f'<h3>{i}. {event.get("title", "")}</h3>\n'
-        html += f'<div class="news-meta">'
-        html += f'<span class="badge {badge_cls}">{badge_text}</span>'
-        html += f'<span class="badge {dir_cls}">{dir_text}</span>'
-        html += f'<span style="font-size:8pt;color:#999;">影響範圍：{affected}</span>'
-        html += '</div>\n'
-        html += f'<div class="news-body">{event.get("description", "")}</div>\n'
+        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
 
+        # 標題行 + badges
+        title = event.get('title', '')
+        html += f'<div style="margin-bottom:8px;">'
+        html += f'<span style="font-size:14pt;font-weight:800;color:#1a1a2e;">{i}. {title}</span> '
+        html += f'<span style="background:{impact_bg};color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">{impact}影響</span> '
+        html += f'<span style="background:{dir_bg};color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">{dir_label}</span>'
+        html += f'</div>\n'
+        html += f'<div style="font-size:8pt;color:#999;margin-bottom:12px;">{event.get("source_info", "")} ｜ 影響範圍：{event.get("affected_markets", "")}</div>\n'
+
+        # 敘事摘要
+        narrative = event.get('narrative', '')
+        if narrative:
+            html += f'<div style="font-size:10pt;line-height:1.8;color:#2c3e50;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:4px;border:1px solid #eee;">{narrative}</div>\n'
+
+        # 重點標題 + 數據條 並排佈局
+        news_headlines = event.get('headlines', [])
+        data_pts = event.get('data_points', [])
         tickers = event.get('related_tickers', [])
-        ticker_impact = event.get('ticker_impact', {})
-        if tickers:
-            if ticker_impact:
-                impact_parts = []
-                for t in tickers:
-                    impact_desc = ticker_impact.get(t, '')
-                    if impact_desc:
-                        impact_parts.append(f'<code>{t}</code> {impact_desc}')
-                    else:
-                        impact_parts.append(f'<code>{t}</code>')
-                html += f'<div class="news-tickers">相關標的影響：{"；".join(impact_parts)}</div>\n'
-            else:
-                ticker_html = '、'.join([f'<code>{t}</code>' for t in tickers])
-                html += f'<div class="news-tickers">相關標的：{ticker_html}</div>\n'
+
+        if news_headlines or data_pts:
+            html += '<div style="display:flex;gap:16px;flex-wrap:wrap;">\n'
+
+            # 左側：重點標題
+            if news_headlines:
+                html += '<div style="flex:1;min-width:280px;">\n'
+                html += '<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">HEADLINES</div>\n'
+                for h in news_headlines[:4]:
+                    html += f'<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid {border_color}40;margin:3px 0;">• {h}</div>\n'
+                html += '</div>\n'
+
+            # 右側：數據 + 標的
+            if data_pts or tickers:
+                html += '<div style="min-width:180px;">\n'
+                if data_pts:
+                    html += '<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>\n'
+                    html += '<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;">'
+                    for dp in data_pts:
+                        html += f'<div><strong>{dp}</strong></div>'
+                    html += '</div>\n'
+                if tickers:
+                    html += '<div style="margin-top:8px;">'
+                    ticker_html = ' '.join([f'<code style="background:#e8e8f8;padding:2px 6px;border-radius:3px;font-size:8pt;color:#4a4a8a;">{t}</code>' for t in tickers])
+                    html += ticker_html
+                    html += '</div>\n'
+                html += '</div>\n'
+
+            html += '</div>\n'
 
         html += '</div>\n'
+
+    # === 其他要聞（卡片式，跟頭條統一風格）===
+    if briefs:
+        html += '<div style="margin:24px 0 12px 0;font-size:12pt;font-weight:700;color:#1a1a2e;border-bottom:2.5px solid #2c3e50;padding-bottom:6px;">其他要聞</div>\n'
+        for event in briefs:
+            direction = event.get('market_direction', '中性')
+            colors = {
+                '利空': ('#e74c3c', '#e74c3c', '▼ 利空'),
+                '利多': ('#27ae60', '#27ae60', '▲ 利多'),
+                '中性': ('#95a5a6', '#7f8c8d', '— 中性'),
+            }
+            border_color, dir_bg, dir_label = colors.get(direction, colors['中性'])
+            title = event.get('title', '')
+            narrative = event.get('narrative', '')
+            news_headlines = event.get('headlines', [])
+
+            html += f'<div style="border-left:4px solid {border_color};padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
+
+            # 標題行
+            html += f'<div style="margin-bottom:6px;">'
+            html += f'<strong style="font-size:11pt;color:#1a1a2e;">{title}</strong> '
+            html += f'<span style="background:{dir_bg};color:#fff;padding:1px 6px;border-radius:3px;font-size:7pt;font-weight:700;">{dir_label}</span> '
+            html += f'<span style="font-size:7.5pt;color:#aaa;">{event.get("source_info", "")}</span>'
+            html += '</div>\n'
+
+            # 敘事（如果有，限制長度）
+            if narrative:
+                short_narrative = narrative[:150].rstrip('。，；、 ') + '。' if len(narrative) > 150 else narrative
+                html += f'<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">{short_narrative}</div>\n'
+
+            # 重點標題（最多2條）
+            if news_headlines:
+                for h in news_headlines[:2]:
+                    html += f'<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid {border_color}33;line-height:1.6;margin:2px 0;">• {h}</div>\n'
+
+            # 數據條
+            data_pts = event.get('data_points', [])
+            if data_pts:
+                dp_html = '&nbsp;&nbsp;｜&nbsp;&nbsp;'.join([f'<strong>{dp}</strong>' for dp in data_pts[:3]])
+                html += f'<div style="font-size:8.5pt;color:#2980b9;margin-top:6px;">{dp_html}</div>\n'
+
+            html += '</div>\n'
 
     html += '<hr class="divider">\n'
     return html
 
 
-# ==================== 商品、外匯、債券 ====================
+# ==================== 債券・殖利率 ====================
 
-def _gen_commodities_forex_bonds(market_data):
-    """生成商品、外匯與債券章節"""
+def _gen_bonds_section(market_data):
+    """生成債券殖利率章節"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">三、商品、外匯與債券</div>\n'
+    html += '<div class="section-title">三、債券・殖利率</div>\n'
+    bonds = market_data.get('bonds', {})
+    if bonds:
+        html += '<div class="sub-section-block">\n'
+        html += '<table>\n<thead><tr>'
+        html += '<th>債券</th><th>殖利率</th><th>變動</th><th>變動幅度</th><th>趨勢</th>'
+        html += '</tr></thead>\n<tbody>\n'
+        for name, data in bonds.items():
+            cls = _change_class(data['change_pct'])
+            html += f'<tr><td class="name-cell">{name}</td><td>{data["current"]:.3f}%</td><td class="{cls}">{_format_change4(data["change"])}</td><td class="{cls}">{_format_pct(data["change_pct"])}</td><td class="{cls}">{_trend_arrow(data["change_pct"])}</td></tr>\n'
+        html += '</tbody></table>\n</div>\n'
+    return html
 
-    # 大宗商品
+
+# ==================== 外匯市場 ====================
+
+def _gen_forex_section(market_data):
+    """生成外匯市場章節"""
+    html = '<div class="section-new-page"></div>\n'
+    html += '<div class="section-title">四、外匯市場</div>\n'
+    forex = market_data.get('forex', {})
+    if forex:
+        html += '<div class="sub-section-block">\n'
+        html += '<div class="sub-section-title">主要貨幣對</div>\n'
+        html += '<table>\n<thead><tr>'
+        html += '<th>貨幣對</th><th>匯率</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th>'
+        html += '</tr></thead>\n<tbody>\n'
+        for name, data in forex.items():
+            cls = _change_class(data['change_pct'])
+            html += f'<tr><td class="name-cell">{name}</td><td>{data["current"]:.4f}</td><td class="{cls}">{_format_change4(data["change"])}</td><td class="{cls}">{_format_pct(data["change_pct"])}</td><td class="{cls}">{_trend_arrow(data["change_pct"])}</td></tr>\n'
+        html += '</tbody></table>\n</div>\n'
+    return html
+
+
+# ==================== 大宗商品 ====================
+
+def _gen_commodities_section(market_data):
+    """生成大宗商品章節"""
+    html = '<div class="section-new-page"></div>\n'
+    html += '<div class="section-title">五、大宗商品</div>\n'
     commodities = market_data.get('commodities', {})
     if commodities:
-        html += '<div class="sub-section-title">大宗商品</div>\n'
+        html += '<div class="sub-section-block">\n'
         html += '<table>\n<thead><tr>'
         html += '<th>商品</th><th>價格</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th>'
         html += '</tr></thead>\n<tbody>\n'
@@ -745,53 +866,16 @@ def _gen_commodities_forex_bonds(market_data):
             html += f'<td class="{cls}">{_trend_arrow(data["change_pct"])}</td>'
             html += '</tr>\n'
         html += '</tbody></table>\n'
-
-    # 外匯
-    forex = market_data.get('forex', {})
-    if forex:
-        html += '<div class="sub-section-title">外匯市場</div>\n'
-        html += '<table>\n<thead><tr>'
-        html += '<th>貨幣對</th><th>匯率</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th>'
-        html += '</tr></thead>\n<tbody>\n'
-        for name, data in forex.items():
-            cls = _change_class(data['change_pct'])
-            html += '<tr>'
-            html += f'<td class="name-cell">{name}</td>'
-            html += f'<td>{data["current"]:.4f}</td>'
-            html += f'<td class="{cls}">{_format_change4(data["change"])}</td>'
-            html += f'<td class="{cls}">{_format_pct(data["change_pct"])}</td>'
-            html += f'<td class="{cls}">{_trend_arrow(data["change_pct"])}</td>'
-            html += '</tr>\n'
-        html += '</tbody></table>\n'
-
-    # 債券
-    bonds = market_data.get('bonds', {})
-    if bonds:
-        html += '<div class="sub-section-title">債券殖利率</div>\n'
-        html += '<table>\n<thead><tr>'
-        html += '<th>債券</th><th>殖利率</th><th>變動</th><th>變動幅度</th><th>趨勢</th>'
-        html += '</tr></thead>\n<tbody>\n'
-        for name, data in bonds.items():
-            cls = _change_class(data['change_pct'])
-            html += '<tr>'
-            html += f'<td class="name-cell">{name}</td>'
-            html += f'<td>{data["current"]:.3f}%</td>'
-            html += f'<td class="{cls}">{_format_change4(data["change"])}</td>'
-            html += f'<td class="{cls}">{_format_pct(data["change_pct"])}</td>'
-            html += f'<td class="{cls}">{_trend_arrow(data["change_pct"])}</td>'
-            html += '</tr>\n'
-        html += '</tbody></table>\n'
-
-    html += '<hr class="divider">\n'
+        html += '</div>\n'
     return html
 
 
 # ==================== 市場情緒指標 (NEW) ====================
 
-def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None):
-    """生成市場情緒指標章節，包含 Fear & Greed、VIX、US10Y、DXY 和美林時鐘"""
+def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, historical_context=None):
+    """生成市場情緒指標章節，包含 Fear & Greed、VIX、US10Y、DXY、美林時鐘和歷史情境"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">四、市場情緒指標</div>\n'
+    html += '<div class="section-title">七、市場情緒指標</div>\n'
 
     if sentiment_analysis:
         html += f'<p class="analysis-text">{sentiment_analysis}</p>\n'
@@ -846,71 +930,30 @@ def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None):
 '''
     html += '</div>\n'
 
-    # Fear & Greed semicircle gauge (SVG)
-    cx, cy = 150, 140
-    R_out, R_in, R_lbl = 110, 75, 120
-
-    def arc_pt(r, deg):
-        rad = math.radians(deg)
-        return cx + r * math.cos(rad), cy - r * math.sin(rad)
-
-    angles = [180, 144, 108, 72, 36, 0]
-    seg_colors = ['#c0392b', '#e67e22', '#f1c40f', '#2ecc71', '#27ae60']
-    seg_labels = ['極度恐懼', '恐懼', '中性', '貪婪', '極度貪婪']
-    lbl_colors = ['#c0392b', '#e67e22', '#f1c40f', '#2ecc71', '#27ae60']
-
-    arc_paths = ''
-    for i in range(5):
-        a1, a2 = angles[i], angles[i+1]
-        ox1, oy1 = arc_pt(R_out, a1)
-        ox2, oy2 = arc_pt(R_out, a2)
-        ix2, iy2 = arc_pt(R_in, a2)
-        ix1, iy1 = arc_pt(R_in, a1)
-        arc_paths += f'<path d="M {ox1:.1f} {oy1:.1f} A {R_out} {R_out} 0 0 1 {ox2:.1f} {oy2:.1f} L {ix2:.1f} {iy2:.1f} A {R_in} {R_in} 0 0 0 {ix1:.1f} {iy1:.1f} Z" fill="{seg_colors[i]}"/>\n'
-
-    needle_deg = 180 - (fg_score / 100) * 180
-    nx, ny = arc_pt(85, needle_deg)
-
-    label_svg = ''
-    mid_angles = [(angles[i] + angles[i+1]) / 2 for i in range(5)]
-    for i, ma in enumerate(mid_angles):
-        lx, ly = arc_pt(R_lbl + 8, ma)
-        label_svg += f'<text x="{lx:.0f}" y="{ly:.0f}" text-anchor="middle" font-size="6.5" fill="{lbl_colors[i]}">{seg_labels[i]}</text>\n'
-
-    html += f'''<div style="margin-bottom:10px;">
-  <div style="font-size:9pt; font-weight:600; margin-bottom:2px;">恐懼與貪婪指數</div>
-  <div style="text-align:center;">
-  <svg viewBox="0 0 300 170" width="320" height="180" style="display:block; margin:0 auto;">
-    {arc_paths}
-    <line x1="{cx}" y1="{cy}" x2="{nx:.1f}" y2="{ny:.1f}" stroke="#2c3e50" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="{cx}" cy="{cy}" r="5" fill="#2c3e50"/>
-    <text x="{cx}" y="{cy - 15}" text-anchor="middle" font-size="22" font-weight="800" fill="{fg_color}">{fg_score:.1f}</text>
-    <text x="{cx}" y="{cy - 2}" text-anchor="middle" font-size="9" font-weight="600" fill="{fg_color}">{fg_rating_zh}</text>
-    {label_svg}
-  </svg>
-  </div>
-</div>
-'''
-
-    # Sentiment comparison table
-    html += '<table><thead><tr><th>指標</th><th>當前</th><th>前日</th><th>一週前</th><th>一月前</th><th>一年前</th></tr></thead><tbody>\n'
+    # 恐貪歷史比較
     fg_prev = fg.get('previous_close', 0) or 0
     fg_1w = fg.get('previous_1_week', 0) or 0
     fg_1m = fg.get('previous_1_month', 0) or 0
     fg_1y = fg.get('previous_1_year', 0) or 0
+    html += '<table><thead><tr><th>指標</th><th>當前</th><th>前日</th><th>一週前</th><th>一月前</th><th>一年前</th></tr></thead><tbody>\n'
     html += f'<tr><td class="name-cell">恐懼與貪婪</td><td class="down">{fg_score:.1f}</td><td>{fg_prev:.1f}</td><td>{fg_1w:.1f}</td><td>{fg_1m:.1f}</td><td>{fg_1y:.1f}</td></tr>\n'
     html += '</tbody></table>\n'
 
-    # ─── Investment Clock (美林時鐘) ───
+    # 美林時鐘 + 歷史情境
     if clock_data and clock_data.get('phase') != 'Unknown':
-        html += _gen_investment_clock(clock_data)
+        html += _gen_investment_clock(clock_data, historical_context)
+    elif historical_context:
+        hp = [v for v in historical_context.values() if isinstance(v, str)]
+        if hp:
+            html += f'<div style="background:linear-gradient(135deg,#fff5f5 0%,#ffe8e8 100%);border-left:4px solid #e74c3c;padding:10px 14px;margin:10px 0;font-size:8.5pt;line-height:1.6;border-radius:0 6px 6px 0;"><strong style="color:#c0392b;font-size:9pt;">歷史情境參考</strong><br>{"<br>".join(hp)}</div>\n'
 
     return html
 
 
-def _gen_investment_clock(clock_data):
-    """生成美林時鐘 SVG 和資訊面板"""
-    html = '<div class="sub-section-title" style="margin-top:15px;">經濟週期指示器</div>\n'
+def _gen_investment_clock(clock_data, historical_context=None):
+    """生成美林時鐘 SVG 和資訊面板（含歷史情境）"""
+    html = '<div>\n'
+    html += '<div class="sub-section-title" style="margin-top:8px;">經濟週期指示器</div>\n'
 
     ck_phase = clock_data.get('phase', 'Unknown')
     ck_phase_cn = clock_data.get('phase_cn', '未知')
@@ -1057,7 +1100,7 @@ def _gen_investment_clock(clock_data):
 
     html += f'''<div class="clock-wrapper">
   <div class="clock-svg-box">
-    <svg viewBox="0 0 340 340" width="300" height="300">
+    <svg viewBox="0 0 340 340" width="220" height="220">
       {clock_svg}
     </svg>
   </div>
@@ -1089,6 +1132,13 @@ def _gen_investment_clock(clock_data):
   </div>
 </div>
 '''
+    # 歷史情境參考（嵌在同一個區塊裡）
+    if historical_context:
+        hp = [v for v in historical_context.values() if isinstance(v, str)]
+        if hp:
+            html += f'<div style="background:linear-gradient(135deg,#fff5f5 0%,#ffe8e8 100%);border-left:4px solid #e74c3c;padding:10px 14px;margin:10px 0;font-size:8.5pt;line-height:1.6;border-radius:0 6px 6px 0;"><strong style="color:#c0392b;font-size:9pt;">歷史情境參考</strong><br>{"<br>".join(hp)}</div>\n'
+
+    html += '</div>\n'  # 關閉區塊
     return html
 
 
@@ -1097,7 +1147,7 @@ def _gen_investment_clock(clock_data):
 def _gen_fund_flow_section(fund_flows, flow_analysis=None):
     """生成全球資金流向脈動章節"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">五、全球資金流向脈動</div>\n'
+    html += '<div class="section-title">八、全球資金流向</div>\n'
 
     if flow_analysis:
         html += f'<p class="analysis-text">{flow_analysis}</p>\n'
@@ -1143,7 +1193,7 @@ def _gen_fund_flow_section(fund_flows, flow_analysis=None):
 def _gen_gics_sector_section(fund_flows, sector_analysis=None):
     """生成 GICS 11大板塊資金流向章節"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">六、GICS 11大板塊資金流向</div>\n'
+    html += '<div class="section-title">九、板塊輪動</div>\n'
 
     if sector_analysis:
         html += f'<p class="analysis-text">{sector_analysis}</p>\n'
@@ -1195,30 +1245,40 @@ def _gen_gics_sector_section(fund_flows, sector_analysis=None):
 # ==================== 熱門股票 ====================
 
 def _gen_stock_table_html(stocks, stock_analysis):
-    """渲染一組股票的 HTML 表格"""
+    """渲染一組股票的 HTML 表格（簡潔版，不含模板化分析）"""
     if not stocks:
         return ""
     html = '<table>\n<thead><tr>'
-    html += '<th>股票</th><th>代碼</th><th>收盤價</th><th>漲跌幅</th><th>量比</th><th>分析</th>'
+    html += '<th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th>'
     html += '</tr></thead>\n<tbody>\n'
     for s in stocks:
-        full_symbol = s['symbol']
-        symbol_base = full_symbol.split('.')[0]
-        analysis = ""
-        if stock_analysis:
-            analysis = stock_analysis.get(full_symbol, stock_analysis.get(symbol_base, ''))
         name = s['name']
-        if len(name) > 50:
-            name = name[:48] + "..."
+        if len(name) > 30:
+            name = name[:28] + "..."
         vol_ratio = s.get('volume_ratio', 1)
+        volume = s.get('volume', 0)
         cls = _change_class(s.get('change_pct', 0))
+
+        # 成交量格式化
+        if volume >= 1_000_000_000:
+            vol_str = f'{volume/1_000_000_000:.1f}B'
+        elif volume >= 1_000_000:
+            vol_str = f'{volume/1_000_000:.1f}M'
+        elif volume >= 1_000:
+            vol_str = f'{volume/1_000:.0f}K'
+        else:
+            vol_str = f'{volume:,.0f}'
+
+        # 量比顏色
+        vr_color = '#e74c3c' if vol_ratio >= 3 else '#e67e22' if vol_ratio >= 2 else '#333'
+
         html += '<tr>'
-        html += f'<td class="name-cell">{name}</td>'
-        html += f'<td><code style="font-size:8pt;">{s["symbol"]}</code></td>'
-        html += f'<td>{s["current"]:,.2f}</td>'
-        html += f'<td class="{cls}">{_format_pct(s["change_pct"])}</td>'
-        html += f'<td>{vol_ratio:.1f}x</td>'
-        html += f'<td class="stock-analysis">{analysis}</td>'
+        html += f'<td class="name-cell" style="text-align:left;">{name}</td>'
+        html += f'<td style="text-align:center;"><code style="font-size:8pt;color:#666;">{s["symbol"]}</code></td>'
+        html += f'<td style="text-align:right;">{s["current"]:,.2f}</td>'
+        html += f'<td class="{cls}" style="text-align:right;font-weight:600;">{_format_pct(s["change_pct"])}</td>'
+        html += f'<td style="text-align:right;color:{vr_color};font-weight:600;">{vol_ratio:.1f}x</td>'
+        html += f'<td style="text-align:right;color:#999;font-size:8.5pt;">{vol_str}</td>'
         html += '</tr>\n'
     html += '</tbody></table>\n'
     return html
@@ -1238,7 +1298,7 @@ def _extract_stocks_html(market_data):
 def _gen_hot_stocks_section(hot_stocks, stock_analysis):
     """生成當日熱門股票章節"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">七、當日熱門股票</div>\n'
+    html += '<div class="section-title">十、當日熱門股票</div>\n'
     html += '<div class="filter-note">篩選邏輯：資金追捧（量比 ≥ 1.5x + 上漲）；資金出清（量比 ≥ 2.5x + 下跌）<br/>'
     html += '排序方式：量比門檻（硬篩）→ 漲跌幅排序 → 新聞提及加分 | 每市場最多 5 支買入 + 5 支賣出</div>\n'
 
@@ -1273,7 +1333,7 @@ def _gen_crypto_section(crypto_data):
         return ""
 
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">八、加密貨幣市場</div>\n'
+    html += '<div class="section-title">六、加密貨幣市場</div>\n'
     html += '<table>\n<thead><tr>'
     html += '<th>幣種</th><th>價格（USD）</th><th>24h 漲跌</th><th>漲跌幅</th><th>趨勢</th>'
     html += '</tr></thead>\n<tbody>\n'
@@ -1298,7 +1358,7 @@ def _gen_crypto_section(crypto_data):
 def _gen_calendar_section(calendar_events):
     """生成經濟日曆提示章節"""
     html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">九、本週經濟日曆</div>\n'
+    html += '<div class="section-title">十一、本週經濟日曆</div>\n'
 
     if not calendar_events:
         html += '<p class="analysis-text">本週暫無重大經濟數據發布。</p>\n'
@@ -1351,7 +1411,8 @@ def _gen_calendar_section(calendar_events):
 def generate_html_report(market_data, news_events, hot_stocks, stock_analysis,
                          index_analysis, calendar_events, report_date,
                          sentiment_data=None, clock_data=None, fund_flows=None,
-                         sentiment_analysis=None, flow_analysis=None, sector_analysis=None):
+                         sentiment_analysis=None, flow_analysis=None, sector_analysis=None,
+                         historical_context=None):
     """
     生成完整的 HTML 報告 v2
     新增參數：
@@ -1386,38 +1447,31 @@ def generate_html_report(market_data, news_events, hot_stocks, stock_analysis,
     # 市場速覽
     html += _gen_snapshot(market_data, news_events)
 
-    # 一、各國指數表現
+    # ═══ 第一段：發生了什麼 ═══
+    html += _gen_news_section(news_events)
     html += _gen_indices_section(market_data, index_analysis)
 
-    # 二、宏觀重點新聞
-    html += _gen_news_section(news_events)
-
-    # 三、商品、外匯與債券
-    html += _gen_commodities_forex_bonds(market_data)
-
-    # 四、市場情緒指標 (NEW)
+    # ═══ 第二段：為什麼 ═══
+    html += _gen_bonds_section(market_data)
+    html += _gen_forex_section(market_data)
+    html += _gen_commodities_section(market_data)
+    html += _gen_crypto_section(market_data.get('crypto', {}))
     if sentiment_data and clock_data:
-        html += _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis)
+        html += _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis, historical_context)
 
-    # 五、全球資金流向脈動 (NEW)
+    # ═══ 第三段：錢怎麼流 ═══
     if fund_flows:
         html += _gen_fund_flow_section(fund_flows, flow_analysis)
-
-    # 六、GICS 板塊資金流向 (NEW)
     if fund_flows:
         html += _gen_gics_sector_section(fund_flows, sector_analysis)
-
-    # 七、當日熱門股票
     html += _gen_hot_stocks_section(hot_stocks, stock_analysis)
 
-    # 八、加密貨幣市場
-    html += _gen_crypto_section(market_data.get('crypto', {}))
-
-    # 九、經濟日曆提示
+    # ═══ 第四段：往前看 ═══
     html += _gen_calendar_section(calendar_events)
 
-    # 底部
+    # 底部（用 footer-wrapper 包住，避免分頁切開）
     html += f"""
+<div class="footer-wrapper">
 <div class="footer" style="line-height:1.6;">
     <strong style="font-size:8.5pt; color:#2c3e50;">何宣逸</strong><br>
     <span>副總裁 ｜ 私人財富管理部</span><br>
@@ -1434,6 +1488,7 @@ def generate_html_report(market_data, news_events, hot_stocks, stock_analysis,
     資金流向數據基於ETF Chaikin Money Flow (CMF) × 成交量計算<br><br>
     <em>本報告僅供參考，不構成任何投資建議。投資有風險，入市需謹慎。</em>
 </div>
+</div><!-- /footer-wrapper -->
 
 </body>
 </html>

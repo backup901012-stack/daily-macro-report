@@ -282,11 +282,14 @@ def generate_email_summary(json_path):
 
 
 def generate_email_html(json_path):
-    """從 JSON 數據生成專業晨報 HTML 郵件正文（v2 模板）"""
+    """從 JSON 數據生成簡潔引導式 HTML 郵件正文（v3 模板）"""
     from modules.email_template_v2 import (
-        get_morning_briefing_template, build_list_items,
-        format_pct, pct_color, vix_color_fn, verdict_color_fn
+        get_morning_briefing_template,
+        format_pct, pct_color, vix_color_fn,
     )
+
+    def verdict_color_fn(sentiment):
+        return {'bullish': '#27ae60', 'bearish': '#e74c3c'}.get(sentiment, '#e67e22')
 
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -315,7 +318,7 @@ def generate_email_html(json_path):
     gold = md.get('commodities', {}).get('黃金', {})
     oil = md.get('commodities', {}).get('原油(WTI)', {})
     btc = md.get('crypto', {}).get('Bitcoin', {})
-    dxy = sentiment.get('dxy', {})
+    dxy = md.get('forex', {}).get('美元指數', {})  # DXY 從市場數據拿
     us10y = sentiment.get('us10y', {})
     vix = sentiment.get('vix', {})
     fg = sentiment.get('fear_greed', {})
@@ -433,47 +436,141 @@ def generate_email_html(json_path):
     if not watch:
         watch = ['本日無重大經濟數據發布']
 
+    # === 生成焦點的簡短版（一句話）===
+    def _brief(body, max_len=50):
+        """截取描述的第一句話作為簡短摘要"""
+        if not body:
+            return ''
+        first = body.split('。')[0]
+        if len(first) > max_len:
+            first = first[:max_len] + '...'
+        return first
+
     # === 填充模板 ===
     template = get_morning_briefing_template()
 
+    # DXY 和 BTC 數據
+    dxy_pct = dxy.get('change_pct') if isinstance(dxy, dict) else None
+    btc_pct = btc.get('change_pct') if isinstance(btc, dict) else None
+
+    # 焦點標題（帶簡短說明）
+    focus_titles = []
+    for title, body in focuses[:3]:
+        brief = _brief(body, 60)
+        if brief:
+            focus_titles.append(f'{title} — {brief}')
+        else:
+            focus_titles.append(title)
+
+    # === 【市場總覽】 ===
+    overview_parts = []
+    oil_chg = oil.get('change_pct', 0) if oil else 0
+    gold_chg = gold.get('change_pct', 0) if gold else 0
+    fg_score = fg.get('score')
+
+    # 整體方向
+    avg_us = ((sp_pct or 0) + (nq_pct or 0)) / 2
+    if avg_us < -1:
+        overview_parts.append('全球市場今日普遍承壓')
+    elif avg_us < -0.3:
+        overview_parts.append('全球市場今日溫和走弱')
+    elif avg_us > 1:
+        overview_parts.append('全球市場今日全面上漲')
+    elif avg_us > 0.3:
+        overview_parts.append('全球市場今日穩中偏強')
+    else:
+        overview_parts.append('全球市場今日漲跌互見')
+
+    # 驅動因素
+    drivers = []
+    if abs(oil_chg) > 3:
+        drivers.append('能源供應風險')
+    if fg_score and fg_score < 25:
+        drivers.append('避險情緒升溫')
+    if vix_val and vix_val > 25:
+        drivers.append('波動率飆升')
+    if abs(gold_chg) > 2:
+        drivers.append(f'黃金{"走強" if gold_chg > 0 else "回落"}')
+    if drivers:
+        overview_parts.append('，主要受到' + '及'.join(drivers[:2]) + '的影響')
+    overview_parts.append('。')
+
+    # 情緒總結
+    if fg_score is not None:
+        if fg_score < 20:
+            overview_parts.append(f'市場情緒極度恐懼（CNN Fear & Greed: {fg_score:.0f}），VIX {vix_val:.1f}。資金流向避險資產。')
+        elif fg_score < 40:
+            overview_parts.append(f'市場情緒偏謹慎（CNN Fear & Greed: {fg_score:.0f}），觀望氣氛濃厚。')
+        elif fg_score > 75:
+            overview_parts.append(f'市場情緒樂觀（CNN Fear & Greed: {fg_score:.0f}），需警惕過度追高。')
+
+    market_overview = ''.join(overview_parts)
+
+    # === 【宏觀重點新聞】 ===
+    # 從所有新聞組收集標題，過濾掉非金融相關的垃圾
+    import re as _re
+    def _clean(text):
+        return _re.sub(r'\s*[-–—]\s*(reuters|bloomberg|cnbc|bbc|wsj|cnn|ft|com)[\w.\s]*$', '', text, flags=_re.IGNORECASE).strip()
+
+    # 上游已做好品質控制，直接從各組取最佳標題+敘事
+    news_lines = []
+    seen = set()
+    if news:
+        for n in news:
+            for h in n.get('headlines', []):
+                h = _clean(h)
+                if len(h) > 10 and h[:15] not in seen:
+                    seen.add(h[:15])
+                    narrative = n.get('narrative', '')
+                    brief = ''
+                    if narrative:
+                        first_sentence = narrative.split('。')[0]
+                        if len(first_sentence) > 10:
+                            brief = first_sentence
+                    if brief:
+                        news_lines.append(f'{len(news_lines)+1}. {h}<br>\n<span style="color:#666;font-size:13px;">　　{brief}</span>')
+                    else:
+                        news_lines.append(f'{len(news_lines)+1}. {h}')
+                    break
+            if len(news_lines) >= 5:
+                break
+    news_highlights = '<br>\n'.join(news_lines) if news_lines else '暫無重大新聞。'
+
+    # === 【指數表現亮點】 ===
+    index_lines = []
+    for region_name, region_key in [('亞洲', 'asia_indices'), ('歐洲', 'europe_indices'), ('美國', 'us_indices')]:
+        indices = md.get(region_key, {})
+        if not indices:
+            continue
+        sorted_idx = sorted(indices.items(), key=lambda x: abs(x[1].get('change_pct', 0)) if isinstance(x[1], dict) else 0, reverse=True)
+        items = [f'{name} {x.get("change_pct",0):+.2f}%' for name, x in sorted_idx[:3] if isinstance(x, dict)]
+        if items:
+            index_lines.append(f'- {region_name}：{"、".join(items)}')
+    index_highlights = '<br>\n'.join(index_lines) if index_lines else ''
+
+    # === 【加密貨幣】 ===
+    crypto = md.get('crypto', {})
+    crypto_items = []
+    for name, c in crypto.items():
+        if isinstance(c, dict) and c.get('change_pct') is not None:
+            crypto_items.append(f'{name} {c["change_pct"]:+.2f}%')
+    crypto_highlights = '- ' + '、'.join(crypto_items) if crypto_items else '暫無數據'
+
+    # === 【本週經濟日曆重點】 ===
+    cal_lines = []
+    for evt in calendar[:6]:
+        if isinstance(evt, dict):
+            cal_lines.append(f'- {evt.get("date","")} {evt.get("event","")}')
+    calendar_highlights = '<br>\n'.join(cal_lines) if cal_lines else '本週暫無重大經濟數據。'
+
     template_data = {
         'report_date': report_date,
-        'market_verdict': market_verdict,
-        'verdict_color': verdict_color_fn(verdict_sentiment),
-        'focus_1_title': focuses[0][0],
-        'focus_1_body': focuses[0][1],
-        'focus_2_title': focuses[1][0],
-        'focus_2_body': focuses[1][1],
-        'focus_3_title': focuses[2][0],
-        'focus_3_body': focuses[2][1],
-        'sp500_val': f'{sp.get("current",0):,.0f}' if sp.get('current') else 'N/A',
-        'sp500_pct': format_pct(sp_pct),
-        'sp500_color': pct_color(sp_pct),
-        'nasdaq_val': f'{nq.get("current",0):,.0f}' if nq.get('current') else 'N/A',
-        'nasdaq_pct': format_pct(nq_pct),
-        'nasdaq_color': pct_color(nq_pct),
-        'dxy_val': f'{dxy.get("value",0):.1f}' if dxy.get('value') else 'N/A',
-        'dxy_pct': '',
-        'dxy_color': '#666',
-        'us10y_val': f'{us10y.get("yield",0):.3f}%' if us10y.get('yield') else 'N/A',
-        'us10y_pct': f'{us10y.get("change",0):+.3f}' if us10y.get('change') else '',
-        'us10y_color': pct_color(us10y.get('change', 0)),
-        'vix_val': f'{vix_val:.1f}' if vix_val else 'N/A',
-        'vix_color': vix_color_fn(vix_val),
-        'gold_val': f'${gold.get("current",0):,.0f}' if gold.get('current') else 'N/A',
-        'gold_pct': format_pct(gold.get('change_pct')),
-        'gold_color': pct_color(gold.get('change_pct')),
-        'oil_val': f'${oil.get("current",0):,.1f}' if oil.get('current') else 'N/A',
-        'oil_pct': format_pct(oil.get('change_pct')),
-        'oil_color': pct_color(oil.get('change_pct')),
-        'btc_val': f'${btc.get("current",0):,.0f}' if btc.get('current') else 'N/A',
-        'btc_pct': format_pct(btc.get('change_pct')),
-        'btc_color': pct_color(btc.get('change_pct')),
-        'risk_items': build_list_items(risks),
-        'opportunity_items': build_list_items(opportunities),
-        'watch_items': build_list_items(watch),
+        'market_overview': market_overview,
+        'news_highlights': news_highlights,
+        'index_highlights': index_highlights,
+        'crypto_highlights': crypto_highlights,
+        'calendar_highlights': calendar_highlights,
         'sender_name': SENDER_NAME,
-        'holiday_alert_html': '',
     }
 
     return template.format(**template_data)
