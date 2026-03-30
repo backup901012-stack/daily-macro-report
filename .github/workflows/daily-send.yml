@@ -104,7 +104,7 @@ jobs:
                   print(f'生成摘要失敗: {e}')
 
           GMAIL_USER = os.environ.get('GMAIL_USER', 'backup901012@gmail.com')
-          EMAIL_TO = os.environ.get('EMAIL_TO', 'cbe566@gmail.com')
+          EMAIL_TO = os.environ.get('EMAIL_TO', 'backup901012@gmail.com')
 
           msg = MIMEMultipart('mixed')
           msg['From'] = GMAIL_USER
