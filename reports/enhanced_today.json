@@ -1,26 +1,26 @@
 {
   "sentiment": {
     "fear_greed": {
-      "score": 10.2172757475083,
+      "score": 10.4492610837438,
       "rating": "extreme fear",
-      "previous_close": 17.4521008403361,
-      "previous_1_week": 15.6285714285714,
+      "previous_close": 10.2172757475083,
+      "previous_1_week": 14.1251700680272,
       "previous_1_month": 41.17142857142857,
-      "previous_1_year": 28.342857142857145
+      "previous_1_year": 26.371428571428574
     },
     "vix": {
-      "value": 31.049999237060547,
-      "change": 3.6099987030029297,
-      "change_pct": 13.155971693667858,
+      "value": 31.1200008392334,
+      "change": 0.07000160217285156,
+      "change_pct": 0.2254479996550187,
       "high_1m": 35.29999923706055,
-      "low_1m": 18.770000457763672
+      "low_1m": 20.280000686645508
     },
     "us10y": {
       "yield": 4.440000057220459,
       "change": 0.024000167846679688
     },
     "dxy": {
-      "value": 100.33300018310547
+      "value": 100.22799682617188
     }
   },
   "clock": {
@@ -266,7 +266,7 @@
         "1d": 656063326.1398315,
         "5d": -40302742.370034575,
         "1m": -1218994227.0475476,
-        "ytd": -171741845.30606413,
+        "ytd": -171741773.82225394,
         "close": 82.38999938964844,
         "volume": 7962900.0,
         "change_pct": 0.20676011483992374
@@ -321,7 +321,7 @@
         "1d": 89867803.4045708,
         "5d": -6227581340.388693,
         "1m": -21146989789.479427,
-        "ytd": 7053351421.958382,
+        "ytd": 7053351495.683882,
         "close": 107.62000274658203,
         "volume": 42578500.0,
         "change_pct": -0.24100344220920905
@@ -343,7 +343,7 @@
         "1d": -915820231.8564087,
         "5d": -1357100491.7832956,
         "1m": -5011778310.793338,
-        "ytd": -1706377121.6293073,
+        "ytd": -1706377380.9907298,
         "close": 92.94999694824219,
         "volume": 15107100.0,
         "change_pct": -0.545690285925971
@@ -444,44 +444,44 @@
     {
       "name": "印度SENSEX",
       "symbol": "^BSESN",
-      "price": 73583.22,
-      "change": -1690.23,
-      "changesPercentage": -2.25
+      "price": 71947.55,
+      "change": -1635.67,
+      "changesPercentage": -2.22
     },
     {
       "name": "印度NIFTY50",
       "symbol": "^NSEI",
-      "price": 22819.6,
-      "change": -486.85,
-      "changesPercentage": -2.09
+      "price": 22331.4,
+      "change": -488.2,
+      "changesPercentage": -2.14
     },
     {
       "name": "印尼雅加達綜合",
       "symbol": "^JKSE",
-      "price": 7097.06,
-      "change": -67.03,
-      "changesPercentage": -0.94
+      "price": 7091.67,
+      "change": -5.39,
+      "changesPercentage": -0.08
     },
     {
       "name": "泰國SET",
       "symbol": "^SET.BK",
-      "price": 1447.05,
-      "change": 4.13,
-      "changesPercentage": 0.29
+      "price": 1449.62,
+      "change": 2.57,
+      "changesPercentage": 0.18
     },
     {
       "name": "馬來西亞KLCI",
       "symbol": "^KLSE",
-      "price": 1712.65,
-      "change": 1.76,
-      "changesPercentage": 0.1
+      "price": 1687.9,
+      "change": -24.75,
+      "changesPercentage": -1.45
     },
     {
       "name": "菲律賓PSEi",
       "symbol": "PSEI.PS",
-      "price": 5972.83,
-      "change": -11.37,
-      "changesPercentage": -0.19
+      "price": 5869.49,
+      "change": -103.34,
+      "changesPercentage": -1.73
     }
   ]
 }
