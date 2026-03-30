@@ -104,11 +104,12 @@ jobs:
                   print(f'生成摘要失敗: {e}')
 
           GMAIL_USER = os.environ.get('GMAIL_USER', 'backup901012@gmail.com')
-          EMAIL_TO = os.environ.get('EMAIL_TO', 'backup901012@gmail.com')
+          EMAIL_TO = os.environ.get('EMAIL_TO', 'cbe566@gmail.com').split(',')
+          EMAIL_TO = [e.strip() for e in EMAIL_TO]
 
           msg = MIMEMultipart('mixed')
           msg['From'] = GMAIL_USER
-          msg['To'] = EMAIL_TO
+          msg['To'] = ', '.join(EMAIL_TO)
           msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
 
           alt = MIMEMultipart('alternative')
@@ -127,7 +128,7 @@ jobs:
 
           server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
           server.login(GMAIL_USER, os.environ['GMAIL_APP_PASSWORD'])
-          server.sendmail(GMAIL_USER, [EMAIL_TO], msg.as_string())
+          server.sendmail(GMAIL_USER, EMAIL_TO, msg.as_string())
           server.quit()
-          print(f'Email sent to {EMAIL_TO} at {datetime.now().strftime(\"%H:%M:%S\")}')
+          print(f'Email sent to {", ".join(EMAIL_TO)} at {datetime.now().strftime(\"%H:%M:%S\")}')
           "
