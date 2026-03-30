@@ -1,7 +1,7 @@
 # 每日宏觀資訊日報系統 — 完整邏輯備檔
 
 > 備檔日期：2026-03-27
-> 來源 Repo：https://github.com/cbe566/daily-macro-report.git
+> 來源 Repo：https://github.com/backup901012-stack/daily-macro-report.git
 
 ---
 
@@ -380,7 +380,7 @@ def main():
 
 **SMTP 配置**：
 - Server：smtp.gmail.com:587（STARTTLS）
-- 發件人：cbe566@gmail.com（何宣逸）
+- 發件人：backup901012@gmail.com（何宣逸）
 - 認證：Google 應用程式密碼
 
 **發送策略**：
@@ -455,7 +455,7 @@ def main():
 | `OPENAI_API_KEY` | OpenAI GPT-4.1-mini | 環境變數（openai 套件自動讀取） |
 
 ### SMTP 認證
-- Email：cbe566@gmail.com
+- Email：backup901012@gmail.com
 - App Password：（在 email_sender.py 中硬編碼）
 
 ---

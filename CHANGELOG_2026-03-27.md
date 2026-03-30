@@ -3,7 +3,7 @@
 ## 一、環境建置
 
 ### 從 GitHub Clone 下來
-- Repo: `https://github.com/cbe566/daily-macro-report.git`
+- Repo: `https://github.com/backup901012-stack/daily-macro-report.git`
 - Clone 到: `/Users/jamie/Desktop/Claude-每日宏觀日報/`
 
 ### 安裝 Python 依賴
@@ -162,8 +162,8 @@ brew install pango poppler
 - **排程**: 每週一到五 07:00 台北時間（UTC 23:00 前一天，cron: `0 23 * * 0-4`）
 - **環境**: Anthropic Cloud（`env_01FAUJkDSKEYfCMdDj5xrvWx`）
 - **模型**: `claude-sonnet-4-6`
-- **Repo**: `https://github.com/cbe566/macro-daily-report-claude`（自動 clone）
-- **收件人**: 測試階段只寄 `cbe566@gmail.com`，其他 32 人備檔在 `recipients.json`
+- **Repo**: `https://github.com/backup901012-stack/macro-daily-report-claude`（自動 clone）
+- **收件人**: 測試階段只寄 `backup901012@gmail.com`，其他 32 人備檔在 `recipients.json`
 
 ### 自動化流程
 ```
@@ -183,14 +183,14 @@ brew install pango poppler
 - 腳本: `run_auto.sh`（使用 `claude -p` 做 AI 分析）
 
 ### 新 GitHub Repo
-- **名稱**: `cbe566/macro-daily-report-claude`（Private）
-- **URL**: https://github.com/cbe566/macro-daily-report-claude
+- **名稱**: `backup901012-stack/macro-daily-report-claude`（Private）
+- **URL**: https://github.com/backup901012-stack/macro-daily-report-claude
 - **用途**: 雲端 Agent 每天從這裡 clone 最新程式碼
-- **原 Repo**: `cbe566/daily-macro-report` 未動到
+- **原 Repo**: `backup901012-stack/daily-macro-report` 未動到
 
 ### SMTP 配置（已在程式碼中）
 - Server: `smtp.gmail.com:587`
-- 寄件人: `cbe566@gmail.com`（何宣逸）
+- 寄件人: `backup901012@gmail.com`（何宣逸）
 - 認證: Gmail App Password（在 `modules/email_sender.py` 中）
 
 ### 後續操作

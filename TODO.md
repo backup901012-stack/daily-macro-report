@@ -8,7 +8,7 @@
 - **可能原因**:
   - App Password 產生後可能需要等幾分鐘才生效
   - Google 可能封鎖了 GitHub Actions 的 IP 範圍
-  - 需要確認是用 `cbe566@gmail.com` 帳號產生的 App Password
+  - 需要確認是用 `backup901012@gmail.com` 帳號產生的 App Password
 - **解決方向**:
   - [ ] 重新產生 App Password，截圖確認
   - [ ] 如果 Gmail 持續失敗，考慮改用其他郵件服務（SendGrid / Mailgun 免費方案）
