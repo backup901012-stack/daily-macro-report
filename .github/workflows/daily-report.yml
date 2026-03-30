@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yfinance requests beautifulsoup4 exchange_calendars numpy pandas
+          pip install yfinance requests beautifulsoup4 exchange_calendars numpy pandas deep-translator
 
       - name: Collect market data
         run: |
