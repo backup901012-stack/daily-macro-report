@@ -107,30 +107,45 @@ jobs:
           EMAIL_TO = os.environ.get('EMAIL_TO', 'cbe566@gmail.com').split(',')
           EMAIL_TO = [e.strip() for e in EMAIL_TO]
 
-          msg = MIMEMultipart('mixed')
-          msg['From'] = GMAIL_USER
-          msg['To'] = ', '.join(EMAIL_TO)
-          msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
+          # 確保內文有內容
+          if not html_body:
+              print('Warning: HTML body is empty, using fallback')
 
-          alt = MIMEMultipart('alternative')
-          alt.attach(MIMEText(plain_body, 'plain', 'utf-8'))
-          if html_body:
-              alt.attach(MIMEText(html_body, 'html', 'utf-8'))
-          msg.attach(alt)
-
+          # 讀取 PDF
+          pdf_data = None
           if os.path.exists(PDF_PATH):
               with open(PDF_PATH, 'rb') as f:
+                  pdf_data = f.read()
+              print(f'PDF loaded: {len(pdf_data):,} bytes')
+
+          # 逐一發送（收件人之間看不到彼此 — 隱私保護）
+          server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+          server.login(GMAIL_USER, os.environ['GMAIL_APP_PASSWORD'])
+
+          for recipient in EMAIL_TO:
+              msg = MIMEMultipart('mixed')
+              msg['From'] = GMAIL_USER
+              msg['To'] = recipient
+              msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
+
+              alt = MIMEMultipart('alternative')
+              alt.attach(MIMEText(plain_body, 'plain', 'utf-8'))
+              if html_body:
+                  alt.attach(MIMEText(html_body, 'html', 'utf-8'))
+              msg.attach(alt)
+
+              if pdf_data:
                   att = MIMEBase('application', 'pdf')
-                  att.set_payload(f.read())
+                  att.set_payload(pdf_data)
                   encoders.encode_base64(att)
                   att.add_header('Content-Disposition', 'attachment', filename=f'daily_report_{DATE}.pdf')
                   msg.attach(att)
 
-          server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-          server.login(GMAIL_USER, os.environ['GMAIL_APP_PASSWORD'])
-          server.sendmail(GMAIL_USER, EMAIL_TO, msg.as_string())
+              server.sendmail(GMAIL_USER, [recipient], msg.as_string())
+              print(f'Sent to {recipient}')
+
           server.quit()
-          recipients = ', '.join(EMAIL_TO)
           now = datetime.now().strftime('%H:%M:%S')
-          print(f'Email sent to {recipients} at {now}')
+          count = len(EMAIL_TO)
+          print(f'All {count} emails sent at {now}')
           "

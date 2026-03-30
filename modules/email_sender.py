@@ -563,13 +563,61 @@ def generate_email_html(json_path):
             cal_lines.append(f'- {evt.get("date","")} {evt.get("event","")}')
     calendar_highlights = '<br>\n'.join(cal_lines) if cal_lines else '本週暫無重大經濟數據。'
 
+    # 構建 v2 模板所需的完整數據
+    from modules.email_template_v2 import build_list_items, format_pct, pct_color, vix_color_fn, verdict_color_fn
+
+    # 休市提醒
+    holiday_html = ''
+    holiday_data = data.get('holiday_alerts', {})
+    if holiday_data and holiday_data.get('has_alerts'):
+        from modules.email_template_v2 import get_holiday_alert_block
+        parts = []
+        if holiday_data.get('today_closed'):
+            names = '、'.join(m.get('market','') for m in holiday_data['today_closed'])
+            parts.append(f'今日休市：{names}')
+        if holiday_data.get('tomorrow_closed'):
+            names = '、'.join(m.get('market','') for m in holiday_data['tomorrow_closed'])
+            parts.append(f'明日休市：{names}')
+        if parts:
+            holiday_html = get_holiday_alert_block().format(holiday_text='　|　'.join(parts))
+
     template_data = {
         'report_date': report_date,
-        'market_overview': market_overview,
-        'news_highlights': news_highlights,
-        'index_highlights': index_highlights,
-        'crypto_highlights': crypto_highlights,
-        'calendar_highlights': calendar_highlights,
+        'holiday_alert_html': holiday_html,
+        'market_verdict': market_verdict,
+        'verdict_color': verdict_color_fn(verdict_sentiment),
+        'focus_1_title': focus_titles[0] if len(focus_titles) > 0 else '',
+        'focus_1_body': focuses[0][1] if len(focuses) > 0 else '',
+        'focus_2_title': focus_titles[1] if len(focus_titles) > 1 else '',
+        'focus_2_body': focuses[1][1] if len(focuses) > 1 else '',
+        'focus_3_title': focus_titles[2] if len(focus_titles) > 2 else '',
+        'focus_3_body': focuses[2][1] if len(focuses) > 2 else '',
+        'sp500_val': f'{sp.get("current",0):,.0f}' if sp else 'N/A',
+        'sp500_pct': format_pct(sp_pct),
+        'sp500_color': pct_color(sp_pct),
+        'nasdaq_val': f'{nq.get("current",0):,.0f}' if nq else 'N/A',
+        'nasdaq_pct': format_pct(nq_pct),
+        'nasdaq_color': pct_color(nq_pct),
+        'dxy_val': f'{dxy.get("current",0):.2f}' if isinstance(dxy, dict) and dxy.get("current") else 'N/A',
+        'dxy_pct': format_pct(dxy.get('change_pct') if isinstance(dxy, dict) else None),
+        'dxy_color': pct_color(dxy.get('change_pct') if isinstance(dxy, dict) else None),
+        'us10y_val': f'{us10y.get("yield",0):.3f}%' if us10y.get("yield") else 'N/A',
+        'us10y_pct': f'{us10y.get("change",0):+.4f}' if us10y.get("change") else 'N/A',
+        'us10y_color': pct_color(us10y.get('change', 0)),
+        'vix_val': f'{vix_val:.1f}' if vix_val else 'N/A',
+        'vix_color': vix_color_fn(vix_val),
+        'gold_val': f'${gold.get("current",0):,.0f}' if gold else 'N/A',
+        'gold_pct': format_pct(gold.get('change_pct') if gold else None),
+        'gold_color': pct_color(gold.get('change_pct') if gold else None),
+        'oil_val': f'${oil.get("current",0):.1f}' if oil else 'N/A',
+        'oil_pct': format_pct(oil.get('change_pct') if oil else None),
+        'oil_color': pct_color(oil.get('change_pct') if oil else None),
+        'btc_val': f'${btc.get("current",0):,.0f}' if btc else 'N/A',
+        'btc_pct': format_pct(btc.get('change_pct') if isinstance(btc, dict) else None),
+        'btc_color': pct_color(btc.get('change_pct') if isinstance(btc, dict) else None),
+        'risk_items': build_list_items(risks),
+        'opportunity_items': build_list_items(opportunities),
+        'watch_items': build_list_items(watch),
         'sender_name': SENDER_NAME,
     }
 
