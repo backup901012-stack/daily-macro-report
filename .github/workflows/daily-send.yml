@@ -130,5 +130,7 @@ jobs:
           server.login(GMAIL_USER, os.environ['GMAIL_APP_PASSWORD'])
           server.sendmail(GMAIL_USER, EMAIL_TO, msg.as_string())
           server.quit()
-          print(f'Email sent to {", ".join(EMAIL_TO)} at {datetime.now().strftime(\"%H:%M:%S\")}')
+          recipients = ', '.join(EMAIL_TO)
+          now = datetime.now().strftime('%H:%M:%S')
+          print(f'Email sent to {recipients} at {now}')
           "
