@@ -53,16 +53,49 @@ jobs:
           print(f'Market data: {sum(len(v) for v in data.values())} items')
           "
 
-      - name: Collect news
+      - name: Collect news + translate titles
+        timeout-minutes: 10
         run: |
           python3 -c "
           import sys, json
           sys.path.insert(0, '.')
           from modules.news_collector import get_news_for_date
           news = get_news_for_date()
+          articles = news.get('articles', [])
+          print(f'News: {len(articles)} articles')
+
+          # 預翻譯標題（在收集階段做，避免生成報告時 API 限流）
+          try:
+              from deep_translator import GoogleTranslator
+              translator = GoogleTranslator(source='en', target='zh-TW')
+              translated_count = 0
+              for i in range(0, len(articles), 15):
+                  batch = articles[i:i+15]
+                  titles = [a.get('title', '') for a in batch]
+                  combined = ' ||| '.join(titles)
+                  try:
+                      result = translator.translate(combined)
+                      parts = result.split(' ||| ')
+                      if len(parts) == len(batch):
+                          for a, zh in zip(batch, parts):
+                              a['title_zh'] = zh.strip()
+                              translated_count += 1
+                      else:
+                          for a in batch:
+                              try:
+                                  a['title_zh'] = translator.translate(a.get('title', '')).strip()
+                                  translated_count += 1
+                              except:
+                                  a['title_zh'] = a.get('title', '')
+                  except:
+                      for a in batch:
+                          a['title_zh'] = a.get('title', '')
+              print(f'Translated: {translated_count}/{len(articles)} titles')
+          except ImportError:
+              print('deep-translator not installed, skipping translation')
+
           with open('reports/news_today.json', 'w', encoding='utf-8') as f:
               json.dump(news, f, ensure_ascii=False, indent=2, default=str)
-          print(f'News: {len(news[\"articles\"])} articles')
           "
 
       - name: Scan hot stocks

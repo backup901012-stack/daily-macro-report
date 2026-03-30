@@ -444,7 +444,8 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
         if best_cat not in groups:
             groups[best_cat] = []
         groups[best_cat].append({
-            'title': title, 'text': (title + ' ' + desc).lower(), 'tier': tier,
+            'title': title, 'title_zh': article.get('title_zh', ''),
+            'text': (title + ' ' + desc).lower(), 'tier': tier,
             'publisher': article.get('publisher', ''),
             'desc': desc,
         })
@@ -460,15 +461,20 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
     )
 
     # Step 3: 批量翻譯（標題 + descriptions）
+    # 優先用數據收集階段預翻譯的 title_zh，沒有的才送去即時翻譯
     all_texts = []
     text_indices = {}  # (group, original_text) -> index
+    pre_translated = {}  # (kind, group, orig) -> zh text
 
     for group_name, group_articles in sorted_groups[:8]:
-        # 收集標題（前5條）
+        # 收集標題（前5條），有 title_zh 的直接用
         for a in group_articles[:6]:
-            idx = len(all_texts)
-            text_indices[('title', group_name, a['title'])] = idx
-            all_texts.append(a['title'])
+            if a.get('title_zh') and len(a['title_zh']) > 5:
+                pre_translated[('title', group_name, a['title'])] = a['title_zh']
+            else:
+                idx = len(all_texts)
+                text_indices[('title', group_name, a['title'])] = idx
+                all_texts.append(a['title'])
 
         # 收集有內容的 descriptions（只取跟主題關鍵詞匹配的高品質描述）
         config_kw = NEWS_CATEGORIES.get(group_name, {}).get('keywords', [])
@@ -486,8 +492,13 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
     translated = _translate_titles(all_texts)
 
     def _zh(kind, group_name, orig):
-        idx = text_indices.get((kind, group_name, orig))
-        t = translated[idx] if idx is not None and idx < len(translated) else orig
+        # 優先用預翻譯結果
+        pre = pre_translated.get((kind, group_name, orig))
+        if pre:
+            t = pre
+        else:
+            idx = text_indices.get((kind, group_name, orig))
+            t = translated[idx] if idx is not None and idx < len(translated) else orig
         return re.sub(r'\s*[-–—]\s*(Bloomberg|Reuters|CNBC|WSJ|BBC|CNN|Investing|TechCrunch|Abcnews|Yahoo|CNA|Mediaite|CoinDesk|Business Insider)[\w.\s]*$', '', t).strip()
 
     # Step 4: 生成事件
