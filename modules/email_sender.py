@@ -232,16 +232,28 @@ def generate_email_summary(json_path):
                 lines.append(f"明日休市提醒：{names}")
             lines.append("")
 
-    # 市場總覽
+    # 市場總覽（用 executive_summary，更完整）
+    executive = data.get('executive_summary', '')
     overall = index_analysis.get('overall_summary', '')
-    if overall:
+    if executive:
+        lines.append("【市場總覽】")
+        lines.append(executive)
+        lines.append("")
+    elif overall:
         lines.extend(["【市場總覽】", overall, ""])
 
-    # 新聞
+    # 新聞（取每組的第一條翻譯標題，不是分類名）
     if news:
         lines.append("【宏觀重點新聞】")
         for i, n in enumerate(news[:5], 1):
-            lines.append(f"{i}. {n.get('title', '')}")
+            # 優先用 headlines 裡的中文標題
+            headlines = n.get('headlines', [])
+            if headlines:
+                lines.append(f"{i}. {headlines[0]}")
+            else:
+                # fallback 到 description
+                desc = n.get('description', n.get('title', ''))
+                lines.append(f"{i}. {desc[:60]}")
         lines.append("")
 
     # 指數亮點

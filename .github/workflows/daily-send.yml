@@ -90,26 +90,20 @@ jobs:
           PDF_PATH = f'reports/daily_report_{DATE}.pdf'
           JSON_PATH = f'reports/raw_data_{DATE}.json'
 
-          # 用 email_sender 生成精簡摘要（不是完整報告）
-          from modules.email_sender import generate_email_html, generate_email_summary
+          # 生成純文字摘要作為郵件正文（投行風格，不用 HTML 美工）
+          from modules.email_sender import generate_email_summary
 
-          html_body = None
           plain_body = f'{DATE} 報告請見附件'
           if os.path.exists(JSON_PATH):
               try:
-                  html_body = generate_email_html(JSON_PATH)
                   plain_body = generate_email_summary(JSON_PATH)
-                  print('Email 摘要正文已生成')
+                  print('Email 純文字摘要已生成')
               except Exception as e:
                   print(f'生成摘要失敗: {e}')
 
           GMAIL_USER = os.environ.get('GMAIL_USER', 'backup901012@gmail.com')
           EMAIL_TO = os.environ.get('EMAIL_TO', 'cbe566@gmail.com').split(',')
           EMAIL_TO = [e.strip() for e in EMAIL_TO]
-
-          # 確保內文有內容
-          if not html_body:
-              print('Warning: HTML body is empty, using fallback')
 
           # 讀取 PDF
           pdf_data = None
@@ -128,11 +122,7 @@ jobs:
               msg['To'] = recipient
               msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
 
-              alt = MIMEMultipart('alternative')
-              alt.attach(MIMEText(plain_body, 'plain', 'utf-8'))
-              if html_body:
-                  alt.attach(MIMEText(html_body, 'html', 'utf-8'))
-              msg.attach(alt)
+              msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
 
               if pdf_data:
                   att = MIMEBase('application', 'pdf')

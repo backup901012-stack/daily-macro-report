@@ -93,7 +93,8 @@ def gen_executive_summary(md, enh, enh2):
     if emo_parts:
         parts.append('，'.join(emo_parts))
 
-    return '。'.join(parts) + '。'
+    cleaned = [p.rstrip('。') for p in parts]
+    return '。'.join(cleaned) + '。'
 
 
 def gen_index_analysis(md, enh2):
