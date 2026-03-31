@@ -1,22 +1,24 @@
 name: 每日宏觀資訊報告（生成+發送）
 
 on:
+  # 數據收集完成後自動觸發
+  workflow_run:
+    workflows: ["每日宏觀資訊報告（數據收集）"]
+    types: [completed]
+  # 備用 cron（萬一 workflow_run 沒觸發）
   schedule:
-    # 台北時間 07:30 = UTC 23:30（前一天），週一到週五
-    # 數據已於 05:00 收集+驗證完畢，07:30 準時送達信箱
-    - cron: '30 23 * * 0-4'
+    - cron: '0 23 * * 0-4'
   workflow_dispatch:
 
 env:
   TZ: Asia/Taipei
-  GMAIL_USER: ${{ secrets.GMAIL_USER }}
-  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-  EMAIL_TO: ${{ secrets.EMAIL_TO }}
 
 jobs:
   generate-and-send:
+    # workflow_run 觸發時，只在數據收集成功後才執行
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 150
 
     steps:
       - name: Checkout repo (with latest data)
@@ -29,21 +31,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yfinance requests beautifulsoup4 numpy pandas weasyprint
+          pip install yfinance requests beautifulsoup4 numpy pandas deep-translator
           sudo apt-get update && sudo apt-get install -y fonts-noto-cjk chromium-browser || true
 
-      - name: Verify data exists
+      - name: Verify data exists (必要數據缺失則中止)
         run: |
           echo "Checking data files..."
+          MISSING=0
           for f in market_data_today.json news_today.json hot_stocks_today.json enhanced_today.json enhanced_v2_today.json; do
-            if [ -f "reports/$f" ]; then
+            if [ -f "reports/$f" ] && [ $(stat -c%s "reports/$f") -gt 100 ]; then
               SIZE=$(stat -c%s "reports/$f")
               echo "  ✓ $f ($SIZE bytes)"
             else
-              echo "  ✗ $f MISSING"
+              echo "  ✗ $f MISSING or EMPTY"
+              MISSING=$((MISSING+1))
             fi
           done
-          # fred and alternative are optional
           for f in fred_today.json alternative_today.json; do
             if [ -f "reports/$f" ]; then
               SIZE=$(stat -c%s "reports/$f")
@@ -52,6 +55,10 @@ jobs:
               echo "  ⚠ $f not found (optional)"
             fi
           done
+          if [ $MISSING -gt 0 ]; then
+            echo "❌ $MISSING 個必要數據檔案缺失，中止發送"
+            exit 1
+          fi
 
       - name: Generate report
         run: python3 scripts/generate_full_report.py
@@ -67,22 +74,70 @@ jobs:
               "file://$(pwd)/${HTML_FILE}" || true
           fi
           if [ ! -f "${PDF_FILE}" ] || [ $(stat -c%s "${PDF_FILE}" 2>/dev/null || echo 0) -lt 1000 ]; then
-            python3 -c "
-          from weasyprint import HTML
-          HTML('${HTML_FILE}').write_pdf('${PDF_FILE}')
-          print('PDF generated with WeasyPrint')
-          "
+            echo "❌ PDF 生成失敗"
+            exit 1
           fi
-          ls -la "${PDF_FILE}"
+          PDF_SIZE=$(stat -c%s "${PDF_FILE}")
+          echo "✅ PDF: ${PDF_SIZE} bytes"
+          if [ $PDF_SIZE -lt 100000 ]; then
+            echo "❌ PDF 異常偏小 (< 100KB)，可能有問題"
+            exit 1
+          fi
 
-      - name: Send email (摘要正文 + PDF附件)
+      - name: Quality gate (品質閘門)
         run: |
           python3 -c "
-          import smtplib, os, sys, json
+          import json, sys
+          DATE = __import__('datetime').datetime.now().strftime('%Y-%m-%d')
+          with open(f'reports/raw_data_{DATE}.json') as f:
+              data = json.load(f)
+          news = data.get('news_events', [])
+          if len(news) < 3:
+              print('❌ 新聞不足 3 條')
+              sys.exit(1)
+          # 檢查新聞中文率
+          zh_count = 0
+          total = 0
+          for n in news:
+              for h in n.get('headlines', []):
+                  total += 1
+                  cjk = sum(1 for c in h if '\u4e00' <= c <= '\u9fff')
+                  if cjk > len(h) * 0.3:
+                      zh_count += 1
+          rate = zh_count / total * 100 if total > 0 else 0
+          print(f'新聞中文率: {zh_count}/{total} = {rate:.0f}%')
+          if rate < 50:
+              print('⚠️ 中文率偏低但繼續發送')
+          print('✅ 品質閘門通過')
+          "
+
+      - name: 等待至台北 07:30 再發信
+        run: |
+          TARGET_H=7
+          TARGET_M=30
+          NOW=$(TZ='Asia/Taipei' date +%s)
+          TARGET=$(TZ='Asia/Taipei' python3 -c "from datetime import datetime,timezone,timedelta;import time;tz=timezone(timedelta(hours=8));now=datetime.now(tz);t=now.replace(hour=${TARGET_H},minute=${TARGET_M},second=0,microsecond=0);print(int(t.timestamp()))")
+          WAIT=$((TARGET - NOW))
+          if [ "$WAIT" -gt 0 ] && [ "$WAIT" -lt 7200 ]; then
+            echo "⏰ 距離台北 07:30 還有 ${WAIT} 秒，等待中..."
+            sleep "$WAIT"
+          else
+            echo "⏰ 已過 07:30 或距離超過 2 小時，直接執行"
+          fi
+
+      - name: Send email (Gmail OAuth2 API)
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: |
+          python3 -c "
+          import os, sys, json, base64, requests
           from email.mime.multipart import MIMEMultipart
           from email.mime.text import MIMEText
-          from email.mime.base import MIMEBase
-          from email import encoders
+          from email.mime.application import MIMEApplication
           from datetime import datetime
 
           sys.path.insert(0, '.')
@@ -90,52 +145,78 @@ jobs:
           PDF_PATH = f'reports/daily_report_{DATE}.pdf'
           JSON_PATH = f'reports/raw_data_{DATE}.json'
 
-          # 生成純文字摘要作為郵件正文（投行風格，不用 HTML 美工）
+          # 生成純文字摘要
           from modules.email_sender import generate_email_summary
-
           plain_body = f'{DATE} 報告請見附件'
           if os.path.exists(JSON_PATH):
               try:
                   plain_body = generate_email_summary(JSON_PATH)
-                  print('Email 純文字摘要已生成')
+                  print('✅ Email 摘要已生成')
               except Exception as e:
-                  print(f'生成摘要失敗: {e}')
+                  print(f'⚠️ 摘要生成失敗: {e}')
 
-          GMAIL_USER = os.environ.get('GMAIL_USER', 'backup901012@gmail.com')
-          EMAIL_TO = os.environ.get('EMAIL_TO', 'cbe566@gmail.com').split(',')
-          EMAIL_TO = [e.strip() for e in EMAIL_TO]
+          # OAuth2 取得 access_token
+          gmail_user = os.environ.get('GMAIL_USER')
+          client_id = os.environ.get('GMAIL_CLIENT_ID')
+          client_secret = os.environ.get('GMAIL_CLIENT_SECRET')
+          refresh_token = os.environ.get('GMAIL_REFRESH_TOKEN')
+          email_to = os.environ.get('EMAIL_TO', '').split(',')
+          email_to = [e.strip() for e in email_to if e.strip()]
+
+          if not all([gmail_user, client_id, client_secret, refresh_token]):
+              print('❌ Gmail OAuth2 憑證未設定')
+              sys.exit(1)
+
+          token_resp = requests.post('https://oauth2.googleapis.com/token', data={
+              'client_id': client_id,
+              'client_secret': client_secret,
+              'refresh_token': refresh_token,
+              'grant_type': 'refresh_token',
+          })
+          if token_resp.status_code != 200:
+              print(f'❌ OAuth2 token 刷新失敗: {token_resp.text[:200]}')
+              sys.exit(1)
+
+          access_token = token_resp.json()['access_token']
+          print('✅ OAuth2 token 取得成功')
 
           # 讀取 PDF
           pdf_data = None
           if os.path.exists(PDF_PATH):
               with open(PDF_PATH, 'rb') as f:
                   pdf_data = f.read()
-              print(f'PDF loaded: {len(pdf_data):,} bytes')
+              print(f'✅ PDF: {len(pdf_data):,} bytes')
 
-          # 逐一發送（收件人之間看不到彼此 — 隱私保護）
-          server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-          server.login(GMAIL_USER, os.environ['GMAIL_APP_PASSWORD'])
-
-          for recipient in EMAIL_TO:
+          # 逐一發送（隱私保護）
+          success = 0
+          for recipient in email_to:
               msg = MIMEMultipart('mixed')
-              msg['From'] = GMAIL_USER
+              msg['From'] = f'何宣逸 <{gmail_user}>'
               msg['To'] = recipient
               msg['Subject'] = f'每日宏觀資訊綜合早報 | {DATE}'
 
               msg.attach(MIMEText(plain_body, 'plain', 'utf-8'))
 
               if pdf_data:
-                  att = MIMEBase('application', 'pdf')
-                  att.set_payload(pdf_data)
-                  encoders.encode_base64(att)
+                  att = MIMEApplication(pdf_data, _subtype='pdf')
                   att.add_header('Content-Disposition', 'attachment', filename=f'daily_report_{DATE}.pdf')
                   msg.attach(att)
 
-              server.sendmail(GMAIL_USER, [recipient], msg.as_string())
-              print(f'Sent to {recipient}')
+              raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+              send_resp = requests.post(
+                  'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+                  headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
+                  json={'raw': raw},
+                  timeout=30,
+              )
+              if send_resp.status_code == 200:
+                  print(f'✅ Sent to {recipient}')
+                  success += 1
+              else:
+                  print(f'❌ Failed {recipient}: {send_resp.text[:100]}')
 
-          server.quit()
           now = datetime.now().strftime('%H:%M:%S')
-          count = len(EMAIL_TO)
-          print(f'All {count} emails sent at {now}')
+          print(f'📧 {success}/{len(email_to)} emails sent at {now}')
+          if success == 0:
+              sys.exit(1)
           "
