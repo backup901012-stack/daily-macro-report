@@ -9,6 +9,15 @@ on:
   schedule:
     - cron: '0 0 * * 1-5'
   workflow_dispatch:
+    inputs:
+      force_send:
+        description: '強制發送（跳過防重發）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 env:
   TZ: Asia/Taipei
@@ -142,7 +151,7 @@ jobs:
           fi
 
       - name: Send email (Gmail OAuth2 API)
-        if: steps.dedup.outputs.already_sent != 'true'
+        if: steps.dedup.outputs.already_sent != 'true' || github.event.inputs.force_send == 'true'
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
