@@ -424,8 +424,9 @@ def enrich_with_quant_scores(stocks, quant_scores, direction='buy'):
     max_chg = max(abs(s['change_pct']) for s in stocks) if stocks else 1
 
     for s in stocks:
-        ticker = s['symbol'].split('.')[0]
-        qs = quant_scores.get(ticker, {})
+        # 嘗試完整 symbol 匹配，再嘗試去後綴匹配
+        sym = s['symbol']
+        qs = quant_scores.get(sym) or quant_scores.get(sym.split('.')[0], {})
 
         # 寫入量化欄位
         s['quant_total_score'] = qs.get('total_score', 0)
