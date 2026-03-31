@@ -5,9 +5,9 @@ on:
   workflow_run:
     workflows: ["每日宏觀資訊報告（數據收集）"]
     types: [completed]
-  # 備用 cron（萬一 workflow_run 沒觸發）
+  # 備用 cron（萬一 workflow_run 沒觸發，台北 08:00 最後防線）
   schedule:
-    - cron: '0 23 * * 0-4'
+    - cron: '0 0 * * 1-5'
   workflow_dispatch:
 
 env:
