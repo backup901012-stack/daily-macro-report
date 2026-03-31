@@ -129,7 +129,20 @@ jobs:
             echo "⏰ 已過 07:30 或距離超過 2 小時，直接執行"
           fi
 
+      - name: 防重發檢查（查 D1 是否今天已發）
+        id: dedup
+        run: |
+          RESP=$(curl -s "https://macro-report-monitor.stock-quant.workers.dev/status" 2>/dev/null || echo '{"sent":false}')
+          SENT=$(echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('sent') and any(r.get('status')=='success' for r in d.get('records',[])) else 'false')")
+          echo "already_sent=$SENT" >> $GITHUB_OUTPUT
+          if [ "$SENT" = "true" ]; then
+            echo "⚠️ 今天已經發過信了，跳過發送"
+          else
+            echo "✅ 今天尚未發信，繼續"
+          fi
+
       - name: Send email (Gmail OAuth2 API)
+        if: steps.dedup.outputs.already_sent != 'true'
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
