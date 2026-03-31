@@ -352,9 +352,110 @@ MARKET_CONFIG = {
 }
 
 
+def fetch_quant_scores(market_name):
+    """從股票量化系統 API 取得量化評分，用於熱門股複合排名"""
+    import requests
+    try:
+        resp = requests.get(
+            f'https://stock-screening-api.stock-quant.workers.dev/api/top/{market_name}',
+            timeout=10
+        )
+        if resp.status_code != 200:
+            print(f"  [量化API] {market_name} 請求失敗: {resp.status_code}")
+            return {}
+        data = resp.json()
+        # 建立 ticker → scores 的快速查詢表
+        scores = {}
+        for s in data.get('buy', []) + data.get('sell', []):
+            scores[s['ticker']] = {
+                'total_score': s.get('total_score', 0),
+                'buy_score': s.get('buy_score', 50),
+                'sell_score': s.get('sell_score', 50),
+                'tech_signal': s.get('tech_signal', 0),
+                'zscore': s.get('zscore', 0),
+                'f_score': s.get('f_score', 5),
+                'momentum_score': s.get('momentum_score'),
+                'quality_score': s.get('quality_score'),
+            }
+        # 也取得完整列表（不只 top 10）
+        try:
+            resp2 = requests.get(
+                f'https://stock-screening-api.stock-quant.workers.dev/api/date/{data.get("date", "")}',
+                timeout=10
+            )
+            if resp2.status_code == 200:
+                full_data = resp2.json()
+                for market_stocks in full_data.get('markets', {}).values():
+                    for s in market_stocks:
+                        if s['ticker'] not in scores:
+                            scores[s['ticker']] = {
+                                'total_score': s.get('total_score', 0),
+                                'buy_score': s.get('buy_score', 50),
+                                'sell_score': s.get('sell_score', 50),
+                                'tech_signal': s.get('tech_signal', 0),
+                                'zscore': s.get('zscore', 0),
+                                'f_score': s.get('f_score', 5),
+                                'momentum_score': s.get('momentum_score'),
+                                'quality_score': s.get('quality_score'),
+                            }
+        except Exception:
+            pass
+        print(f"  [量化API] {market_name}: 取得 {len(scores)} 支股票的量化評分")
+        return scores
+    except Exception as e:
+        print(f"  [量化API] {market_name} 異常: {e}")
+        return {}
+
+
+def enrich_with_quant_scores(stocks, quant_scores, direction='buy'):
+    """
+    將量化評分疊加到熱門股上，計算複合排名分數
+
+    複合分數 = 量能分 (30%) + 量化分 (40%) + 動量分 (30%)
+    - 量能分：volume_ratio 正規化
+    - 量化分：buy_score 或 sell_score（0-100）
+    - 動量分：|change_pct| 正規化
+    """
+    if not stocks:
+        return stocks
+
+    # 取得量能和動量的最大值用於正規化
+    max_vr = max(s['volume_ratio'] for s in stocks) if stocks else 1
+    max_chg = max(abs(s['change_pct']) for s in stocks) if stocks else 1
+
+    for s in stocks:
+        ticker = s['symbol'].split('.')[0]
+        qs = quant_scores.get(ticker, {})
+
+        # 寫入量化欄位
+        s['quant_total_score'] = qs.get('total_score', 0)
+        s['quant_buy_score'] = qs.get('buy_score', 50)
+        s['quant_sell_score'] = qs.get('sell_score', 50)
+        s['quant_tech_signal'] = qs.get('tech_signal', 0)
+        s['quant_zscore'] = qs.get('zscore', 0)
+        s['quant_f_score'] = qs.get('f_score', 5)
+        s['quant_matched'] = ticker in quant_scores
+
+        # 正規化各維度到 0-100
+        vr_norm = min(s['volume_ratio'] / max(max_vr, 1) * 100, 100)
+        chg_norm = min(abs(s['change_pct']) / max(max_chg, 0.01) * 100, 100)
+
+        if direction == 'buy':
+            quant_norm = qs.get('buy_score', 50)
+        else:
+            quant_norm = qs.get('sell_score', 50)
+
+        # 複合分數：量能 30% + 量化 40% + 動量 30%
+        s['composite_score'] = round(vr_norm * 0.3 + quant_norm * 0.4 + chg_norm * 0.3, 1)
+
+    # 按複合分數重新排序
+    stocks.sort(key=lambda x: x['composite_score'], reverse=True)
+    return stocks
+
+
 def detect_hot_stocks_v2(market_code, market_name, news_trending_tickers=None):
     """
-    完整流程：載入成分股 → 掃描 → 分層篩選 → 新聞加分
+    完整流程：載入成分股 → 掃描 → 分層篩選 → 量化驗證 → 新聞加分
 
     Returns:
         dict with 'inflow' and 'outflow' lists
@@ -366,8 +467,14 @@ def detect_hot_stocks_v2(market_code, market_name, news_trending_tickers=None):
     # 所有市場統一使用 yfinance 批量下載
     raw_data = yfinance_batch_scan(symbols, market_name, market_code)
 
-    # 分層漏斗篩選
+    # 分層漏斗篩選（量能門檻不變：買入 1.5x / 賣出 2.5x）
     inflow, outflow = apply_funnel_filter(raw_data, market_name)
+
+    # 量化數據整合：從股票量化系統取得評分
+    quant_scores = fetch_quant_scores(market_name)
+    if quant_scores:
+        inflow = enrich_with_quant_scores(inflow, quant_scores, direction='buy')
+        outflow = enrich_with_quant_scores(outflow, quant_scores, direction='sell')
 
     # 新聞 tiebreaker
     inflow = apply_news_tiebreaker(inflow, news_trending_tickers)

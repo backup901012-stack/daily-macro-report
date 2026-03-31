@@ -1357,40 +1357,72 @@ def _gen_gics_sector_section(fund_flows, sector_analysis=None):
 # ==================== 熱門股票 ====================
 
 def _gen_stock_table_html(stocks, stock_analysis):
-    """渲染一組股票的 HTML 表格（簡潔版，不含模板化分析）"""
+    """渲染一組股票的 HTML 表格（含量化評分）"""
     if not stocks:
         return ""
+
+    # 檢查是否有量化數據
+    has_quant = any(s.get('quant_matched') for s in stocks)
+
     html = '<table>\n<thead><tr>'
-    html += '<th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th>'
+    html += '<th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th>'
+    if has_quant:
+        html += '<th style="text-align:right;">量化分</th><th style="text-align:right;">綜合分</th>'
+    else:
+        html += '<th style="text-align:right;">成交量</th>'
     html += '</tr></thead>\n<tbody>\n'
-    for s in stocks:
+
+    for i, s in enumerate(stocks):
         name = s['name']
-        if len(name) > 30:
-            name = name[:28] + "..."
+        if len(name) > 25:
+            name = name[:23] + "..."
         vol_ratio = s.get('volume_ratio', 1)
         volume = s.get('volume', 0)
         cls = _change_class(s.get('change_pct', 0))
 
-        # 成交量格式化
-        if volume >= 1_000_000_000:
-            vol_str = f'{volume/1_000_000_000:.1f}B'
-        elif volume >= 1_000_000:
-            vol_str = f'{volume/1_000_000:.1f}M'
-        elif volume >= 1_000:
-            vol_str = f'{volume/1_000:.0f}K'
-        else:
-            vol_str = f'{volume:,.0f}'
-
         # 量比顏色
         vr_color = '#e74c3c' if vol_ratio >= 3 else '#e67e22' if vol_ratio >= 2 else '#333'
 
+        # 排名標記
+        rank_badge = ''
+        if i < 3:
+            medals = ['🥇', '🥈', '🥉']
+            rank_badge = f'<span style="font-size:7pt;">{medals[i]}</span> '
+
         html += '<tr>'
-        html += f'<td class="name-cell" style="text-align:left;">{name}</td>'
+        html += f'<td class="name-cell" style="text-align:left;">{rank_badge}{name}</td>'
         html += f'<td style="text-align:center;"><code style="font-size:8pt;color:#666;">{s["symbol"]}</code></td>'
         html += f'<td style="text-align:right;">{s["current"]:,.2f}</td>'
         html += f'<td class="{cls}" style="text-align:right;font-weight:600;">{_format_pct(s["change_pct"])}</td>'
         html += f'<td style="text-align:right;color:{vr_color};font-weight:600;">{vol_ratio:.1f}x</td>'
-        html += f'<td style="text-align:right;color:#999;font-size:8.5pt;">{vol_str}</td>'
+
+        if has_quant:
+            # 量化分數（買入用 buy_score，賣出用 sell_score）
+            if s.get('quant_matched'):
+                flow = s.get('flow', '')
+                q_score = s.get('quant_buy_score', 50) if flow == 'inflow' else s.get('quant_sell_score', 50)
+                q_color = '#27ae60' if q_score >= 70 else '#e67e22' if q_score >= 40 else '#999'
+                total_s = s.get('quant_total_score', 0)
+                ts_sign = '+' if total_s > 0 else ''
+                html += f'<td style="text-align:right;color:{q_color};font-weight:600;">{q_score}<span style="font-size:7pt;color:#999;"> ({ts_sign}{total_s})</span></td>'
+            else:
+                html += '<td style="text-align:right;color:#ccc;font-size:8pt;">—</td>'
+            # 綜合分
+            comp = s.get('composite_score', 0)
+            comp_color = '#c0392b' if comp >= 70 else '#e67e22' if comp >= 50 else '#333'
+            html += f'<td style="text-align:right;color:{comp_color};font-weight:700;">{comp:.0f}</td>'
+        else:
+            # 無量化數據時顯示成交量
+            if volume >= 1_000_000_000:
+                vol_str = f'{volume/1_000_000_000:.1f}B'
+            elif volume >= 1_000_000:
+                vol_str = f'{volume/1_000_000:.1f}M'
+            elif volume >= 1_000:
+                vol_str = f'{volume/1_000:.0f}K'
+            else:
+                vol_str = f'{volume:,.0f}'
+            html += f'<td style="text-align:right;color:#999;font-size:8.5pt;">{vol_str}</td>'
+
         html += '</tr>\n'
     html += '</tbody></table>\n'
     return html
@@ -1412,7 +1444,7 @@ def _gen_hot_stocks_section(hot_stocks, stock_analysis):
     html = '<div class="section-new-page"></div>\n'
     html += '<div class="section-title">十、當日熱門股票</div>\n'
     html += '<div class="filter-note">篩選邏輯：資金追捧（量比 ≥ 1.5x + 上漲）；資金出清（量比 ≥ 2.5x + 下跌）<br/>'
-    html += '排序方式：量比門檻（硬篩）→ 漲跌幅排序 → 新聞提及加分 | 每市場最多 5 支買入 + 5 支賣出</div>\n'
+    html += '綜合排名：量能 30% + 量化評分 40% + 動量 30% | 量化數據來源：股票量化研究系統</div>\n'
 
     for market in ['美股', '港股', '日股', '台股']:
         if market not in hot_stocks or not hot_stocks[market]:

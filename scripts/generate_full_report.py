@@ -1070,6 +1070,22 @@ def main():
     md = load_json(f'{REPORTS}/market_data_today.json')
     news = load_json(f'{REPORTS}/news_today.json')
     hot_stocks = load_json(f'{REPORTS}/hot_stocks_today.json')
+
+    # 量化數據整合：從股票量化系統取得評分，疊加到熱門股
+    try:
+        from modules.hot_stocks import fetch_quant_scores, enrich_with_quant_scores
+        for market_name, mdata in hot_stocks.items():
+            if not isinstance(mdata, dict):
+                continue
+            quant_scores = fetch_quant_scores(market_name)
+            if quant_scores:
+                if mdata.get('inflow'):
+                    mdata['inflow'] = enrich_with_quant_scores(mdata['inflow'], quant_scores, 'buy')
+                if mdata.get('outflow'):
+                    mdata['outflow'] = enrich_with_quant_scores(mdata['outflow'], quant_scores, 'sell')
+    except Exception as e:
+        print(f'⚠️ 量化整合失敗: {e}')
+
     enh = load_json(f'{REPORTS}/enhanced_today.json')
     enh2 = load_json(f'{REPORTS}/enhanced_v2_today.json')
     fred = load_json(f'{REPORTS}/fred_today.json')
@@ -1091,13 +1107,16 @@ def main():
     historical = get_historical_sentiment_context(fg, vix) if fg else {}
 
     # Serialize hot stocks
+    HS_FIELDS = ['symbol','name','current','change_pct','volume_ratio','volume','avg_volume','flow','news_mentions',
+                  'quant_total_score','quant_buy_score','quant_sell_score','quant_tech_signal','quant_zscore','quant_f_score','quant_matched','composite_score']
+
     def ser_hs(hs):
         out = {}
         for m, d in hs.items():
             if isinstance(d, dict) and 'inflow' in d:
                 out[m] = {
-                    'inflow': [{k: s.get(k) for k in ['symbol','name','current','change_pct','volume_ratio','volume','avg_volume','flow','news_mentions']} for s in d['inflow']],
-                    'outflow': [{k: s.get(k) for k in ['symbol','name','current','change_pct','volume_ratio','volume','avg_volume','flow','news_mentions']} for s in d['outflow']],
+                    'inflow': [{k: s.get(k) for k in HS_FIELDS if s.get(k) is not None} for s in d['inflow']],
+                    'outflow': [{k: s.get(k) for k in HS_FIELDS if s.get(k) is not None} for s in d['outflow']],
                 }
             else:
                 out[m] = d
