@@ -4,7 +4,7 @@
 
 ### 每日流程
 ```
-UTC 21:30（台北 05:30）  GitHub Actions 數據收集
+UTC 22:00（台北 06:00）  GitHub Actions 數據收集
   ├─ 市場數據 / 新聞 / 熱門股 / 情緒 / FRED / 替代數據
   ├─ 新聞標題預翻譯（前 100 篇，continue-on-error）
   └─ git commit 數據到 repo
@@ -17,7 +17,7 @@ UTC 21:30（台北 05:30）  GitHub Actions 數據收集
   ├─ 等待至台北 07:30
   └─ Gmail OAuth2 API 逐一發送（隱私保護）
 
-備用 cron: UTC 23:00（台北 07:00）
+備用 cron: UTC 00:00（台北 08:00）
 ```
 
 ### 發信方式
@@ -36,6 +36,16 @@ UTC 21:30（台北 05:30）  GitHub Actions 數據收集
   - `POST /record`：workflow 發完信後記錄到 D1（需 X-API-Key）
   - 未偵測到發送 → 自動觸發 GitHub Actions `daily-send.yml` 補發
 - **GitHub Secrets**：`MONITOR_RECORD_KEY`（Worker 記錄端點的 API Key）
+
+### 熱門股量化評分系統（2026-03-31 建成）
+- **三層篩選**：放量門檻（硬篩）→ 量化驗證 → 複合排名
+- **複合分數**：量能 30% + 量化評分 40% + 動量 30%
+- **數據來源**：
+  1. 股票量化系統 API（D1，~4000+ 支指數成分股）
+  2. 即時評分 fallback（yfinance，對 API 未覆蓋的股票即時算分）
+- **即時評分維度**：技術面信號 + Z-Score 均值回歸 + F-Score + 分析師目標價
+- **顯示邏輯**：匹配率 ≥ 50% 顯示量化欄位，否則回退成交量欄位
+- **force_send**：`workflow_dispatch` 支援 `force_send=true` 跳過防重發
 
 ### 待完成
 - [ ] **34 人名單上線**：等品質確認穩定後切換
@@ -85,6 +95,7 @@ UTC 21:30（台北 05:30）  GitHub Actions 數據收集
 ## 關鍵檔案
 - `scripts/generate_full_report.py` — 主報告生成（1200+ 行進階版，不可回退）
 - `modules/html_report_generator.py` — HTML 模板引擎
+- `modules/hot_stocks.py` — 熱門股偵測 + 量化評分整合 + 即時評分 fallback
 - `modules/email_sender.py` — Email 摘要生成
 - `modules/news_collector.py` — 新聞收集
 - `modules/email_template_v2.py` — Goldman 風格 HTML 模板（備用）
