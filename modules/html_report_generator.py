@@ -870,6 +870,114 @@ def _gen_commodities_section(market_data):
     return html
 
 
+# ==================== 恐懼與貪婪儀表盤 ====================
+
+def _gen_fear_greed_gauge(score, rating_zh, color):
+    """生成平滑彩虹漸層半圓儀表盤 SVG"""
+    import math
+
+    cx, cy = 200, 158
+    r = 110
+    arc_w = 28
+
+    # 彩虹色標：紅→橙→黃→綠（用 50 個小段模擬平滑漸層）
+    color_stops = [
+        (0.00, (183, 28, 28)),    # 深紅
+        (0.20, (229, 57, 53)),    # 紅
+        (0.40, (239, 108, 0)),    # 橙
+        (0.50, (249, 168, 37)),   # 黃橙
+        (0.60, (253, 216, 53)),   # 黃
+        (0.75, (124, 179, 66)),   # 淺綠
+        (1.00, (46, 125, 50)),    # 深綠
+    ]
+
+    def interp_color(t):
+        """在色標之間線性插值"""
+        for i in range(len(color_stops) - 1):
+            t0, c0 = color_stops[i]
+            t1, c1 = color_stops[i + 1]
+            if t0 <= t <= t1:
+                f = (t - t0) / (t1 - t0)
+                return tuple(int(c0[j] + f * (c1[j] - c0[j])) for j in range(3))
+        return color_stops[-1][1]
+
+    labels = [
+        (0,   '極度恐懼', 'end'),
+        (20,  '恐懼', 'end'),
+        (45,  '沮喪', 'middle'),
+        (55,  '中性', 'middle'),
+        (80,  '貪婪', 'start'),
+        (100, '極度貪婪', 'start'),
+    ]
+
+    svg = '<svg viewBox="0 0 400 230" width="320" height="185" style="display:block;margin:0 auto;">\n'
+    svg += '<defs><filter id="ns" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.15"/></filter></defs>\n'
+
+    # 底部灰色軌道
+    svg += f'<path d="M {cx - r} {cy} A {r} {r} 0 0 1 {cx + r} {cy}" fill="none" stroke="#f0f0f0" stroke-width="{arc_w + 6}" stroke-linecap="round"/>\n'
+
+    # 平滑彩虹弧線（50 小段）
+    n_seg = 50
+    for i in range(n_seg):
+        t0 = i / n_seg
+        t1 = (i + 1) / n_seg
+        a0 = math.radians(180 - t0 * 180)
+        a1 = math.radians(180 - t1 * 180)
+        x0 = cx + r * math.cos(a0)
+        y0 = cy - r * math.sin(a0)
+        x1 = cx + r * math.cos(a1)
+        y1 = cy - r * math.sin(a1)
+        rgb = interp_color((t0 + t1) / 2)
+        svg += f'<path d="M {x0:.1f} {y0:.1f} A {r} {r} 0 0 0 {x1:.1f} {y1:.1f}" fill="none" stroke="rgb({rgb[0]},{rgb[1]},{rgb[2]})" stroke-width="{arc_w}" stroke-linecap="butt"/>\n'
+
+    # 兩端圓角蓋
+    a_start = math.radians(180)
+    a_end = math.radians(0)
+    rgb_start = interp_color(0)
+    rgb_end = interp_color(1)
+    svg += f'<circle cx="{cx + r * math.cos(a_start):.1f}" cy="{cy - r * math.sin(a_start):.1f}" r="{arc_w / 2}" fill="rgb({rgb_start[0]},{rgb_start[1]},{rgb_start[2]})"/>\n'
+    svg += f'<circle cx="{cx + r * math.cos(a_end):.1f}" cy="{cy - r * math.sin(a_end):.1f}" r="{arc_w / 2}" fill="rgb({rgb_end[0]},{rgb_end[1]},{rgb_end[2]})"/>\n'
+
+    # 標籤
+    for l_pos, l_text, l_anchor in labels:
+        la = math.radians(180 - (l_pos / 100) * 180)
+        label_r = r + arc_w / 2 + 14
+        lx = cx + label_r * math.cos(la)
+        ly = cy - label_r * math.sin(la)
+        svg += f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{l_anchor}" font-size="9" fill="#95a5a6" font-weight="500">{l_text}</text>\n'
+
+    # 指針
+    needle_deg = 180 - (score / 100) * 180
+    needle_rad = math.radians(needle_deg)
+    needle_len = r - 8
+    nx = cx + needle_len * math.cos(needle_rad)
+    ny = cy - needle_len * math.sin(needle_rad)
+    tail_len = 18
+    tx = cx - tail_len * math.cos(needle_rad)
+    ty = cy + tail_len * math.sin(needle_rad)
+    bw = 2.5
+    tw = 4
+    perp = needle_rad + math.pi / 2
+    b1x = cx + bw * math.cos(perp)
+    b1y = cy - bw * math.sin(perp)
+    b2x = cx - bw * math.cos(perp)
+    b2y = cy + bw * math.sin(perp)
+    t1x = tx + tw * math.cos(perp)
+    t1y = ty - tw * math.sin(perp)
+    t2x = tx - tw * math.cos(perp)
+    t2y = ty + tw * math.sin(perp)
+    svg += f'<polygon points="{nx:.1f},{ny:.1f} {b1x:.1f},{b1y:.1f} {t1x:.1f},{t1y:.1f} {t2x:.1f},{t2y:.1f} {b2x:.1f},{b2y:.1f}" fill="#34495e" filter="url(#ns)"/>\n'
+    svg += f'<circle cx="{cx}" cy="{cy}" r="9" fill="#fff" stroke="#34495e" stroke-width="2.5"/>\n'
+    svg += f'<circle cx="{cx}" cy="{cy}" r="3.5" fill="#34495e"/>\n'
+
+    # 分數 + 文字
+    svg += f'<text x="{cx}" y="{cy + 40}" text-anchor="middle" font-size="30" font-weight="800" fill="{color}">{score:.1f}</text>\n'
+    svg += f'<text x="{cx}" y="{cy + 56}" text-anchor="middle" font-size="11" font-weight="600" fill="{color}">{rating_zh}</text>\n'
+
+    svg += '</svg>\n'
+    return f'<div style="text-align:center;margin:4px 0;">{svg}</div>\n'
+
+
 # ==================== 市場情緒指標 (NEW) ====================
 
 def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, historical_context=None):
@@ -929,6 +1037,10 @@ def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, 
 </div>
 '''
     html += '</div>\n'
+
+    # ===== 恐懼與貪婪儀表盤 =====
+    html += '<div class="sub-section-title">恐懼與貪婪指數</div>\n'
+    html += _gen_fear_greed_gauge(fg_score, fg_rating_zh, fg_color)
 
     # 恐貪歷史比較
     fg_prev = fg.get('previous_close', 0) or 0
