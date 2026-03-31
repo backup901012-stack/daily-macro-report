@@ -1361,8 +1361,9 @@ def _gen_stock_table_html(stocks, stock_analysis):
     if not stocks:
         return ""
 
-    # 檢查是否有量化數據
-    has_quant = any(s.get('quant_matched') for s in stocks)
+    # 檢查是否有量化數據（匹配率 ≥ 50% 才顯示量化欄位）
+    matched_count = sum(1 for s in stocks if s.get('quant_matched'))
+    has_quant = matched_count >= len(stocks) * 0.5 if stocks else False
 
     html = '<table>\n<thead><tr>'
     html += '<th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th>'

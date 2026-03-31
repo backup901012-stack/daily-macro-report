@@ -435,7 +435,7 @@ def enrich_with_quant_scores(stocks, quant_scores, direction='buy'):
         s['quant_tech_signal'] = qs.get('tech_signal', 0)
         s['quant_zscore'] = qs.get('zscore', 0)
         s['quant_f_score'] = qs.get('f_score', 5)
-        s['quant_matched'] = ticker in quant_scores
+        s['quant_matched'] = bool(qs)
 
         # 正規化各維度到 0-100
         vr_norm = min(s['volume_ratio'] / max(max_vr, 1) * 100, 100)
