@@ -26,10 +26,21 @@ UTC 21:30（台北 05:30）  GitHub Actions 數據收集
 - 收件人: `EMAIL_TO`（逗號分隔，目前 2 人測試，正式 34 人在 recipients.json）
 - 逐一發送，每位收件人只看到自己的地址
 
-### 待完成（P0 最緊急）
-- [ ] **Cloudflare Worker 監控**：07:45 檢查是否已發，沒有則觸發補發
-- [ ] **D1 發送記錄**：發信後記錄到 D1（防重發 + 監控依據）
+### Cloudflare 監控架構（2026-03-31 建成）
+- **D1 資料庫**：`macro-report-db`（UUID: `26fc7949-e2b4-4b30-b317-3ccc165d967d`）
+  - 表 `send_log`：記錄每次發送（report_date, recipient, status, sent_at, pdf_size）
+- **Worker**：`macro-report-monitor`（`https://macro-report-monitor.stock-quant.workers.dev`）
+  - Cron: 每天 UTC 23:45（台北 07:45）自動檢查 D1
+  - `GET /status`：查看今天發送記錄
+  - `GET /check`：手動觸發檢查（與 Cron 同邏輯）
+  - `POST /record`：workflow 發完信後記錄到 D1（需 X-API-Key）
+  - 未偵測到發送 → 自動觸發 GitHub Actions `daily-send.yml` 補發
+- **GitHub Secrets**：`MONITOR_RECORD_KEY`（Worker 記錄端點的 API Key）
+
+### 待完成
 - [ ] **34 人名單上線**：等品質確認穩定後切換
+- [ ] **報告存 R2**：PDF 歷史存檔
+- [ ] **數據存 D1**：取代 git commit JSON
 
 ## 報告結構（四段式敘事，2026-03-30 確認，不可擅改）
 ```
