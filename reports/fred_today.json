@@ -35,12 +35,24 @@
         },
         "DFF": {
           "name": "聯邦基金日利率",
-          "latest_date": "2026-03-27",
+          "latest_date": "2026-03-30",
           "latest_value": 3.64,
           "prev_value": 3.64,
           "change": 0.0,
           "change_pct": 0.0,
           "history": [
+            {
+              "date": "2026-03-30",
+              "value": 3.64
+            },
+            {
+              "date": "2026-03-29",
+              "value": 3.64
+            },
+            {
+              "date": "2026-03-28",
+              "value": 3.64
+            },
             {
               "date": "2026-03-27",
               "value": 3.64
@@ -48,29 +60,21 @@
             {
               "date": "2026-03-26",
               "value": 3.64
-            },
-            {
-              "date": "2026-03-25",
-              "value": 3.64
-            },
-            {
-              "date": "2026-03-24",
-              "value": 3.64
-            },
-            {
-              "date": "2026-03-23",
-              "value": 3.64
             }
           ]
         },
         "T10Y2Y": {
           "name": "10Y-2Y 殖利率利差",
-          "latest_date": "2026-03-30",
-          "latest_value": 0.53,
-          "prev_value": 0.56,
-          "change": -0.03,
-          "change_pct": -5.3571,
+          "latest_date": "2026-03-31",
+          "latest_value": 0.51,
+          "prev_value": 0.53,
+          "change": -0.02,
+          "change_pct": -3.7736,
           "history": [
+            {
+              "date": "2026-03-31",
+              "value": 0.51
+            },
             {
               "date": "2026-03-30",
               "value": 0.53
@@ -86,21 +90,21 @@
             {
               "date": "2026-03-25",
               "value": 0.49
-            },
-            {
-              "date": "2026-03-24",
-              "value": 0.49
             }
           ]
         },
         "T10Y3M": {
           "name": "10Y-3M 殖利率利差",
-          "latest_date": "2026-03-30",
-          "latest_value": 0.64,
-          "prev_value": 0.71,
-          "change": -0.07,
-          "change_pct": -9.8592,
+          "latest_date": "2026-03-31",
+          "latest_value": 0.6,
+          "prev_value": 0.64,
+          "change": -0.04,
+          "change_pct": -6.25,
           "history": [
+            {
+              "date": "2026-03-31",
+              "value": 0.6
+            },
             {
               "date": "2026-03-30",
               "value": 0.64
@@ -116,21 +120,21 @@
             {
               "date": "2026-03-25",
               "value": 0.6
-            },
-            {
-              "date": "2026-03-24",
-              "value": 0.65
             }
           ]
         },
         "BAMLH0A0HYM2": {
           "name": "ICE BofA 高收益利差",
-          "latest_date": "2026-03-27",
-          "latest_value": 3.42,
-          "prev_value": 3.21,
-          "change": 0.21,
-          "change_pct": 6.5421,
+          "latest_date": "2026-03-30",
+          "latest_value": 3.46,
+          "prev_value": 3.42,
+          "change": 0.04,
+          "change_pct": 1.1696,
           "history": [
+            {
+              "date": "2026-03-30",
+              "value": 3.46
+            },
             {
               "date": "2026-03-27",
               "value": 3.42
@@ -146,10 +150,6 @@
             {
               "date": "2026-03-24",
               "value": 3.19
-            },
-            {
-              "date": "2026-03-23",
-              "value": 3.19
             }
           ]
         }
@@ -160,12 +160,16 @@
       "data": {
         "T5YIE": {
           "name": "5年盈虧平衡通脹率",
-          "latest_date": "2026-03-30",
-          "latest_value": 2.57,
-          "prev_value": 2.56,
-          "change": 0.01,
-          "change_pct": 0.3906,
+          "latest_date": "2026-03-31",
+          "latest_value": 2.54,
+          "prev_value": 2.57,
+          "change": -0.03,
+          "change_pct": -1.1673,
           "history": [
+            {
+              "date": "2026-03-31",
+              "value": 2.54
+            },
             {
               "date": "2026-03-30",
               "value": 2.57
@@ -181,21 +185,21 @@
             {
               "date": "2026-03-25",
               "value": 2.51
-            },
-            {
-              "date": "2026-03-24",
-              "value": 2.55
             }
           ]
         },
         "T10YIE": {
           "name": "10年盈虧平衡通脹率",
-          "latest_date": "2026-03-30",
-          "latest_value": 2.31,
+          "latest_date": "2026-03-31",
+          "latest_value": 2.3,
           "prev_value": 2.31,
-          "change": 0.0,
-          "change_pct": 0.0,
+          "change": -0.01,
+          "change_pct": -0.4329,
           "history": [
+            {
+              "date": "2026-03-31",
+              "value": 2.3
+            },
             {
               "date": "2026-03-30",
               "value": 2.31
@@ -211,10 +215,6 @@
             {
               "date": "2026-03-25",
               "value": 2.31
-            },
-            {
-              "date": "2026-03-24",
-              "value": 2.33
             }
           ]
         },
@@ -285,12 +285,16 @@
         },
         "RRPONTSYD": {
           "name": "隔夜逆回購（日）",
-          "latest_date": "2026-03-30",
-          "latest_value": 0.752,
-          "prev_value": 0.992,
-          "change": -0.24,
-          "change_pct": -24.1935,
+          "latest_date": "2026-03-31",
+          "latest_value": 15.782,
+          "prev_value": 0.752,
+          "change": 15.03,
+          "change_pct": 1998.6702,
           "history": [
+            {
+              "date": "2026-03-31",
+              "value": 15.782
+            },
             {
               "date": "2026-03-30",
               "value": 0.752
@@ -306,10 +310,6 @@
             {
               "date": "2026-03-25",
               "value": 0.777
-            },
-            {
-              "date": "2026-03-24",
-              "value": 1.123
             }
           ]
         }
@@ -489,7 +489,7 @@
   },
   "metadata": {
     "source": "FRED (Federal Reserve Economic Data)",
-    "timestamp": "2026-03-31 11:11:11",
+    "timestamp": "2026-04-01 07:57:53",
     "api_key_set": true,
     "series_fetched": 14,
     "series_total": 14
