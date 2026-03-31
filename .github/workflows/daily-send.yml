@@ -13,6 +13,10 @@ on:
 env:
   TZ: Asia/Taipei
 
+concurrency:
+  group: daily-report-send
+  cancel-in-progress: false
+
 jobs:
   generate-and-send:
     # workflow_run 觸發時，只在數據收集成功後才執行
@@ -190,6 +194,7 @@ jobs:
 
           # 逐一發送（隱私保護）
           success = 0
+          sent_recipients = []
           for recipient in email_to:
               msg = MIMEMultipart('mixed')
               msg['From'] = f'何宣逸 <{gmail_user}>'
@@ -213,6 +218,7 @@ jobs:
               if send_resp.status_code == 200:
                   print(f'✅ Sent to {recipient}')
                   success += 1
+                  sent_recipients.append(recipient)
               else:
                   print(f'❌ Failed {recipient}: {send_resp.text[:100]}')
 
@@ -228,7 +234,7 @@ jobs:
                   record_resp = requests.post(
                       'https://macro-report-monitor.stock-quant.workers.dev/record',
                       headers={'X-API-Key': record_key, 'Content-Type': 'application/json'},
-                      json={'date': DATE, 'recipients': email_to[:success], 'pdf_size': len(pdf_data) if pdf_data else 0},
+                      json={'date': DATE, 'recipients': sent_recipients, 'pdf_size': len(pdf_data) if pdf_data else 0},
                       timeout=10,
                   )
                   if record_resp.status_code == 200:
