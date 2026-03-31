@@ -54,7 +54,8 @@ jobs:
           "
 
       - name: Collect news + translate titles
-        timeout-minutes: 10
+        timeout-minutes: 8
+        continue-on-error: true
         run: |
           python3 -c "
           import sys, json
@@ -64,13 +65,14 @@ jobs:
           articles = news.get('articles', [])
           print(f'News: {len(articles)} articles')
 
-          # 預翻譯標題（在收集階段做，避免生成報告時 API 限流）
+          # 只翻譯前 100 篇（報告只用前 30 篇，100 篇綽綽有餘）
+          to_translate = articles[:100]
           try:
               from deep_translator import GoogleTranslator
               translator = GoogleTranslator(source='en', target='zh-TW')
               translated_count = 0
-              for i in range(0, len(articles), 15):
-                  batch = articles[i:i+15]
+              for i in range(0, len(to_translate), 15):
+                  batch = to_translate[i:i+15]
                   titles = [a.get('title', '') for a in batch]
                   combined = ' ||| '.join(titles)
                   try:
