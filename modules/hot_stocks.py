@@ -407,6 +407,116 @@ def fetch_quant_scores(market_name):
         return {}
 
 
+def _score_stock_realtime(ticker):
+    """即時量化評分（輕量版）— 對 API 查不到的股票用 yfinance 直接算分"""
+    import yfinance as yf
+    try:
+        stk = yf.Ticker(ticker)
+        info = stk.info or {}
+        hist = stk.history(period='1y')
+        if hist.empty or len(hist) < 50:
+            return None
+
+        total_score = 0
+        result = {}
+
+        # 1. 技術面信號
+        close = hist['Close']
+        tech_score = 0.0
+        sma20 = close.rolling(20).mean()
+        sma50 = close.rolling(50).mean()
+        if len(close) > 200:
+            sma200 = close.rolling(200).mean()
+            if sma20.iloc[-1] > sma50.iloc[-1]: tech_score += 15
+            else: tech_score -= 15
+            if sma50.iloc[-1] > sma200.iloc[-1]: tech_score += 15
+            else: tech_score -= 15
+            if close.iloc[-1] > sma200.iloc[-1]: tech_score += 10
+            else: tech_score -= 10
+        elif len(close) > 50:
+            if sma20.iloc[-1] > sma50.iloc[-1]: tech_score += 15
+            else: tech_score -= 15
+
+        # RSI
+        delta = close.diff()
+        gain = delta.clip(lower=0).rolling(14).mean()
+        loss = (-delta.clip(upper=0)).rolling(14).mean()
+        rs = gain / loss.replace(0, float('nan'))
+        rsi = 100 - (100 / (1 + rs))
+        rsi_val = float(rsi.iloc[-1]) if not rsi.empty else 50
+        if rsi_val < 30: tech_score += 20
+        elif rsi_val > 70: tech_score -= 20
+        elif rsi_val < 45: tech_score += 10
+        elif rsi_val > 55: tech_score -= 10
+
+        tech_score = max(-100, min(100, tech_score))
+        result['tech_signal'] = round(tech_score, 1)
+
+        if tech_score > 40: total_score += 2
+        elif tech_score > 20: total_score += 1
+        elif tech_score < -40: total_score -= 2
+        elif tech_score < -20: total_score -= 1
+
+        # 2. Z-Score 均值回歸
+        mean20 = close.rolling(20).mean()
+        std20 = close.rolling(20).std()
+        z = float((close.iloc[-1] - mean20.iloc[-1]) / std20.iloc[-1]) if float(std20.iloc[-1]) > 0 else 0
+        result['zscore'] = round(z, 2)
+        if z < -2.0: total_score += 2
+        elif z < -1.0: total_score += 1
+        elif z > 2.0: total_score -= 2
+        elif z > 1.0: total_score -= 1
+
+        # 3. F-Score（簡化版：用 info 可取得的欄位）
+        f_score = 5  # 預設中性
+        roe = info.get('returnOnEquity')
+        if roe is not None:
+            if roe > 0.15: f_score += 1
+            elif roe < 0: f_score -= 1
+        debt = info.get('debtToEquity')
+        if debt is not None:
+            if debt < 50: f_score += 1
+            elif debt > 150: f_score -= 1
+        f_score = max(0, min(9, f_score))
+        result['f_score'] = f_score
+        if f_score >= 7: total_score += 1
+        elif f_score <= 3: total_score -= 1
+
+        # 4. 分析師目標價
+        target = info.get('targetMeanPrice')
+        current = info.get('currentPrice') or info.get('regularMarketPrice')
+        if target and current and current > 0:
+            upside = (target / current - 1) * 100
+            if upside > 25: total_score += 1
+            elif upside < -15: total_score -= 1
+
+        # 計算買賣分數
+        result['total_score'] = total_score
+        result['buy_score'] = max(0, min(100, 50 + total_score * 8))
+        result['sell_score'] = max(0, min(100, 50 - total_score * 8))
+        return result
+
+    except Exception as e:
+        return None
+
+
+def _batch_score_realtime(tickers):
+    """批量即時評分（多線程加速）"""
+    from concurrent.futures import ThreadPoolExecutor
+    scores = {}
+    if not tickers:
+        return scores
+
+    def _score_one(t):
+        return t, _score_stock_realtime(t)
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        for ticker, result in pool.map(lambda t: _score_one(t), tickers):
+            if result:
+                scores[ticker] = result
+    return scores
+
+
 def enrich_with_quant_scores(stocks, quant_scores, direction='buy'):
     """
     將量化評分疊加到熱門股上，計算複合排名分數
@@ -418,6 +528,19 @@ def enrich_with_quant_scores(stocks, quant_scores, direction='buy'):
     """
     if not stocks:
         return stocks
+
+    # 找出 API 查不到的股票，批量即時評分
+    missing = []
+    for s in stocks:
+        sym = s['symbol']
+        if not (quant_scores.get(sym) or quant_scores.get(sym.split('.')[0])):
+            missing.append(sym)
+    if missing:
+        print(f"    [即時評分] {len(missing)} 支未覆蓋，即時計算: {missing[:5]}{'...' if len(missing) > 5 else ''}")
+        realtime = _batch_score_realtime(missing)
+        quant_scores.update(realtime)
+        matched = sum(1 for t in missing if t in realtime)
+        print(f"    [即時評分] 完成 {matched}/{len(missing)} 支")
 
     # 取得量能和動量的最大值用於正規化
     max_vr = max(s['volume_ratio'] for s in stocks) if stocks else 1
