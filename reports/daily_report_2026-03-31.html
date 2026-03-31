@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>每日宏觀資訊綜合早報 | 2026-03-31</title>
+<style>
+
+@page {
+    size: A4;
+    margin: 15mm 12mm 20mm 12mm;
+    @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font-size: 8pt;
+        color: #95a5a6;
+        font-family: 'PingFang TC', 'PingFang SC', 'Heiti TC', 'Noto Sans TC', sans-serif;
+    }
+}
+@page :first {
+    margin-top: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'PingFang TC', 'PingFang SC', 'Heiti TC', 'Noto Sans TC', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.65;
+    color: #2c3e50;
+    background: #fff;
+    max-width: 210mm;
+}
+
+/* ===== 報告頭部 ===== */
+.report-header {
+    background: #2c3e50;
+    color: white;
+    padding: 24px 24px 18px;
+    margin: 0 -12mm 0 -12mm;
+    padding-left: 24mm;
+    padding-right: 24mm;
+}
+
+.report-header h1 {
+    font-size: 26pt;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.report-header .subtitle {
+    font-size: 11pt;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 2px;
+}
+
+.report-header .date-line {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.6);
+}
+
+.header-divider {
+    height: 3px;
+    background: #e67e22;
+    margin: 0 -12mm;
+}
+
+/* ===== 市場速覽 ===== */
+.snapshot-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 9.5pt;
+    line-height: 1.8;
+    color: #2c3e50;
+}
+
+.snapshot-box .snapshot-label {
+    font-weight: 700;
+    color: #2c3e50;
+    display: inline;
+}
+
+.snapshot-line {
+    margin-bottom: 4px;
+}
+
+/* ===== 章節標題 ===== */
+.section-title {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 18px 0 4px;
+    padding-bottom: 6px;
+    border-bottom: 2.5px solid #e67e22;
+    page-break-after: avoid;
+}
+
+.sub-section-title {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 12px 0 5px;
+    padding-left: 10px;
+    border-left: 3.5px solid #3498db;
+    page-break-after: avoid;
+}
+
+/* ===== 分析段落 ===== */
+.analysis-text {
+    font-size: 9.5pt;
+    color: #555;
+    line-height: 1.75;
+    margin-bottom: 6px;
+    text-align: justify;
+}
+
+/* ===== 表格 ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    font-size: 9.5pt;
+}
+
+table thead th {
+    background: #f1f3f5;
+    color: #2c3e50;
+    font-weight: 700;
+    padding: 8px 8px;
+    text-align: left;
+    font-size: 8.5pt;
+    border-bottom: 2px solid #dee2e6;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+table thead th:not(:first-child) {
+    text-align: right;
+}
+
+table tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+table tbody td:not(:first-child) {
+    text-align: right;
+}
+
+table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+table tbody tr:hover {
+    background: #eef2f7;
+}
+
+table tbody tr {
+    page-break-inside: avoid;
+}
+
+/* 整張表格不可跨頁切斷 */
+table {
+    page-break-inside: avoid;
+}
+
+thead {
+    display: table-header-group;
+}
+
+/* 子區塊（含標題+表格）不可跨頁切斷 */
+.sub-section-block {
+    page-break-inside: avoid;
+}
+
+td.name-cell {
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: left;
+}
+
+/* ===== 漲跌顏色 ===== */
+.up, .snapshot-box .up {
+    color: #27ae60 !important;
+    font-weight: 600;
+}
+
+.down, .snapshot-box .down {
+    color: #e74c3c !important;
+    font-weight: 600;
+}
+
+.flat, .snapshot-box .flat {
+    color: #95a5a6 !important;
+}
+
+.trend-up { color: #27ae60; font-weight: 700; }
+.trend-down { color: #e74c3c; font-weight: 700; }
+.trend-strong-up { color: #1e8449; font-weight: 700; }
+.trend-strong-down { color: #c0392b; font-weight: 700; }
+
+/* ===== 新聞卡片 ===== */
+.news-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-left: 4px solid #3498db;
+    border-radius: 3px;
+    padding: 5px 10px;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+}
+
+.news-card h3 {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 2px;
+}
+
+.news-meta {
+    font-size: 8pt;
+    margin-bottom: 2px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 8pt;
+    margin-right: 4px;
+}
+
+.badge-high { background: #e74c3c; color: #fff; }
+.badge-medium { background: #e67e22; color: #fff; }
+.badge-low { background: #95a5a6; color: #fff; }
+.badge-bullish { color: #27ae60; }
+.badge-bearish { color: #e74c3c; }
+.badge-neutral { color: #7f8c8d; }
+
+.news-body {
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.4;
+}
+
+.news-tickers {
+    font-size: 8pt;
+    color: #7f8c8d;
+    margin-top: 2px;
+}
+
+.news-tickers code {
+    background: #ecf0f1;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 8pt;
+    color: #2c3e50;
+}
+
+/* ===== 熱門股票 ===== */
+.stock-analysis {
+    font-size: 8.5pt;
+    color: #666;
+    line-height: 1.4;
+    max-width: 280px;
+}
+
+.filter-note {
+    font-size: 8.5pt;
+    color: #7f8c8d;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    page-break-after: avoid;
+}
+
+.hot-label {
+    font-size: 10pt;
+    font-weight: 700;
+    margin: 8px 0 4px;
+    page-break-after: avoid;
+}
+.hot-label.buy { color: #e74c3c; }
+.hot-label.sell { color: #27ae60; }
+
+/* ===== 經濟日曆 ===== */
+.calendar-highlight {
+    background: #fff8e1;
+    border-left: 3px solid #f1c40f;
+    padding: 10px 14px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+}
+
+.calendar-highlight strong {
+    color: #2c3e50;
+}
+
+/* ===== 分隔線 ===== */
+.divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 18px 0;
+}
+
+/* ===== 底部（名片+聲明不分頁）===== */
+.footer-wrapper {
+    page-break-inside: avoid;
+    margin-top: 20px;
+}
+.footer {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #ddd;
+    font-size: 7.5pt;
+    color: #95a5a6;
+    text-align: left;
+}
+
+.footer strong {
+    color: #666;
+}
+
+/* ===== 頁面控制 ===== */
+@page {
+    margin: 15mm;
+    @top-left { content: ''; }
+    @top-right { content: ''; }
+    @bottom-left { content: ''; }
+    @bottom-right { content: ''; }
+}
+.page-break {
+    page-break-before: always;
+}
+
+.section-new-page {
+    page-break-before: auto;
+    margin-top: 12px;
+}
+
+/* ===== 情緒指標卡片 ===== */
+.sentiment-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.sentiment-card {
+    flex: 1;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+}
+.sentiment-card .label {
+    font-size: 8.5pt;
+    color: #7f8c8d;
+    margin-bottom: 4px;
+}
+.sentiment-card .value {
+    font-size: 20pt;
+    font-weight: 800;
+}
+.sentiment-card .sub {
+    font-size: 8.5pt;
+    margin-top: 2px;
+}
+
+/* ===== 美林時鐘 ===== */
+.clock-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    border-radius: 10px;
+    border: 1px solid #e8ecef;
+}
+.clock-svg-box {
+    flex: 0 0 280px;
+    text-align: center;
+}
+.clock-info-box {
+    flex: 1;
+}
+.clock-phase-title {
+    font-size: 16pt;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+.clock-phase-sub {
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+.clock-indicator-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.clock-ind-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #e8ecef;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.clock-ind-card .ind-label {
+    font-size: 7pt;
+    color: #7f8c8d;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.clock-ind-card .ind-value {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* ===== 資金流向 ===== */
+.flow-val-cell {
+    position: relative;
+    min-width: 70px;
+}
+.flow-val-cell .bar {
+    display: inline-block;
+    height: 10px;
+    border-radius: 2px;
+    opacity: 0.45;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+.flow-val-cell .bar.positive {
+    background: #27ae60;
+}
+.flow-val-cell .bar.negative {
+    background: #e74c3c;
+}
+.bond-flow-table td:first-child {
+    font-weight: 600;
+}
+
+</style>
+</head>
+<body>
+
+<div class="report-header">
+    <h1>每日宏觀資訊綜合早報</h1>
+    <div class="subtitle">Daily Macro Market Briefing</div>
+    <div class="date-line">2026-03-31 ｜ 綜合早報</div>
+</div>
+<div class="header-divider"></div>
+
+<div class="snapshot-box">
+<div class="snapshot-line"><span class="snapshot-label">股市：</span>S&P 500 <span class="down">-1.67%</span>，納斯達克 <span class="down">-2.15%</span>，道瓊斯 <span class="down">-1.73%</span>；亞洲 日經225 <span class="down">-2.79%</span>，台灣加權 <span class="down">-1.80%</span>，香港恆生 <span class="down">-0.81%</span>；歐洲 德國DAX <span class="down">-0.02%</span>，英國FTSE100 <span class="up">+0.61%</span>，法國CAC40 <span class="up">+0.10%</span></div>
+<div class="snapshot-line"><span class="snapshot-label">商品：</span>黃金 <span class="up">+1.54%</span> ｜ 白銀 <span class="up">+1.86%</span> ｜ 原油(WTI) <span class="up">+2.23%</span> ｜ 布蘭特原油 <span class="down">-3.78%</span></div>
+<div class="snapshot-line"><span class="snapshot-label">外匯：</span>美元指數 100.2890（<span class="up">+0.14%</span>） ｜ EUR/USD 1.1496（<span class="down">-0.34%</span>） ｜ USD/JPY 159.5760（<span class="down">-0.08%</span>）</div>
+<div class="snapshot-line"><span class="snapshot-label">加密貨幣：</span>BTC $67,342（<span class="up">+2.10%</span>） ｜ ETH $2,049（<span class="up">+3.33%</span>）</div>
+<div class="snapshot-line"><span class="snapshot-label">焦點事件：</span>地緣政治/關稅</div>
+</div>
+<div style="background:linear-gradient(135deg,#f0f7ff 0%,#e8f4fd 100%);border-left:5px solid #1a365d;padding:12px 18px;margin:12px 0 14px 0;font-size:10pt;line-height:1.5;color:#2c3e50;border-radius:0 6px 6px 0;page-break-inside:avoid;"><strong style="font-size:11pt;color:#1a365d;">市場綜述</strong>　全球市場昨日普遍走低。S&P 500 -1.67%，納斯達克 -2.15%（RSI 24，距高點 -8.7%）。黃金 +1.54%，原油 +2.23%。恐貪指數 10（extreme fear），VIX 31.3，美林時鐘：滯脹期。</div>
+<div class="section-new-page"></div>
+<div class="section-title">一、宏觀重點新聞</div>
+<div style="border-left:5px solid #e74c3c;padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:8px;"><span style="font-size:14pt;font-weight:800;color:#1a1a2e;">1. 地緣政治/關稅</span> <span style="background:#c0392b;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">高影響</span> <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">▼ 利空</span></div>
+<div style="font-size:8pt;color:#999;margin-bottom:12px;">Reuters、CNN、South China Morning Post 等 168 篇 ｜ 影響範圍：全球股市、能源、避險資產</div>
+<div style="font-size:10pt;line-height:1.8;color:#2c3e50;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:4px;border:1px solid #eee;">此舉是英國應對伊朗戰爭的一部分，這場衝突引發了石油市場史上最嚴重的供應中斷。英國部長表示，伊朗向位於印度洋的美英聯合迪戈加西亞基地發射了兩枚飛彈，但未能擊中目標。</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<div style="flex:1;min-width:280px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">HEADLINES</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 霍爾木茲海峽石油危機正在向西蔓延</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 受亞洲壓力和美國關稅影響，法國工廠關閉量猛增 30%</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 川普的「流氓法官」言論違反了他的誓言</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 胡塞武裝加入伊朗戰爭，美軍抵達，攻擊仍在繼續</div>
+</div>
+<div style="min-width:180px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>
+<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;"><div><strong>黃金 $4,561（+1.5%）</strong></div><div><strong>原油 $101.9（+2.2%）</strong></div><div><strong>VIX 31.3</strong></div><div><strong>恐貪指數 10</strong></div></div>
+<div style="margin-top:8px;"><code style="background:#e8e8f8;padding:2px 6px;border-radius:3px;font-size:8pt;color:#4a4a8a;">META</code> <code style="background:#e8e8f8;padding:2px 6px;border-radius:3px;font-size:8pt;color:#4a4a8a;">INTC</code></div>
+</div>
+</div>
+</div>
+<div style="border-left:5px solid #3498db;padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:8px;"><span style="font-size:14pt;font-weight:800;color:#1a1a2e;">2. 通脹/經濟數據</span> <span style="background:#c0392b;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">高影響</span> <span style="background:#7f8c8d;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">— 中性</span></div>
+<div style="font-size:8pt;color:#999;margin-bottom:12px;">Yahoo Entertainment、Bloomberg.com、WSJ 等 10 篇 ｜ 影響範圍：美股、美債、美元</div>
+<div style="font-size:10pt;line-height:1.8;color:#2c3e50;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:4px;border:1px solid #eee;">State Street Bridgewater All Weather ETF (ALLW) 提供多元資產多元化方法，將股票、債券、大宗商品和通膨保值證券合併在一檔基金中。該策略由 Bridgewater Associates 創辦人 Ray Dalio 開發，利用槓桿實現各資產類別約 180% 的名義敞口，旨在防範經濟衰退、通膨和地緣政治風險。本文探討了該基金的理論方法是否能轉化為實際績效。</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<div style="flex:1;min-width:280px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">HEADLINES</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 對沖基金押注英國房地產巨頭。其股價暴跌 70%</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 通膨擔憂再度浮現，美國和歐洲公債殖利率上升</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 隨著投資人關注就業數據，國債殖利率走低</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 德國勞動力短缺，因此向印度尋求協助</div>
+</div>
+<div style="min-width:180px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>
+<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;"><div><strong>10Y殖利率 4.44%</strong></div><div><strong>2-10Y利差 +1bp</strong></div><div><strong>美元 +0.1%</strong></div><div><strong>恐貪指數 10</strong></div></div>
+</div>
+</div>
+</div>
+<div style="border-left:5px solid #e74c3c;padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:8px;"><span style="font-size:14pt;font-weight:800;color:#1a1a2e;">3. Fed/央行政策</span> <span style="background:#c0392b;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">高影響</span> <span style="background:#e74c3c;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">▼ 利空</span></div>
+<div style="font-size:8pt;color:#999;margin-bottom:12px;">BBC News、Bloomberg.com、Reuters 等 10 篇 ｜ 影響範圍：全球股市、債券、外匯</div>
+<div style="font-size:10pt;line-height:1.8;color:#2c3e50;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:4px;border:1px solid #eee;">聯準會主席鮑威爾表示，聯準會正在對利率採取觀望態度，並對能源價格上漲可能導致通膨飆升表示擔憂。如果通膨超過聯準會 2% 的目標，升息可能會隨之而來，這將增加借貸成本，並可能透過使債務更加昂貴和國庫券更具吸引力來抑制人工智慧驅動的股市上漲。地緣政治緊張局勢加劇和油價飆升正在重塑全球貨幣政策，土耳其準備大幅升息，銀行則準備應對商業和消費貸款成本上升。</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<div style="flex:1;min-width:280px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">HEADLINES</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• ECB Must Anchor Inflation Expectations, Villeroy Tells La Stampa</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 維勒魯瓦表示歐洲央行已準備好採取行動，但討論升息時機還為時過早</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 意見 |川普、鮑威爾和聯準會面臨的危險</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #e74c3c40;margin:3px 0;">• 從一個避風港到多個避風港：為什麼世界上的富人正在全球多元化</div>
+</div>
+<div style="min-width:180px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>
+<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;"><div><strong>10Y殖利率 4.44%</strong></div><div><strong>2-10Y利差 +1bp</strong></div><div><strong>美元 +0.1%</strong></div><div><strong>恐貪指數 10</strong></div></div>
+</div>
+</div>
+</div>
+<div style="border-left:5px solid #3498db;padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:8px;"><span style="font-size:14pt;font-weight:800;color:#1a1a2e;">4. 能源/商品</span> <span style="background:#e67e22;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">中影響</span> <span style="background:#7f8c8d;color:#fff;padding:2px 8px;border-radius:3px;font-size:7.5pt;font-weight:700;">— 中性</span></div>
+<div style="font-size:8pt;color:#999;margin-bottom:12px;">Reuters、BBC News、CNBC 等 26 篇 ｜ 影響範圍：能源股、商品期貨、通脹預期</div>
+<div style="font-size:10pt;line-height:1.8;color:#2c3e50;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:4px;border:1px solid #eee;">由於伊朗衝突，石油價格已飆升超過 70%，達到每桶 100 美元以上，以低得多的價格點實現盈利的能源公司受益。康菲石油公司、EOG 資源公司和響尾蛇能源公司被列為損益平衡成本較低的三大石油生產商，可以產生大量自由現金流，並透過股息和股票回購為股東帶來意外之財。</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<div style="flex:1;min-width:280px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">HEADLINES</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 雪佛龍表示惠斯頓液化天然氣工廠的損壞將阻礙重啟</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 這些私人資本基金正在押注 HALO 能源，挑戰降價</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 布蘭特原油月度創歷史新高，股市陷入困境</div>
+<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid #3498db40;margin:3px 0;">• 印度放寬煤油規定以解決能源供應問題</div>
+</div>
+<div style="min-width:180px;">
+<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>
+<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;"><div><strong>WTI $101.9（+2.2%）</strong></div><div><strong>黃金 $4,561（+1.5%）</strong></div></div>
+<div style="margin-top:8px;"><code style="background:#e8e8f8;padding:2px 6px;border-radius:3px;font-size:8pt;color:#4a4a8a;">META</code></div>
+</div>
+</div>
+</div>
+<div style="margin:24px 0 12px 0;font-size:12pt;font-weight:700;color:#1a1a2e;border-bottom:2.5px solid #2c3e50;padding-bottom:6px;">其他要聞</div>
+<div style="border-left:4px solid #95a5a6;padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:6px;"><strong style="font-size:11pt;color:#1a1a2e;">企業/財報</strong> <span style="background:#7f8c8d;color:#fff;padding:1px 6px;border-radius:3px;font-size:7pt;font-weight:700;">— 中性</span> <span style="font-size:7.5pt;color:#aaa;">The Motley Fool、BBC News、Seeking Alpha 等 26 篇</span></div>
+<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">RingCentral 首席會計長 Tarun Arora 於 2026 年 3 月 10 日出售了 8,840 股股票（約 36 萬美元），佔其直接持股的 10.48%。然而，此次出售是 2025 年 3 月通過的預先計劃的規則 10b5-1 交易計劃的一部分，不應被視為危險信號。 Arora 保。</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #95a5a633;line-height:1.6;margin:2px 0;">• 三峽集團免稅店期待盈利催化劑扭轉 39% 的頹勢</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #95a5a633;line-height:1.6;margin:2px 0;">• 意見 |民主黨人重提吉米卡特對“意外”利潤的稅收錯誤</div>
+<div style="font-size:8.5pt;color:#2980b9;margin-top:6px;"><strong>納指 -2.1%</strong>&nbsp;&nbsp;｜&nbsp;&nbsp;<strong>S&P -1.7%</strong></div>
+</div>
+<div style="border-left:4px solid #e74c3c;padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:6px;"><strong style="font-size:11pt;color:#1a1a2e;">加密貨幣</strong> <span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:3px;font-size:7pt;font-weight:700;">▼ 利空</span> <span style="font-size:7.5pt;color:#aaa;">CoinDesk、Cointelegraph、newsBTC 等 14 篇</span></div>
+<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">XNordiqo 是一個新創建的加密貨幣交易系統，旨在平滑和改善對加密貨幣交易感興趣的個人的整體用戶體驗。該平台表示，它使用人工智慧和基於規則的方法等現代工具來執行...。彭博：
+看看 Coinbase One 和其他針對加密貨幣用戶的類似保險的計劃，這些計劃通常不包括多種帳戶黑客攻擊的承保，包括網。</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #e74c3c33;line-height:1.6;margin:2px 0;">• 伊朗戰爭期間比特幣的韌性提高了人們對東協採用加密貨幣的樂觀態度 - 日經亞洲</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #e74c3c33;line-height:1.6;margin:2px 0;">• Bitfinex 的比特幣看漲押注創 28 個月新高，這對空頭來說是個好消息</div>
+</div>
+<div style="border-left:4px solid #95a5a6;padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:6px;"><strong style="font-size:11pt;color:#1a1a2e;">房地產/金融</strong> <span style="background:#7f8c8d;color:#fff;padding:1px 6px;border-radius:3px;font-size:7pt;font-weight:700;">— 中性</span> <span style="font-size:7.5pt;color:#aaa;">CNBC、Reuters、Financial Times 等 13 篇</span></div>
+<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">布列塔尼·格林 (Brittany Greene) 作為 Self Financial 社區負責人幫助個人建立和修復信用。她直接了解不良信用會為您帶來什麼損失。布魯克菲爾德公司 (Brookfield Corporation) 正在轉型為一家效仿波克夏海瑟威 (Berkshire Hathaway)。</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #95a5a633;line-height:1.6;margin:2px 0;">• 摩根大通和太平洋投資管理公司表示債券市場低估了經濟放緩風險</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #95a5a633;line-height:1.6;margin:2px 0;">• 法國又拘留了兩名涉嫌挫敗巴黎美國銀行攻擊案的嫌疑人</div>
+<div style="font-size:8.5pt;color:#2980b9;margin-top:6px;"><strong>10Y 4.44%</strong></div>
+</div>
+<div style="border-left:4px solid #e74c3c;padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">
+<div style="margin-bottom:6px;"><strong style="font-size:11pt;color:#1a1a2e;">AI/半導體</strong> <span style="background:#e74c3c;color:#fff;padding:1px 6px;border-radius:3px;font-size:7pt;font-weight:700;">▼ 利空</span> <span style="font-size:7.5pt;color:#aaa;">WSJ、BBC News、Al Jazeera English 等 8 篇</span></div>
+<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">主要科技公司本週發布了重大公告：Netflix和索尼提高了串流媒體和遊戲服務的價格； OpenAI 警告對微軟的依賴風險； Arm Holdings 以其 AGI CPU 進入晶片生產；特斯拉報告強勁的交付預期；多家半導體和人工智慧公司宣佈建立合作夥伴關係並進行擴張。此外，Snowflake 解雇了。</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #e74c3c33;line-height:1.6;margin:2px 0;">• 意見 | Sayonara、Sora：OpenAI 表示歡樂時光已經結束</div>
+<div style="font-size:9pt;color:#555;padding-left:12px;border-left:2px solid #e74c3c33;line-height:1.6;margin:2px 0;">• 被告 Meta、Nvidia 對 AI 的鐵腕控制等等 | 3 月 29 日技術</div>
+<div style="font-size:8.5pt;color:#2980b9;margin-top:6px;"><strong>納指 -2.1%</strong>&nbsp;&nbsp;｜&nbsp;&nbsp;<strong>S&P -1.7%</strong></div>
+</div>
+<hr class="divider">
+<div class="section-title">二、全球指數表現</div>
+<div class="sub-section-block">
+<div class="sub-section-title">亞洲市場</div>
+<p class="analysis-text">亞洲市場整體走弱。上證綜指表現最佳（+0.24%），韓國KOSPI表現最弱（-2.97%）。</p>
+<table>
+<thead><tr><th>指數</th><th>收盤價</th><th>昨日漲跌</th><th>昨日漲跌幅</th><th>昨日趨勢</th><th>年初至今(%)</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">日經225</td><td>51,885.85</td><td class="down"><span class="down">-1,487.22</span></td><td class="down"><span class="down">-2.79%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="up">+0.10%</span></td></tr>
+<tr><td class="name-cell">台灣加權</td><td>32,518.16</td><td class="down"><span class="down">-594.43</span></td><td class="down"><span class="down">-1.80%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="up">+10.80%</span></td></tr>
+<tr><td class="name-cell">香港恆生</td><td>24,750.79</td><td class="down"><span class="down">-201.09</span></td><td class="down"><span class="down">-0.81%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-6.03%</span></td></tr>
+<tr><td class="name-cell">上證綜指</td><td>3,923.29</td><td class="up"><span class="up">+9.56</span></td><td class="up"><span class="up">+0.24%</span></td><td class="up">—</td><td><span class="down">-2.49%</span></td></tr>
+<tr><td class="name-cell">深證成指</td><td>13,726.19</td><td class="down"><span class="down">-34.18</span></td><td class="down"><span class="down">-0.25%</span></td><td class="down">—</td><td><span class="down">-0.74%</span></td></tr>
+<tr><td class="name-cell">韓國KOSPI</td><td>5,277.30</td><td class="down"><span class="down">-161.57</span></td><td class="down"><span class="down">-2.97%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="up">+22.45%</span></td></tr>
+<tr><td class="name-cell">澳洲ASX200</td><td>8,461.00</td><td class="down"><span class="down">-55.30</span></td><td class="down"><span class="down">-0.65%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-3.06%</span></td></tr>
+</tbody></table>
+</div>
+<div class="sub-section-block">
+<div class="sub-section-title">歐洲市場</div>
+<p class="analysis-text">歐洲市場漲跌互見。英國FTSE100表現最佳（+0.61%），德國DAX表現最弱（-0.02%）。</p>
+<table>
+<thead><tr><th>指數</th><th>收盤價</th><th>昨日漲跌</th><th>昨日漲跌幅</th><th>昨日趨勢</th><th>年初至今(%)</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">德國DAX</td><td>22,296.05</td><td class="down"><span class="down">-4.70</span></td><td class="down"><span class="down">-0.02%</span></td><td class="down">—</td><td><span class="down">-9.14%</span></td></tr>
+<tr><td class="name-cell">英國FTSE100</td><td>10,028.49</td><td class="up"><span class="up">+61.09</span></td><td class="up"><span class="up">+0.61%</span></td><td class="up"><span class="trend-up">▲</span></td><td><span class="up">+0.78%</span></td></tr>
+<tr><td class="name-cell">法國CAC40</td><td>7,709.88</td><td class="up"><span class="up">+7.93</span></td><td class="up"><span class="up">+0.10%</span></td><td class="up">—</td><td><span class="down">-5.92%</span></td></tr>
+<tr><td class="name-cell">歐洲STOXX50</td><td>5,510.84</td><td class="up"><span class="up">+5.04</span></td><td class="up"><span class="up">+0.09%</span></td><td class="up">—</td><td><span class="down">-6.97%</span></td></tr>
+<tr><td class="name-cell">瑞士SMI</td><td>12,588.80</td><td class="up"><span class="up">+18.54</span></td><td class="up"><span class="up">+0.15%</span></td><td class="up">—</td><td><span class="down">-4.97%</span></td></tr>
+</tbody></table>
+</div>
+<div class="sub-section-block">
+<div class="sub-section-title">美國市場</div>
+<p class="analysis-text">美國市場整體走弱。S&P 500表現最佳（-1.67%），納斯達克表現最弱（-2.15%）。</p>
+<table>
+<thead><tr><th>指數</th><th>收盤價</th><th>昨日漲跌</th><th>昨日漲跌幅</th><th>昨日趨勢</th><th>年初至今(%)</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">S&P 500</td><td>6,368.85</td><td class="down"><span class="down">-108.31</span></td><td class="down"><span class="down">-1.67%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-7.14%</span></td></tr>
+<tr><td class="name-cell">納斯達克</td><td>20,948.36</td><td class="down"><span class="down">-459.72</span></td><td class="down"><span class="down">-2.15%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-9.84%</span></td></tr>
+<tr><td class="name-cell">道瓊斯</td><td>45,166.64</td><td class="down"><span class="down">-793.47</span></td><td class="down"><span class="down">-1.73%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-6.65%</span></td></tr>
+<tr><td class="name-cell">羅素2000</td><td>2,449.70</td><td class="down"><span class="down">-43.62</span></td><td class="down"><span class="down">-1.75%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="down">-2.33%</span></td></tr>
+<tr><td class="name-cell">費城半導體</td><td>7,457.67</td><td class="down"><span class="down">-128.20</span></td><td class="down"><span class="down">-1.69%</span></td><td class="down"><span class="trend-down">▼</span></td><td><span class="up">+1.22%</span></td></tr>
+</tbody></table>
+</div>
+<hr class="divider">
+<div style="margin:16px 0 20px 0;page-break-inside:avoid;"><div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #e67e22;padding-bottom:6px;margin-bottom:10px;">主要指數技術面關鍵位</div><table><thead><tr><th style="text-align:left;">指數</th><th style="text-align:right;">收盤</th><th style="text-align:right;">50MA</th><th style="text-align:right;">200MA</th><th style="text-align:right;">RSI(14)</th><th style="text-align:right;">距52W高</th><th style="text-align:center;">均線交叉</th></tr></thead><tbody><tr><td style="font-weight:600;text-align:left;">S&P 500</td><td style="text-align:right;">6,369</td><td style="text-align:right;">6,814</td><td style="text-align:right;">6,635</td><td style="text-align:right;font-weight:700;color:#e74c3c;">23.8</td><td style="text-align:right;color:#e74c3c;">-8.7%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">納斯達克</td><td style="text-align:right;">20,948</td><td style="text-align:right;">22,761</td><td style="text-align:right;">22,301</td><td style="text-align:right;font-weight:700;color:#e74c3c;">24.8</td><td style="text-align:right;color:#e74c3c;">-12.6%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">道瓊斯</td><td style="text-align:right;">45,167</td><td style="text-align:right;">48,407</td><td style="text-align:right;">46,647</td><td style="text-align:right;font-weight:700;color:#e74c3c;">25.8</td><td style="text-align:right;color:#e74c3c;">-10.0%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">香港恆生</td><td style="text-align:right;">24,751</td><td style="text-align:right;">26,277</td><td style="text-align:right;">25,730</td><td style="text-align:right;font-weight:700;color:#2c3e50;">36.3</td><td style="text-align:right;color:#e74c3c;">-11.5%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">台灣加權</td><td style="text-align:right;">32,518</td><td style="text-align:right;">32,706</td><td style="text-align:right;">27,268</td><td style="text-align:right;font-weight:700;color:#2c3e50;">48.1</td><td style="text-align:right;color:#e74c3c;">-8.2%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">日經225</td><td style="text-align:right;">51,886</td><td style="text-align:right;">54,801</td><td style="text-align:right;">47,636</td><td style="text-align:right;font-weight:700;color:#2c3e50;">46.8</td><td style="text-align:right;color:#e74c3c;">-11.8%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr><tr><td style="font-weight:600;text-align:left;">德國DAX</td><td style="text-align:right;">22,279</td><td style="text-align:right;">24,224</td><td style="text-align:right;">24,101</td><td style="text-align:right;font-weight:700;color:#e74c3c;">25.5</td><td style="text-align:right;color:#e74c3c;">-12.4%</td><td style="text-align:center;color:#27ae60;font-size:8.5pt;">黃金交叉</td></tr></tbody></table></div>
+<div class="section-new-page"></div>
+<div class="section-title">三、債券・殖利率</div>
+<div class="sub-section-block">
+<table>
+<thead><tr><th>債券</th><th>殖利率</th><th>變動</th><th>變動幅度</th><th>趨勢</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">美國2年期</td><td>3.607%</td><td class="down"><span class="down">-0.0130</span></td><td class="down"><span class="down">-0.36%</span></td><td class="down">—</td></tr>
+<tr><td class="name-cell">美國10年期</td><td>4.440%</td><td class="up"><span class="up">+0.0240</span></td><td class="up"><span class="up">+0.54%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">美國30年期</td><td>4.982%</td><td class="up"><span class="up">+0.0460</span></td><td class="up"><span class="up">+0.93%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+</tbody></table>
+</div>
+<div style="background:linear-gradient(135deg,#f5f0ff 0%,#ede5ff 100%);border-left:4px solid #6c5ce7;padding:14px 18px;margin:14px 0;font-size:9.5pt;line-height:1.8;border-radius:0 6px 6px 0;page-break-inside:avoid;"><strong style="color:#6c5ce7;font-size:10.5pt;">殖利率曲線分析</strong><br>美國殖利率曲線呈正常偏平形態，3個月-10年利差為 0.833%。殖利率曲線正常但偏平坦，長期利率溫和高於短期，反映市場對經濟增長持謹慎樂觀態度。</div>
+<div class="section-new-page"></div>
+<div class="section-title">四、外匯市場</div>
+<div class="sub-section-block">
+<div class="sub-section-title">主要貨幣對</div>
+<table>
+<thead><tr><th>貨幣對</th><th>匯率</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">美元指數</td><td>100.2890</td><td class="up"><span class="up">+0.1390</span></td><td class="up"><span class="up">+0.14%</span></td><td class="up">—</td></tr>
+<tr><td class="name-cell">EUR/USD</td><td>1.1496</td><td class="down"><span class="down">-0.0040</span></td><td class="down"><span class="down">-0.34%</span></td><td class="down">—</td></tr>
+<tr><td class="name-cell">USD/JPY</td><td>159.5760</td><td class="down"><span class="down">-0.1280</span></td><td class="down"><span class="down">-0.08%</span></td><td class="down">—</td></tr>
+<tr><td class="name-cell">GBP/USD</td><td>1.3234</td><td class="down"><span class="down">-0.0102</span></td><td class="down"><span class="down">-0.76%</span></td><td class="down"><span class="trend-down">▼</span></td></tr>
+<tr><td class="name-cell">USD/CNY</td><td>6.9100</td><td class="down"><span class="down">-0.0007</span></td><td class="down"><span class="down">-0.01%</span></td><td class="down">—</td></tr>
+<tr><td class="name-cell">USD/TWD</td><td>32.0100</td><td class="up"><span class="up">+0.0800</span></td><td class="up"><span class="up">+0.25%</span></td><td class="up">—</td></tr>
+</tbody></table>
+</div>
+<div style="margin:16px 0;page-break-inside:avoid;"><div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #e74c3c;padding-bottom:6px;margin-bottom:10px;">新興市場貨幣壓力 EM Currency Stress</div><div style="font-size:9.5pt;margin-bottom:8px;">綜合壓力: <strong>5.4</strong> — 中度壓力 — 關注新興市場動態</div><table><thead><tr><th style="text-align:left;">貨幣</th><th style="text-align:right;">匯率</th><th style="text-align:right;">1週</th><th style="text-align:right;">1月</th><th style="text-align:right;">波動率</th><th style="text-align:right;">壓力分</th></tr></thead><tbody><tr><td style="text-align:left;">美元/南非蘭特</td><td style="text-align:right;">17.1544</td><td style="text-align:right;">+0.45%</td><td style="text-align:right;">+7.77%</td><td style="text-align:right;">21.6%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">9.0</td></tr><tr><td style="text-align:left;">美元/巴西雷亞爾</td><td style="text-align:right;">5.2439</td><td style="text-align:right;">-1.28%</td><td style="text-align:right;">+2.09%</td><td style="text-align:right;">18.1%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">6.6</td></tr><tr><td style="text-align:left;">美元/墨西哥披索</td><td style="text-align:right;">18.0728</td><td style="text-align:right;">+0.75%</td><td style="text-align:right;">+5.06%</td><td style="text-align:right;">15.3%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">6.4</td></tr><tr><td style="text-align:left;">美元/印度盧比</td><td style="text-align:right;">94.6380</td><td style="text-align:right;">+0.79%</td><td style="text-align:right;">+3.99%</td><td style="text-align:right;">8.7%</td><td style="text-align:right;color:#f39c12;font-weight:700;">4.1</td></tr><tr><td style="text-align:left;">美元/土耳其里拉</td><td style="text-align:right;">44.4556</td><td style="text-align:right;">+0.34%</td><td style="text-align:right;">+1.35%</td><td style="text-align:right;">1.5%</td><td style="text-align:right;color:#27ae60;font-weight:700;">1.0</td></tr></tbody></table></div>
+<div class="section-new-page"></div>
+<div class="section-title">五、大宗商品</div>
+<div class="sub-section-block">
+<table>
+<thead><tr><th>商品</th><th>價格</th><th>漲跌</th><th>漲跌幅</th><th>趨勢</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">黃金</td><td>$4,561.00</td><td class="up"><span class="up">+69.00</span></td><td class="up"><span class="up">+1.54%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">白銀</td><td>$70.84</td><td class="up"><span class="up">+1.29</span></td><td class="up"><span class="up">+1.86%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">原油(WTI)</td><td>$101.86</td><td class="up"><span class="up">+2.22</span></td><td class="up"><span class="up">+2.23%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">布蘭特原油</td><td>$108.32</td><td class="down"><span class="down">-4.25</span></td><td class="down"><span class="down">-3.78%</span></td><td class="down"><span class="trend-strong-down">▼▼</span></td></tr>
+<tr><td class="name-cell">銅</td><td>$5.52</td><td class="up"><span class="up">+0.05</span></td><td class="up"><span class="up">+0.90%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">天然氣</td><td>$2.94</td><td class="down"><span class="down">-0.15</span></td><td class="down"><span class="down">-4.91%</span></td><td class="down"><span class="trend-strong-down">▼▼</span></td></tr>
+</tbody></table>
+</div>
+<div class="section-new-page"></div>
+<div class="section-title">六、加密貨幣市場</div>
+<table>
+<thead><tr><th>幣種</th><th>價格（USD）</th><th>24h 漲跌</th><th>漲跌幅</th><th>趨勢</th></tr></thead>
+<tbody>
+<tr><td class="name-cell">Bitcoin</td><td>$67,341.59</td><td class="up"><span class="up">+1,386.66</span></td><td class="up"><span class="up">+2.10%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">Ethereum</td><td>$2,048.58</td><td class="up"><span class="up">+66.02</span></td><td class="up"><span class="up">+3.33%</span></td><td class="up"><span class="trend-strong-up">▲▲</span></td></tr>
+<tr><td class="name-cell">BNB</td><td>$616.62</td><td class="up"><span class="up">+10.95</span></td><td class="up"><span class="up">+1.81%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">Solana</td><td>$83.88</td><td class="up"><span class="up">+2.46</span></td><td class="up"><span class="up">+3.02%</span></td><td class="up"><span class="trend-strong-up">▲▲</span></td></tr>
+<tr><td class="name-cell">XRP</td><td>$1.35</td><td class="up"><span class="up">+0.02</span></td><td class="up"><span class="up">+1.39%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+<tr><td class="name-cell">Cardano</td><td>$0.25</td><td class="up"><span class="up">+0.01</span></td><td class="up"><span class="up">+3.43%</span></td><td class="up"><span class="trend-strong-up">▲▲</span></td></tr>
+<tr><td class="name-cell">Dogecoin</td><td>$0.09</td><td class="up"><span class="up">+0.00</span></td><td class="up"><span class="up">+2.31%</span></td><td class="up"><span class="trend-up">▲</span></td></tr>
+</tbody></table>
+<hr class="divider">
+<div class="section-new-page"></div>
+<div class="section-title">七、市場情緒指標</div>
+<div class="sentiment-container">
+<div class="sentiment-card">
+  <div class="label">CNN 恐懼與貪婪指數</div>
+  <div class="value" style="color:#e74c3c;">10.4</div>
+  <div class="sub" style="color:#e74c3c; font-weight:600;">極度恐懼</div>
+</div>
+<div class="sentiment-card">
+  <div class="label">VIX 恐慌指數</div>
+  <div class="value" style="color:#e74c3c;">31.26</div>
+  <div class="sub down">+0.21 (+0.7%)</div>
+</div>
+<div class="sentiment-card">
+  <div class="label">美10Y殖利率</div>
+  <div class="value">4.440%</div>
+  <div class="sub up">+0.0240</div>
+</div>
+<div class="sentiment-card">
+  <div class="label">美元指數 DXY</div>
+  <div class="value">100.25</div>
+  <div class="sub">—</div>
+</div>
+</div>
+<table><thead><tr><th>指標</th><th>當前</th><th>前日</th><th>一週前</th><th>一月前</th><th>一年前</th></tr></thead><tbody>
+<tr><td class="name-cell">恐懼與貪婪</td><td class="down">10.4</td><td>10.2</td><td>14.1</td><td>41.2</td><td>26.4</td></tr>
+</tbody></table>
+<div>
+<div class="sub-section-title" style="margin-top:8px;">經濟週期指示器</div>
+<div class="clock-wrapper">
+  <div class="clock-svg-box">
+    <svg viewBox="0 0 340 340" width="220" height="220">
+      <defs>
+  <radialGradient id="grad_Recovery" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#a9dfbf"/>
+    <stop offset="100%" stop-color="#eafaf1"/>
+  </radialGradient>
+  <radialGradient id="grad_Recovery_active" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#27ae60"/>
+    <stop offset="100%" stop-color="#a9dfbf"/>
+  </radialGradient>
+  <radialGradient id="grad_Overheat" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#f5cba7"/>
+    <stop offset="100%" stop-color="#fef5e7"/>
+  </radialGradient>
+  <radialGradient id="grad_Overheat_active" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#e67e22"/>
+    <stop offset="100%" stop-color="#f5cba7"/>
+  </radialGradient>
+  <radialGradient id="grad_Stagflation" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#f5b7b1"/>
+    <stop offset="100%" stop-color="#fdedec"/>
+  </radialGradient>
+  <radialGradient id="grad_Stagflation_active" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#e74c3c"/>
+    <stop offset="100%" stop-color="#f5b7b1"/>
+  </radialGradient>
+  <radialGradient id="grad_Reflation" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#aed6f1"/>
+    <stop offset="100%" stop-color="#ebf5fb"/>
+  </radialGradient>
+  <radialGradient id="grad_Reflation_active" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#2980b9"/>
+    <stop offset="100%" stop-color="#aed6f1"/>
+  </radialGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="needle-shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.3"/></filter>
+</defs>
+<circle cx="160" cy="160" r="117" fill="none" stroke="#dce1e6" stroke-width="1.5"/>
+<path d="M 160 160 L 45 160 A 115 115 0 0 1 160 45 Z" fill="url(#grad_Recovery)" stroke="#ccc" stroke-width="0.5"/>
+<path d="M 160 160 L 160 45 A 115 115 0 0 1 275 160 Z" fill="url(#grad_Overheat)" stroke="#ccc" stroke-width="0.5"/>
+<path d="M 160 160 L 275 160 A 115 115 0 0 1 160 275 Z" fill="url(#grad_Stagflation_active)" stroke="#e74c3c" stroke-width="2.5" filter="url(#glow)"/>
+<path d="M 160 160 L 160 275 A 115 115 0 0 1 45 160 Z" fill="url(#grad_Reflation)" stroke="#ccc" stroke-width="0.5"/>
+<line x1="45" y1="160" x2="275" y2="160" stroke="#fff" stroke-width="2"/>
+<line x1="160" y1="45" x2="160" y2="275" stroke="#fff" stroke-width="2"/>
+<text x="105" y="125" text-anchor="middle" font-size="10" font-weight="500" fill="#666">復甦期</text>
+<text x="215" y="125" text-anchor="middle" font-size="10" font-weight="500" fill="#666">過熱期</text>
+<text x="215" y="202" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">滯脹期</text>
+<text x="105" y="202" text-anchor="middle" font-size="10" font-weight="500" fill="#666">衰退期</text>
+<text x="160" y="33" text-anchor="middle" font-size="9" fill="#e74c3c" font-weight="600">通脹上升 →</text>
+<text x="160" y="295" text-anchor="middle" font-size="9" fill="#2980b9" font-weight="600">← 通脹下降</text>
+<text x="15" y="164" text-anchor="middle" font-size="9" fill="#27ae60" font-weight="600">↑</text>
+<text x="15" y="176" text-anchor="middle" font-size="8" fill="#27ae60" font-weight="600">增長</text>
+<text x="305" y="164" text-anchor="middle" font-size="9" fill="#e67e22" font-weight="600">↓</text>
+<text x="305" y="176" text-anchor="middle" font-size="8" fill="#e67e22" font-weight="600">放緩</text>
+<polygon points="216.9,216.9 155.8,164.2 164.2,155.8" fill="#e74c3c" stroke="#fff" stroke-width="0.5" filter="url(#needle-shadow)"/>
+<circle cx="160" cy="160" r="6" fill="#2c3e50" stroke="#fff" stroke-width="2"/>
+<path d="M 168 40 A 121 121 0 1 1 152 40" fill="none" stroke="#bdc3c7" stroke-width="1.2" stroke-dasharray="4,3"/>
+
+    </svg>
+  </div>
+  <div class="clock-info-box">
+    <div class="clock-phase-title" style="color:#e74c3c;">滯脹期（Stagflation）</div>
+    <div class="clock-phase-sub">
+      增長方向：↓ ｜ 通脹方向：↑ ｜ 信號強度：弱
+    </div>
+    <div class="clock-phase-sub">經濟增長動能減弱但通脹壓力仍然高企，市場面臨滯脹環境，企業成本上升而盈利增速放緩。</div>
+    <div class="clock-indicator-row">
+      <div class="clock-ind-card">
+        <div class="ind-label">10Y殖利率</div>
+        <div class="ind-value">4.440%</div>
+      </div>
+      <div class="clock-ind-card">
+        <div class="ind-label">5Y殖利率</div>
+        <div class="ind-value">4.070%</div>
+      </div>
+      <div class="clock-ind-card">
+        <div class="ind-label">10Y-5Y利差</div>
+        <div class="ind-value">0.370</div>
+      </div>
+      <div class="clock-ind-card">
+        <div class="ind-label">原油</div>
+        <div class="ind-value">$99.6</div>
+      </div>
+    </div>
+    <div style="font-size:7pt; color:#95a5a6; margin-top:4px;">判斷依據：10Y-5Y殖利率利差 20日MA斜率（增長）+ TIP/IEF比率 20日MA斜率（隱含通脹預期）（通脹）</div>
+  </div>
+</div>
+<div style="background:linear-gradient(135deg,#fff5f5 0%,#ffe8e8 100%);border-left:4px solid #e74c3c;padding:10px 14px;margin:10px 0;font-size:8.5pt;line-height:1.6;border-radius:0 6px 6px 0;"><strong style="color:#c0392b;font-size:9pt;">歷史情境參考</strong><br>CNN 恐懼與貪婪指數 10 處於極度恐懼區間（10-20），通常反映市場已大幅回調但恐慌尚未見頂。歷史上此水平往往伴隨高波動性，聰明資金可能開始分批佈局，但建議等待 VIX 從高位回落作為確認信號。<br>VIX 31.3 處於高波動區間（25-35），反映市場不確定性顯著上升，期權避險成本高企。</div>
+</div>
+<div class="section-new-page"></div>
+<div class="section-title">八、全球資金流向</div>
+<div class="sub-section-title">各國/地區資金流向（基於ETF CMF×成交量）</div>
+<table><thead><tr><th>國家/地區</th><th>ETF</th><th>當日</th><th>近一週</th><th>近一月</th><th>年初至今</th></tr></thead><tbody>
+<tr><td class="name-cell">美國</td><td>SPY</td><td class="flow-val-cell down">-518億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell down">-1879億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell down">-2576億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell down">-978億<span class="bar negative" style="width:50px;"></span></td></tr>
+<tr><td class="name-cell">歐洲</td><td>VGK</td><td class="flow-val-cell down">-1.9億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-5.7億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-7.1億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+16.6億<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">日本</td><td>EWJ</td><td class="flow-val-cell down">-7.4億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-14.0億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+14.2億<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+80.6億<span class="bar positive" style="width:4px;"></span></td></tr>
+<tr><td class="name-cell">中國/港股</td><td>FXI</td><td class="flow-val-cell down">-4.6億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-18.4億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-23.0億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+82.4億<span class="bar positive" style="width:4px;"></span></td></tr>
+<tr><td class="name-cell">台灣</td><td>EWT</td><td class="flow-val-cell down">-1.7億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+1.9億<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+7.5億<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+38.5億<span class="bar positive" style="width:1px;"></span></td></tr>
+<tr><td class="name-cell">韓國</td><td>EWY</td><td class="flow-val-cell down">-5.5億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-25.9億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-7.7億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+118億<span class="bar positive" style="width:6px;"></span></td></tr>
+<tr><td class="name-cell">印度</td><td>INDA</td><td class="flow-val-cell down">-1.6億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-10.2億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-15.9億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+22.4億<span class="bar positive" style="width:1px;"></span></td></tr>
+<tr><td class="name-cell">新興市場</td><td>VWO</td><td class="flow-val-cell down">-4.6億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-7.6億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+9.8億<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+71.8億<span class="bar positive" style="width:3px;"></span></td></tr>
+<tr><td class="name-cell">印尼</td><td>EIDO</td><td class="flow-val-cell down">-360萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-2062萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+3375萬<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell down">-8185萬<span class="bar negative" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">越南</td><td>VNM</td><td class="flow-val-cell down">-450萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-3495萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-1.0億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-1.1億<span class="bar negative" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">泰國</td><td>THD</td><td class="flow-val-cell down">-275萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-437萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-956萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+3310萬<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">馬來西亞</td><td>EWM</td><td class="flow-val-cell down">-191萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-4636萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-4160萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+5245萬<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">菲律賓</td><td>EPHE</td><td class="flow-val-cell down">-113萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+176萬<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+408萬<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+3584萬<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">澳洲</td><td>EWA</td><td class="flow-val-cell down">-2020萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-1.5億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+1807萬<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+13.2億<span class="bar positive" style="width:0px;"></span></td></tr>
+</tbody></table>
+<div style="background:linear-gradient(135deg,#fff8f0 0%,#ffecd2 100%);border-left:4px solid #e67e22;padding:14px 18px;margin:14px 0;font-size:9.5pt;line-height:1.8;border-radius:0 6px 6px 0;page-break-inside:avoid;"><strong style="color:#d35400;font-size:10.5pt;">行業輪動解讀</strong><br>當日資金流入板塊：能源、必需消費。資金流出板塊：金融、醫療保健、工業。</div>
+<div class="section-new-page"></div>
+<div class="section-title">九、板塊輪動</div>
+<table><thead><tr><th>板塊</th><th>ETF</th><th>當日</th><th>近一週</th><th>近一月</th><th>年初至今</th></tr></thead><tbody>
+<tr><td class="name-cell">金融</td><td>XLF</td><td class="flow-val-cell down">-23.6億<span class="bar negative" style="width:45px;"></span></td><td class="flow-val-cell down">-67.4億<span class="bar negative" style="width:42px;"></span></td><td class="flow-val-cell down">-65.3億<span class="bar negative" style="width:36px;"></span></td><td class="flow-val-cell down">-76.6億<span class="bar negative" style="width:26px;"></span></td></tr>
+<tr><td class="name-cell">醫療保健</td><td>XLV</td><td class="flow-val-cell down">-15.9億<span class="bar negative" style="width:30px;"></span></td><td class="flow-val-cell down">-33.6億<span class="bar negative" style="width:21px;"></span></td><td class="flow-val-cell down">-79.8億<span class="bar negative" style="width:44px;"></span></td><td class="flow-val-cell down">-4.3億<span class="bar negative" style="width:1px;"></span></td></tr>
+<tr><td class="name-cell">工業</td><td>XLI</td><td class="flow-val-cell down">-15.8億<span class="bar negative" style="width:30px;"></span></td><td class="flow-val-cell down">-56.6億<span class="bar negative" style="width:35px;"></span></td><td class="flow-val-cell down">-29.0億<span class="bar negative" style="width:16px;"></span></td><td class="flow-val-cell up">+94.2億<span class="bar positive" style="width:33px;"></span></td></tr>
+<tr><td class="name-cell">資訊科技</td><td>XLK</td><td class="flow-val-cell down">-15.0億<span class="bar negative" style="width:28px;"></span></td><td class="flow-val-cell down">-52.3億<span class="bar negative" style="width:32px;"></span></td><td class="flow-val-cell down">-90.5億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell down">-131億<span class="bar negative" style="width:46px;"></span></td></tr>
+<tr><td class="name-cell">非必需消費</td><td>XLY</td><td class="flow-val-cell down">-9.3億<span class="bar negative" style="width:17px;"></span></td><td class="flow-val-cell down">-26.6億<span class="bar negative" style="width:16px;"></span></td><td class="flow-val-cell down">-2.9億<span class="bar negative" style="width:1px;"></span></td><td class="flow-val-cell up">+41.0億<span class="bar positive" style="width:14px;"></span></td></tr>
+<tr><td class="name-cell">通訊服務</td><td>XLC</td><td class="flow-val-cell down">-6.6億<span class="bar negative" style="width:12px;"></span></td><td class="flow-val-cell down">-28.5億<span class="bar negative" style="width:17px;"></span></td><td class="flow-val-cell down">-14.8億<span class="bar negative" style="width:8px;"></span></td><td class="flow-val-cell down">-1.7億<span class="bar negative" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">公用事業</td><td>XLU</td><td class="flow-val-cell down">-3.1億<span class="bar negative" style="width:5px;"></span></td><td class="flow-val-cell down">-11.2億<span class="bar negative" style="width:6px;"></span></td><td class="flow-val-cell down">-24.4億<span class="bar negative" style="width:13px;"></span></td><td class="flow-val-cell up">+23.8億<span class="bar positive" style="width:8px;"></span></td></tr>
+<tr><td class="name-cell">原材料</td><td>XLB</td><td class="flow-val-cell down">-2.6億<span class="bar negative" style="width:4px;"></span></td><td class="flow-val-cell down">-6777萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-5.5億<span class="bar negative" style="width:3px;"></span></td><td class="flow-val-cell up">+89.6億<span class="bar positive" style="width:31px;"></span></td></tr>
+<tr><td class="name-cell">房地產</td><td>XLRE</td><td class="flow-val-cell down">-1.8億<span class="bar negative" style="width:3px;"></span></td><td class="flow-val-cell down">-11.8億<span class="bar negative" style="width:7px;"></span></td><td class="flow-val-cell down">-8.7億<span class="bar negative" style="width:4px;"></span></td><td class="flow-val-cell up">+5.8億<span class="bar positive" style="width:2px;"></span></td></tr>
+<tr><td class="name-cell">必需消費</td><td>XLP</td><td class="flow-val-cell up">+4.0億<span class="bar positive" style="width:7px;"></span></td><td class="flow-val-cell down">-7.6億<span class="bar negative" style="width:4px;"></span></td><td class="flow-val-cell down">-81.8億<span class="bar negative" style="width:45px;"></span></td><td class="flow-val-cell up">+142億<span class="bar positive" style="width:50px;"></span></td></tr>
+<tr><td class="name-cell">能源</td><td>XLE</td><td class="flow-val-cell up">+26.0億<span class="bar positive" style="width:50px;"></span></td><td class="flow-val-cell up">+79.8億<span class="bar positive" style="width:50px;"></span></td><td class="flow-val-cell up">+3.0億<span class="bar positive" style="width:1px;"></span></td><td class="flow-val-cell up">+135億<span class="bar positive" style="width:47px;"></span></td></tr>
+</tbody></table>
+<div class="sub-section-title">債券市場資金流向</div>
+<table class="bond-flow-table"><thead><tr><th>債券類型</th><th>ETF</th><th>當日</th><th>近一週</th><th>近一月</th><th>年初至今</th></tr></thead><tbody>
+<tr><td class="name-cell">1-3年國債</td><td>SHY</td><td class="flow-val-cell up">+6.6億<span class="bar positive" style="width:23px;"></span></td><td class="flow-val-cell down">-4030萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-12.2億<span class="bar negative" style="width:2px;"></span></td><td class="flow-val-cell down">-1.7億<span class="bar negative" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">3-7年國債</td><td>IEI</td><td class="flow-val-cell up">+2.9億<span class="bar positive" style="width:10px;"></span></td><td class="flow-val-cell up">+3.2億<span class="bar positive" style="width:2px;"></span></td><td class="flow-val-cell down">-6.6億<span class="bar negative" style="width:1px;"></span></td><td class="flow-val-cell up">+4.2億<span class="bar positive" style="width:2px;"></span></td></tr>
+<tr><td class="name-cell">7-10年國債</td><td>IEF</td><td class="flow-val-cell up">+1.5億<span class="bar positive" style="width:5px;"></span></td><td class="flow-val-cell up">+2.7億<span class="bar positive" style="width:2px;"></span></td><td class="flow-val-cell down">-40.5億<span class="bar negative" style="width:8px;"></span></td><td class="flow-val-cell up">+12.3億<span class="bar positive" style="width:7px;"></span></td></tr>
+<tr><td class="name-cell">10-20年國債</td><td>TLH</td><td class="flow-val-cell up">+158萬<span class="bar positive" style="width:0px;"></span></td><td class="flow-val-cell up">+3.1億<span class="bar positive" style="width:2px;"></span></td><td class="flow-val-cell down">-5.4億<span class="bar negative" style="width:1px;"></span></td><td class="flow-val-cell up">+1195萬<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">20年+國債</td><td>TLT</td><td class="flow-val-cell down">-14.2億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell up">+15.7億<span class="bar positive" style="width:12px;"></span></td><td class="flow-val-cell down">-102億<span class="bar negative" style="width:22px;"></span></td><td class="flow-val-cell up">+86.0億<span class="bar positive" style="width:50px;"></span></td></tr>
+<tr><td class="name-cell">投資級債</td><td>LQD</td><td class="flow-val-cell up">+8987萬<span class="bar positive" style="width:3px;"></span></td><td class="flow-val-cell down">-62.3億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell down">-211億<span class="bar negative" style="width:46px;"></span></td><td class="flow-val-cell up">+70.5億<span class="bar positive" style="width:40px;"></span></td></tr>
+<tr><td class="name-cell">非投資等債</td><td>HYG</td><td class="flow-val-cell up">+6.0億<span class="bar positive" style="width:21px;"></span></td><td class="flow-val-cell down">-61.9億<span class="bar negative" style="width:49px;"></span></td><td class="flow-val-cell down">-226億<span class="bar negative" style="width:50px;"></span></td><td class="flow-val-cell up">+85.7億<span class="bar positive" style="width:49px;"></span></td></tr>
+<tr><td class="name-cell">新興債</td><td>EMB</td><td class="flow-val-cell down">-9.2億<span class="bar negative" style="width:32px;"></span></td><td class="flow-val-cell down">-13.6億<span class="bar negative" style="width:10px;"></span></td><td class="flow-val-cell down">-50.1億<span class="bar negative" style="width:11px;"></span></td><td class="flow-val-cell down">-17.1億<span class="bar negative" style="width:9px;"></span></td></tr>
+<tr><td class="name-cell">新興美元債</td><td>VWOB</td><td class="flow-val-cell down">-4932萬<span class="bar negative" style="width:1px;"></span></td><td class="flow-val-cell down">-7858萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-1.0億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+5661萬<span class="bar positive" style="width:0px;"></span></td></tr>
+<tr><td class="name-cell">新興本地債</td><td>EMLC</td><td class="flow-val-cell down">-2889萬<span class="bar negative" style="width:1px;"></span></td><td class="flow-val-cell down">-4354萬<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell down">-1.1億<span class="bar negative" style="width:0px;"></span></td><td class="flow-val-cell up">+5.5億<span class="bar positive" style="width:3px;"></span></td></tr>
+</tbody></table>
+<div class="section-new-page"></div>
+<div class="section-title">十、當日熱門股票</div>
+<div class="filter-note">篩選邏輯：資金追捧（量比 ≥ 1.5x + 上漲）；資金出清（量比 ≥ 2.5x + 下跌）<br/>排序方式：量比門檻（硬篩）→ 漲跌幅排序 → 新聞提及加分 | 每市場最多 5 支買入 + 5 支賣出</div>
+<div class="sub-section-title">美股</div>
+<p class="hot-label buy">🔥 資金追捧（買入放量 ≥ 1.5x + 上漲）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">Entergy</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">ETR</code></td><td style="text-align:right;">109.88</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+6.82%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">9.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Brown–Forman</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">BF-B</code></td><td style="text-align:right;">27.19</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+5.63%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">13.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Campbell's Company (The)</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">CPB</code></td><td style="text-align:right;">21.99</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+4.96%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">14.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Molson Coors Beverage Company</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">TAP</code></td><td style="text-align:right;">43.40</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+3.56%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.1x</td><td style="text-align:right;color:#999;font-size:8.5pt;">3.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">ExxonMobil</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">XOM</code></td><td style="text-align:right;">170.99</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+3.36%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">30.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">McCormick & Company</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">MKC</code></td><td style="text-align:right;">53.07</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+2.89%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">4.9M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">First Solar</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">FSLR</code></td><td style="text-align:right;">190.29</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+2.40%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Church & Dwight</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">CHD</code></td><td style="text-align:right;">94.69</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+1.58%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.1x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Constellation Brands</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">STZ</code></td><td style="text-align:right;">151.40</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+0.66%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">HP Inc.</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">HPQ</code></td><td style="text-align:right;">19.44</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+0.62%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">23.6M</td></tr>
+</tbody></table>
+<p class="hot-label sell">⚠️ 資金出清（賣出放量 ≥ 2.5x + 下跌）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">Datadog</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">DDOG</code></td><td style="text-align:right;">114.48</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-7.90%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.4x</td><td style="text-align:right;color:#999;font-size:8.5pt;">6.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">CrowdStrike</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">CRWD</code></td><td style="text-align:right;">369.58</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-5.87%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.4x</td><td style="text-align:right;color:#999;font-size:8.5pt;">6.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Citigroup</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">C</code></td><td style="text-align:right;">107.38</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-4.47%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">23.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Carnival</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">CCL</code></td><td style="text-align:right;">24.19</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-4.31%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.4x</td><td style="text-align:right;color:#999;font-size:8.5pt;">43.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">DoorDash</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">DASH</code></td><td style="text-align:right;">146.60</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-3.53%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">6.2M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Fortinet</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">FTNT</code></td><td style="text-align:right;">78.20</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-3.49%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">8.8M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Danaher Corporation</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">DHR</code></td><td style="text-align:right;">181.52</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-3.47%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">5.9M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Fiserv</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">FISV</code></td><td style="text-align:right;">53.90</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.95%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">8.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Equifax</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">EFX</code></td><td style="text-align:right;">171.85</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-1.52%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.5M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Arch Capital Group</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">ACGL</code></td><td style="text-align:right;">93.42</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-0.74%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.9M</td></tr>
+</tbody></table>
+<div class="sub-section-title">港股</div>
+<p class="hot-label buy">🔥 資金追捧（買入放量 ≥ 1.5x + 上漲）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">天圖投資</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1973.HK</code></td><td style="text-align:right;">2.58</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+61.25%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.8x</td><td style="text-align:right;color:#999;font-size:8.5pt;">143K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">甘肅銀行</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2139.HK</code></td><td style="text-align:right;">0.32</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+27.45%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">66.1x</td><td style="text-align:right;color:#999;font-size:8.5pt;">53.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">中鋁國際</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2068.HK</code></td><td style="text-align:right;">2.99</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+22.54%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">8.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">148.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">美中嘉和</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2453.HK</code></td><td style="text-align:right;">1.27</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+16.51%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">赤峰黃金</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">6693.HK</code></td><td style="text-align:right;">40.92</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+10.30%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">22.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">中國鋁業</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2600.HK</code></td><td style="text-align:right;">11.60</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+7.31%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">133.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">山西安裝</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2520.HK</code></td><td style="text-align:right;">2.10</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+7.14%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">30.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">122K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">心瑋醫療－Ｂ</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">6609.HK</code></td><td style="text-align:right;">47.56</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+6.88%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">81K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">中泰期貨</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1461.HK</code></td><td style="text-align:right;">0.65</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+6.56%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">417K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">盛力達科技</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1289.HK</code></td><td style="text-align:right;">2.48</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+6.44%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.1x</td><td style="text-align:right;color:#999;font-size:8.5pt;">96K</td></tr>
+</tbody></table>
+<p class="hot-label sell">⚠️ 資金出清（賣出放量 ≥ 2.5x + 下跌）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">威高股份</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1066.HK</code></td><td style="text-align:right;">3.78</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-17.47%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">6.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">94.7M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">三寶科技</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1708.HK</code></td><td style="text-align:right;">0.29</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-14.71%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">5.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">204K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">興瀘水務</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2281.HK</code></td><td style="text-align:right;">0.67</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-14.10%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">8.8x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.6M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">九源基因</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2566.HK</code></td><td style="text-align:right;">7.08</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-10.83%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">8.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">354K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">十月稻田</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">9676.HK</code></td><td style="text-align:right;">6.80</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-7.86%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">京城佳業</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2210.HK</code></td><td style="text-align:right;">2.39</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-6.64%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">34.1x</td><td style="text-align:right;color:#999;font-size:8.5pt;">86K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">海信家電</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">0921.HK</code></td><td style="text-align:right;">19.63</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-6.43%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">2.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">長城汽車</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2333.HK</code></td><td style="text-align:right;">11.85</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-5.05%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">35.5M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">BYD Electronics</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">0285.HK</code></td><td style="text-align:right;">29.12</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-4.84%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">30.6M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">中國同輻</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1763.HK</code></td><td style="text-align:right;">20.14</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-4.55%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">668K</td></tr>
+</tbody></table>
+<div class="sub-section-title">日股</div>
+<p class="hot-label buy">🔥 資金追捧（買入放量 ≥ 1.5x + 上漲）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">JGC Corporation</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1963.T</code></td><td style="text-align:right;">2,246.50</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+4.25%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">7.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Chugai Pharmaceutical</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">4519.T</code></td><td style="text-align:right;">8,660.00</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+1.41%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">3.4M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Secom</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">9735.T</code></td><td style="text-align:right;">5,991.00</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+1.34%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.8M</td></tr>
+</tbody></table>
+<p class="hot-label sell">⚠️ 資金出清（賣出放量 ≥ 2.5x + 下跌）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">Central Japan Railway Company</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">9022.T</code></td><td style="text-align:right;">4,082.00</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.93%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">5.8M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">Honda Motor</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">7267.T</code></td><td style="text-align:right;">1,270.50</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.64%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">85.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">T&D Holdings</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">8795.T</code></td><td style="text-align:right;">3,880.00</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-1.75%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.8x</td><td style="text-align:right;color:#999;font-size:8.5pt;">7.6M</td></tr>
+</tbody></table>
+<div class="sub-section-title">台股</div>
+<p class="hot-label buy">🔥 資金追捧（買入放量 ≥ 1.5x + 上漲）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">寶隆</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1906.TW</code></td><td style="text-align:right;">12.65</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+10.00%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">11.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.7M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">為升</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2231.TW</code></td><td style="text-align:right;">137.50</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+10.00%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">6.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">6.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">怡利電</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2497.TW</code></td><td style="text-align:right;">48.50</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.98%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">6.3x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.8M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">微程式</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">7721.TW</code></td><td style="text-align:right;">67.30</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.97%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.8x</td><td style="text-align:right;color:#999;font-size:8.5pt;">889K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">敦泰</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">3545.TW</code></td><td style="text-align:right;">49.70</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.96%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.9x</td><td style="text-align:right;color:#999;font-size:8.5pt;">8.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">永裕</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1323.TW</code></td><td style="text-align:right;">21.00</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.95%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">6.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">447K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">巧新</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1563.TW</code></td><td style="text-align:right;">44.20</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.95%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.1M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">台化</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1326.TW</code></td><td style="text-align:right;">48.65</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.94%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.4x</td><td style="text-align:right;color:#999;font-size:8.5pt;">116.5M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">亞聚</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1308.TW</code></td><td style="text-align:right;">19.40</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.92%</span></td><td style="text-align:right;color:#333;font-weight:600;">1.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">26.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">中碳</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1723.TW</code></td><td style="text-align:right;">88.70</td><td class="up" style="text-align:right;font-weight:600;"><span class="up">+9.91%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">4.4M</td></tr>
+</tbody></table>
+<p class="hot-label sell">⚠️ 資金出清（賣出放量 ≥ 2.5x + 下跌）</p>
+<table>
+<thead><tr><th style="text-align:left;">股票</th><th>代碼</th><th style="text-align:right;">收盤價</th><th style="text-align:right;">漲跌幅</th><th style="text-align:right;">量比</th><th style="text-align:right;">成交量</th></tr></thead>
+<tbody>
+<tr><td class="name-cell" style="text-align:left;">世芯-KY</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">3661.TW</code></td><td style="text-align:right;">2,750.00</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-9.54%</span></td><td style="text-align:right;color:#e67e22;font-weight:600;">2.6x</td><td style="text-align:right;color:#999;font-size:8.5pt;">4.3M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">希華</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2484.TW</code></td><td style="text-align:right;">28.15</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-8.90%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">5.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">13.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">統領</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2910.TW</code></td><td style="text-align:right;">20.80</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-5.50%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">61K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">大研生醫*</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">7780.TW</code></td><td style="text-align:right;">21.00</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-4.55%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">3.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">15.0M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">恩德</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">1528.TW</code></td><td style="text-align:right;">24.50</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-3.73%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.5x</td><td style="text-align:right;color:#999;font-size:8.5pt;">30.8M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">宏正</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">6277.TW</code></td><td style="text-align:right;">69.90</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.78%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">8.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">1.9M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">全友</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">2305.TW</code></td><td style="text-align:right;">16.85</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.60%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">9.2M</td></tr>
+<tr><td class="name-cell" style="text-align:left;">吉源-KY</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">8488.TW</code></td><td style="text-align:right;">9.80</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-2.00%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">7.0x</td><td style="text-align:right;color:#999;font-size:8.5pt;">567K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">日成-KY</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">4807.TW</code></td><td style="text-align:right;">14.75</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-1.67%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">10.7x</td><td style="text-align:right;color:#999;font-size:8.5pt;">591K</td></tr>
+<tr><td class="name-cell" style="text-align:left;">晟銘電</td><td style="text-align:center;"><code style="font-size:8pt;color:#666;">3013.TW</code></td><td style="text-align:right;">104.50</td><td class="down" style="text-align:right;font-weight:600;"><span class="down">-1.42%</span></td><td style="text-align:right;color:#e74c3c;font-weight:600;">4.2x</td><td style="text-align:right;color:#999;font-size:8.5pt;">11.8M</td></tr>
+</tbody></table>
+<hr class="divider">
+<div class="section-new-page"></div><div style="margin:16px 0 20px 0;page-break-inside:avoid;"><div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #2980b9;padding-bottom:6px;margin-bottom:10px;">FRED 聯準會經濟數據</div><table><thead><tr><th style="text-align:left;">指標</th><th style="text-align:center;">代碼</th><th style="text-align:right;">最新值</th><th style="text-align:right;">變化</th><th style="text-align:center;">日期</th></tr></thead><tbody><tr><td style="text-align:left;">聯邦基金有效利率</td><td style="text-align:center;color:#888;font-size:8pt;">FEDFUNDS</td><td style="text-align:right;font-weight:600;">3.6400</td><td style="text-align:right;color:#666;">+0.0000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-02-01</td></tr><tr><td style="text-align:left;">聯邦基金日利率</td><td style="text-align:center;color:#888;font-size:8pt;">DFF</td><td style="text-align:right;font-weight:600;">3.6400</td><td style="text-align:right;color:#666;">+0.0000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-26</td></tr><tr><td style="text-align:left;">10Y-2Y 殖利率利差</td><td style="text-align:center;color:#888;font-size:8pt;">T10Y2Y</td><td style="text-align:right;font-weight:600;">0.5600</td><td style="text-align:right;color:#27ae60;">+0.1000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-27</td></tr><tr><td style="text-align:left;">10Y-3M 殖利率利差</td><td style="text-align:center;color:#888;font-size:8pt;">T10Y3M</td><td style="text-align:right;font-weight:600;">0.7100</td><td style="text-align:right;color:#27ae60;">+0.0200</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-27</td></tr><tr><td style="text-align:left;">ICE BofA 高收益利差</td><td style="text-align:center;color:#888;font-size:8pt;">BAMLH0A0HYM2</td><td style="text-align:right;font-weight:600;">3.2100</td><td style="text-align:right;color:#27ae60;">+0.0400</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-26</td></tr><tr><td style="text-align:left;">5年盈虧平衡通脹率</td><td style="text-align:center;color:#888;font-size:8pt;">T5YIE</td><td style="text-align:right;font-weight:600;">2.5600</td><td style="text-align:right;color:#666;">+0.0000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-27</td></tr><tr><td style="text-align:left;">10年盈虧平衡通脹率</td><td style="text-align:center;color:#888;font-size:8pt;">T10YIE</td><td style="text-align:right;font-weight:600;">2.3100</td><td style="text-align:right;color:#e74c3c;">-0.0300</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-27</td></tr><tr><td style="text-align:left;">CPI 消費者物價指數</td><td style="text-align:center;color:#888;font-size:8pt;">CPIAUCSL</td><td style="text-align:right;font-weight:600;">327.4600</td><td style="text-align:right;color:#27ae60;">+0.8720</td><td style="text-align:center;color:#999;font-size:8pt;">2026-02-01</td></tr><tr><td style="text-align:left;">Fed 資產負債表（總資產）</td><td style="text-align:center;color:#888;font-size:8pt;">WALCL</td><td style="text-align:right;font-weight:600;">6,657,161.0000</td><td style="text-align:right;color:#27ae60;">+1222.0000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-25</td></tr><tr><td style="text-align:left;">隔夜逆回購（日）</td><td style="text-align:center;color:#888;font-size:8pt;">RRPONTSYD</td><td style="text-align:right;font-weight:600;">0.9920</td><td style="text-align:right;color:#27ae60;">+0.1070</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-27</td></tr><tr><td style="text-align:left;">初領失業金人數（週）</td><td style="text-align:center;color:#888;font-size:8pt;">ICSA</td><td style="text-align:right;font-weight:600;">210,000.0000</td><td style="text-align:right;color:#27ae60;">+5000.0000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-21</td></tr><tr><td style="text-align:left;">失業率</td><td style="text-align:center;color:#888;font-size:8pt;">UNRATE</td><td style="text-align:right;font-weight:600;">4.4000</td><td style="text-align:right;color:#27ae60;">+0.1000</td><td style="text-align:center;color:#999;font-size:8pt;">2026-02-01</td></tr><tr><td style="text-align:left;">芝加哥聯儲金融狀況指數</td><td style="text-align:center;color:#888;font-size:8pt;">NFCI</td><td style="text-align:right;font-weight:600;">-0.4750</td><td style="text-align:right;color:#27ae60;">+0.0129</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-20</td></tr><tr><td style="text-align:left;">聖路易聯儲金融壓力指數</td><td style="text-align:center;color:#888;font-size:8pt;">STLFSI4</td><td style="text-align:right;font-weight:600;">-0.3677</td><td style="text-align:right;color:#e74c3c;">-0.0681</td><td style="text-align:center;color:#999;font-size:8pt;">2026-03-20</td></tr></tbody></table><div style="margin-top:8px;font-size:9pt;color:#555;">Fed 資產負債表: <strong>$6.66T</strong>（週變化 +1,222M）</div></div>
+<div class="section-new-page"></div><div style="margin:16px 0;page-break-inside:avoid;"><div style="font-size:13pt;font-weight:700;color:#2c3e50;border-bottom:2.5px solid #e67e22;padding-bottom:6px;margin-bottom:10px;">板塊輪動分析 Sector Rotation</div><div style="background:linear-gradient(135deg,#fff8f0,#ffecd2);border-left:4px solid #e67e22;padding:10px 16px;margin-bottom:10px;font-size:9.5pt;border-radius:0 6px 6px 0;"><strong>市場態勢：</strong>強 Risk-Off（避險模式）（Risk Spread: -2.34）</div><table><thead><tr><th style="text-align:left;">板塊</th><th style="text-align:right;">1週</th><th style="text-align:right;">1月</th><th style="text-align:right;">動量</th></tr></thead><tbody><tr><td style="text-align:left;font-weight:600;">能源 (XLE)</td><td style="text-align:right;">+5.48%</td><td style="text-align:right;">+13.64%</td><td style="text-align:right;color:#27ae60;font-weight:700;">+9.56</td></tr><tr><td style="text-align:left;font-weight:600;">公用事業 (XLU)</td><td style="text-align:right;">+2.11%</td><td style="text-align:right;">-3.37%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-0.63</td></tr><tr><td style="text-align:left;font-weight:600;">原材料 (XLB)</td><td style="text-align:right;">+4.11%</td><td style="text-align:right;">-7.72%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-1.80</td></tr><tr><td style="text-align:left;font-weight:600;">必需消費 (XLP)</td><td style="text-align:right;">+0.60%</td><td style="text-align:right;">-7.97%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-3.68</td></tr><tr><td style="text-align:left;font-weight:600;">房地產 (XLRE)</td><td style="text-align:right;">-1.43%</td><td style="text-align:right;">-8.30%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-4.86</td></tr><tr><td style="text-align:left;font-weight:600;">醫療保健 (XLV)</td><td style="text-align:right;">-1.42%</td><td style="text-align:right;">-9.00%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-5.21</td></tr><tr><td style="text-align:left;font-weight:600;">工業 (XLI)</td><td style="text-align:right;">-1.53%</td><td style="text-align:right;">-9.90%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-5.72</td></tr><tr><td style="text-align:left;font-weight:600;">金融 (XLF)</td><td style="text-align:right;">-2.59%</td><td style="text-align:right;">-8.93%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-5.76</td></tr><tr><td style="text-align:left;font-weight:600;">非必需消費 (XLY)</td><td style="text-align:right;">-1.91%</td><td style="text-align:right;">-9.71%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-5.81</td></tr><tr><td style="text-align:left;font-weight:600;">資訊科技 (XLK)</td><td style="text-align:right;">-3.97%</td><td style="text-align:right;">-7.86%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-5.92</td></tr><tr><td style="text-align:left;font-weight:600;">通訊服務 (XLC)</td><td style="text-align:right;">-4.62%</td><td style="text-align:right;">-8.29%</td><td style="text-align:right;color:#e74c3c;font-weight:700;">-6.46</td></tr></tbody></table></div>
+<div style="background:linear-gradient(135deg,#f0fff4,#e6ffed);border-left:4px solid #27ae60;padding:14px 18px;margin:14px 0;font-size:9.5pt;line-height:1.8;border-radius:0 6px 6px 0;page-break-inside:avoid;"><strong style="color:#27ae60;font-size:10.5pt;">市場微觀結構指標</strong><div style="margin:4px 0;">• VIX/VIX3M: <strong>1.0676</strong>（輕微倒掛 — 短期緊張）</div><div style="margin:4px 0;">• RSP/SPY（市場寬度）: 市場寬度穩定（1月 -0.20%）</div><div style="margin:4px 0;">• IWM/SPY（大小型股）: 大小型股表現相近</div><div style="margin:4px 0;">• IWD/IWF（價值/成長）: 價值股領先 — 利率/通脹受益</div></div><div class="section-new-page"></div>
+<div class="section-title">十一、本週經濟日曆</div>
+<p class="analysis-text" style="color:#999;font-style:italic;">以下為本週需要關注的重要經濟數據與事件</p>
+<table>
+<thead><tr><th>日期</th><th>國家/地區</th><th>事件</th><th>重要性</th><th>預期影響</th></tr></thead>
+<tbody>
+<tr><td>2026-04-01</td><td>美國</td><td class="name-cell">ISM 製造業指數</td><td style="color:#c0392b;font-weight:700;">★★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">領先指標。高於 50 利多週期股；低於預期可能觸發避險</td></tr>
+<tr><td>2026-04-01</td><td>多國</td><td class="name-cell">製造業 PMI</td><td style="color:#d4a017;font-weight:600;">★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">製造業景氣指標</td></tr>
+<tr><td>2026-04-02</td><td>多國</td><td class="name-cell">製造業 PMI</td><td style="color:#d4a017;font-weight:600;">★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">製造業景氣指標</td></tr>
+<tr><td>2026-04-02</td><td>美國</td><td class="name-cell">初領失業救濟</td><td style="color:#d4a017;font-weight:600;">★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">高於預期→經濟放緩信號；低於預期→就業韌性仍在</td></tr>
+<tr><td>2026-04-03</td><td>美國</td><td class="name-cell">非農就業報告</td><td style="color:#c0392b;font-weight:700;">★★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">本週最重要數據。超預期→美元走強、延後降息；不及預期→利多黃金和債券</td></tr>
+<tr><td>2026-04-03</td><td>美國</td><td class="name-cell">PCE 物價指數</td><td style="color:#c0392b;font-weight:700;">★★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">聯儲最關注的通脹指標。高於預期→延後降息；低於預期→利多黃金</td></tr>
+<tr><td>2026-04-03</td><td>多國</td><td class="name-cell">製造業 PMI</td><td style="color:#d4a017;font-weight:600;">★★</td><td style="font-size:9pt;color:#666;text-align:left;line-height:1.4;">製造業景氣指標</td></tr>
+</tbody></table>
+<div class="sub-section-title">重點關注</div>
+<div class="calendar-highlight">
+<strong>ISM 製造業指數</strong>（美國，2026-04-01）<br>
+<span style="font-size:10pt;color:#555;">領先指標。高於 50 利多週期股；低於預期可能觸發避險</span>
+</div>
+<div class="calendar-highlight">
+<strong>非農就業報告</strong>（美國，2026-04-03）<br>
+<span style="font-size:10pt;color:#555;">本週最重要數據。超預期→美元走強、延後降息；不及預期→利多黃金和債券</span>
+</div>
+<div class="calendar-highlight">
+<strong>PCE 物價指數</strong>（美國，2026-04-03）<br>
+<span style="font-size:10pt;color:#555;">聯儲最關注的通脹指標。高於預期→延後降息；低於預期→利多黃金</span>
+</div>
+
+<div class="footer-wrapper">
+<div class="footer" style="line-height:1.6;">
+    <strong style="font-size:8.5pt; color:#2c3e50;">何宣逸</strong><br>
+    <span>副總裁 ｜ 私人財富管理部</span><br>
+    <span>華泰金融控股（香港）有限公司</span><br>
+    <span>電話：+852 3658 6180 ｜ 手機：+852 6765 0336 / +86 130 0329 5233</span><br>
+    <span>電郵：jamieho@htsc.com</span><br>
+    <span>地址：香港皇后大道中99號中環中心69樓</span><br>
+    <span style="font-size:6.5pt; color:#aaa;">華泰證券股份有限公司全資附屬公司 (SSE: 601688; SEHK: 6886; LSE: HTSC)</span>
+</div>
+
+<div class="footer" style="margin-top:10px; padding-top:8px; border-top:1px solid #ddd;">
+    <strong>報告製作時間</strong>：2026-03-31 09:06 (UTC+8)<br>
+    <strong>資料來源</strong>：Yahoo Finance、Polygon.io、S&P Global、CNBC、Investing.com、CNN Fear &amp; Greed Index<br>
+    資金流向數據基於ETF Chaikin Money Flow (CMF) × 成交量計算<br><br>
+    <em>本報告僅供參考，不構成任何投資建議。投資有風險，入市需謹慎。</em>
+</div>
+</div><!-- /footer-wrapper -->
+
+</body>
+</html>

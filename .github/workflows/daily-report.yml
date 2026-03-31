@@ -53,9 +53,8 @@ jobs:
           print(f'Market data: {sum(len(v) for v in data.values())} items')
           "
 
-      - name: Collect news + translate titles
-        timeout-minutes: 8
-        continue-on-error: true
+      - name: Collect news (先存檔再翻譯)
+        timeout-minutes: 5
         run: |
           python3 -c "
           import sys, json
@@ -64,15 +63,33 @@ jobs:
           news = get_news_for_date()
           articles = news.get('articles', [])
           print(f'News: {len(articles)} articles')
+          # 先存未翻譯版本（確保檔案存在）
+          with open('reports/news_today.json', 'w', encoding='utf-8') as f:
+              json.dump(news, f, ensure_ascii=False, indent=2, default=str)
+          print('✅ news_today.json saved (untranslated)')
+          "
 
-          # 只翻譯前 100 篇（報告只用前 30 篇，100 篇綽綽有餘）
-          to_translate = articles[:100]
+      - name: Translate news titles (可失敗不影響後續)
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          python3 -c "
+          import json, signal, time
+
+          # 整體 4 分鐘硬上限
+          signal.signal(signal.SIGALRM, lambda s,f: (_ for _ in ()).throw(TimeoutError('翻譯總時間超限')))
+          signal.alarm(240)
+
+          with open('reports/news_today.json', encoding='utf-8') as f:
+              news = json.load(f)
+          articles = news.get('articles', [])[:100]
+
           try:
               from deep_translator import GoogleTranslator
               translator = GoogleTranslator(source='en', target='zh-TW')
               translated_count = 0
-              for i in range(0, len(to_translate), 15):
-                  batch = to_translate[i:i+15]
+              for i in range(0, len(articles), 15):
+                  batch = articles[i:i+15]
                   titles = [a.get('title', '') for a in batch]
                   combined = ' ||| '.join(titles)
                   try:
@@ -89,15 +106,23 @@ jobs:
                                   translated_count += 1
                               except:
                                   a['title_zh'] = a.get('title', '')
+                  except TimeoutError:
+                      print(f'⏰ 翻譯超時，已翻 {translated_count} 篇')
+                      break
                   except:
                       for a in batch:
                           a['title_zh'] = a.get('title', '')
               print(f'Translated: {translated_count}/{len(articles)} titles')
+              # 覆寫已翻譯版本
+              with open('reports/news_today.json', 'w', encoding='utf-8') as f:
+                  json.dump(news, f, ensure_ascii=False, indent=2, default=str)
+              print('✅ news_today.json updated with translations')
           except ImportError:
-              print('deep-translator not installed, skipping translation')
-
-          with open('reports/news_today.json', 'w', encoding='utf-8') as f:
-              json.dump(news, f, ensure_ascii=False, indent=2, default=str)
+              print('deep-translator not installed, skipping')
+          except TimeoutError:
+              print('⏰ 翻譯整體超時，使用已有翻譯結果')
+              with open('reports/news_today.json', 'w', encoding='utf-8') as f:
+                  json.dump(news, f, ensure_ascii=False, indent=2, default=str)
           "
 
       - name: Scan hot stocks

@@ -132,6 +132,7 @@ jobs:
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          MONITOR_RECORD_KEY: ${{ secrets.MONITOR_RECORD_KEY }}
         run: |
           python3 -c "
           import os, sys, json, base64, requests
@@ -219,4 +220,21 @@ jobs:
           print(f'📧 {success}/{len(email_to)} emails sent at {now}')
           if success == 0:
               sys.exit(1)
+
+          # 記錄發送結果到 Cloudflare D1（透過 Worker）
+          record_key = os.environ.get('MONITOR_RECORD_KEY', '')
+          if record_key and success > 0:
+              try:
+                  record_resp = requests.post(
+                      'https://macro-report-monitor.stock-quant.workers.dev/record',
+                      headers={'X-API-Key': record_key, 'Content-Type': 'application/json'},
+                      json={'date': DATE, 'recipients': email_to[:success], 'pdf_size': len(pdf_data) if pdf_data else 0},
+                      timeout=10,
+                  )
+                  if record_resp.status_code == 200:
+                      print(f'✅ D1 記錄成功: {record_resp.json()}')
+                  else:
+                      print(f'⚠️ D1 記錄失敗: {record_resp.text[:100]}')
+              except Exception as e:
+                  print(f'⚠️ D1 記錄異常: {e}')
           "
