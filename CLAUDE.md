@@ -45,6 +45,21 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
   - `POST /record`：workflow 發完信後記錄到 D1（需 X-API-Key）
 - **GitHub Secrets**：`MONITOR_RECORD_KEY`（Worker 記錄端點的 API Key）
 
+### Kimi AI 新聞增強（2026-04-01 建成）
+- **模組**：`modules/kimi_enhancer.py`
+- **API**：Moonshot API（`moonshot-v1-auto`），Secret: `MOONSHOT_API_KEY`
+- **功能**：
+  1. 頭條新聞（前 4 個主題）用 Kimi 生成專業中文敘事摘要
+  2. 報告末尾「十二、總結分析」— 三段式（今日重點/核心驅動/明日關注）
+- **Fallback**：Kimi 失敗時退回規則引擎模板，不影響報告生成
+- **繁體中文**：prompt 強制繁體 + `_to_traditional()` 簡→繁後處理
+- **用詞規則**：客觀陳述、不帶稱呼、不用套話、署名「僅供參考」
+
+### ReportLab PDF 升級（開發中）
+- **檔案**：`modules/pdf_report_generator.py`（初版，尚未切換）
+- **目標**：取代 Chrome headless，pixel-perfect 排版控制
+- **狀態**：基礎框架完成，缺儀表盤圖/美林時鐘圖，**必須超越 HTML 版才能切換**
+
 ### 熱門股量化評分系統（2026-03-31 建成）
 - **三層篩選**：放量門檻（硬篩）→ 量化驗證 → 複合排名
 - **複合分數**：量能 30% + 量化評分 40% + 動量 30%
@@ -106,5 +121,7 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
 - `modules/hot_stocks.py` — 熱門股偵測 + 量化評分整合 + 即時評分 fallback
 - `modules/email_sender.py` — Email 摘要生成
 - `modules/news_collector.py` — 新聞收集
+- `modules/kimi_enhancer.py` — Kimi AI 新聞摘要 + 報告總結
+- `modules/pdf_report_generator.py` — ReportLab PDF 引擎（開發中）
 - `modules/email_template_v2.py` — Goldman 風格 HTML 模板（備用）
 - `recipients.json` — 34 人完整收件名單
