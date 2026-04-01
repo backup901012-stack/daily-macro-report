@@ -129,11 +129,13 @@ jobs:
           NOW=$(TZ='Asia/Taipei' date +%s)
           TARGET=$(TZ='Asia/Taipei' python3 -c "from datetime import datetime,timezone,timedelta;import time;tz=timezone(timedelta(hours=8));now=datetime.now(tz);t=now.replace(hour=${TARGET_H},minute=${TARGET_M},second=0,microsecond=0);print(int(t.timestamp()))")
           WAIT=$((TARGET - NOW))
-          if [ "$WAIT" -gt 0 ] && [ "$WAIT" -lt 7200 ]; then
-            echo "⏰ 距離台北 07:30 還有 ${WAIT} 秒，等待中..."
+          echo "⏰ NOW=$(TZ='Asia/Taipei' date '+%H:%M'), TARGET=07:30, WAIT=${WAIT}s"
+          if [ "$WAIT" -gt 0 ] && [ "$WAIT" -lt 14400 ]; then
+            echo "⏰ 距離台北 07:30 還有 ${WAIT} 秒（$(($WAIT/60))分鐘），等待中..."
             sleep "$WAIT"
+            echo "⏰ 等待完成，現在是 $(TZ='Asia/Taipei' date '+%H:%M') 台北時間"
           else
-            echo "⏰ 已過 07:30 或距離超過 2 小時，直接執行"
+            echo "⏰ 已過 07:30 或距離超過 4 小時，直接執行"
           fi
 
       - name: 防重發檢查（查 D1 是否今天已發）
