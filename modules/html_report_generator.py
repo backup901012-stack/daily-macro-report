@@ -707,7 +707,7 @@ def _gen_news_section(events):
         border_color, dir_bg, dir_label = colors.get(direction, colors['中性'])
         impact_bg = '#c0392b' if impact == '高' else '#e67e22' if impact == '中' else '#95a5a6'
 
-        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
+        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;page-break-inside:avoid;break-inside:avoid;">\n'
 
         # 標題行 + badges
         title = event.get('title', '')
@@ -982,7 +982,7 @@ def _gen_fear_greed_gauge(score, rating_zh, color):
 
 def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, historical_context=None):
     """生成市場情緒指標章節，包含 Fear & Greed、VIX、US10Y、DXY、美林時鐘和歷史情境"""
-    html = '<div class="section-new-page"></div>\n'
+    html = '<div style="page-break-before:always;"></div>\n'
     html += '<div class="section-title">七、市場情緒指標</div>\n'
 
     if sentiment_analysis:
