@@ -1,19 +1,7 @@
 {
   "date": "2026-04-01",
   "put_call_ratio": {
-    "volume_pcr": 1.492,
-    "oi_pcr": 2.118,
-    "total_call_volume": 4628110,
-    "total_put_volume": 6906674,
-    "total_call_oi": 1137992,
-    "total_put_oi": 2410292,
-    "expirations_used": [
-      "2026-03-31",
-      "2026-04-01",
-      "2026-04-02"
-    ],
-    "signal": "極度看跌（反向看多信號）",
-    "signal_en": "Extreme Bearish (Contrarian Bullish)"
+    "error": "Too Many Requests. Rate limited. Try after a while."
   },
   "sector_rotation": {
     "sectors": [
@@ -151,58 +139,58 @@
         "ticker": "ZAR=X",
         "name": "美元/南非蘭特",
         "name_en": "USD/ZAR",
-        "rate": 16.8684,
-        "change_1w_pct": -0.22,
-        "change_1m_pct": 4.94,
-        "vol_20d": 21.39,
-        "stress_score": 7.99
-      },
-      {
-        "ticker": "BRL=X",
-        "name": "美元/巴西雷亞爾",
-        "name_en": "USD/BRL",
-        "rate": 5.264,
-        "change_1w_pct": 0.59,
-        "change_1m_pct": 2.62,
-        "vol_20d": 17.98,
-        "stress_score": 6.42
+        "rate": 16.9036,
+        "change_1w_pct": -0.02,
+        "change_1m_pct": 5.16,
+        "vol_20d": 21.15,
+        "stress_score": 7.9
       },
       {
         "ticker": "MXN=X",
         "name": "美元/墨西哥披索",
         "name_en": "USD/MXN",
-        "rate": 17.8855,
-        "change_1w_pct": 0.88,
-        "change_1m_pct": 3.36,
-        "vol_20d": 14.96,
-        "stress_score": 5.85
+        "rate": 17.9022,
+        "change_1w_pct": 0.98,
+        "change_1m_pct": 3.46,
+        "vol_20d": 14.84,
+        "stress_score": 5.88
+      },
+      {
+        "ticker": "BRL=X",
+        "name": "美元/巴西雷亞爾",
+        "name_en": "USD/BRL",
+        "rate": 5.1781,
+        "change_1w_pct": -1.04,
+        "change_1m_pct": 0.15,
+        "vol_20d": 17.39,
+        "stress_score": 5.68
       },
       {
         "ticker": "INR=X",
         "name": "美元/印度盧比",
         "name_en": "USD/INR",
-        "rate": 94.3559,
-        "change_1w_pct": 1.19,
-        "change_1m_pct": 3.6,
-        "vol_20d": 8.93,
-        "stress_score": 4.24
+        "rate": 93.437,
+        "change_1w_pct": -0.91,
+        "change_1m_pct": 2.05,
+        "vol_20d": 9.68,
+        "stress_score": 3.88
       },
       {
         "ticker": "TRY=X",
         "name": "美元/土耳其里拉",
         "name_en": "USD/TRY",
-        "rate": 44.4553,
-        "change_1w_pct": 0.26,
-        "change_1m_pct": 1.12,
-        "vol_20d": 1.48,
-        "stress_score": 0.88
+        "rate": 44.4735,
+        "change_1w_pct": 0.3,
+        "change_1m_pct": 1.16,
+        "vol_20d": 1.46,
+        "stress_score": 0.9
       }
     ],
-    "avg_stress": 5.08,
-    "max_stress": 7.99,
+    "avg_stress": 4.85,
+    "max_stress": 7.9,
     "most_stressed": "USD/ZAR",
-    "level": "中度壓力 — 關注新興市場動態",
-    "level_en": "Moderate Stress — Monitor EM Developments"
+    "level": "輕微壓力 — 正常波動範圍",
+    "level_en": "Mild Stress — Normal Volatility"
   },
   "market_breadth": {
     "rsp_spy": {
