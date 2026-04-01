@@ -358,38 +358,38 @@ td.name-cell {
 /* ===== 情緒指標卡片 ===== */
 .sentiment-container {
     display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 6px;
 }
 .sentiment-card {
     flex: 1;
     background: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 6px;
-    padding: 8px;
+    padding: 6px;
     text-align: center;
 }
 .sentiment-card .label {
-    font-size: 8.5pt;
+    font-size: 7.5pt;
     color: #7f8c8d;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 .sentiment-card .value {
-    font-size: 20pt;
+    font-size: 18pt;
     font-weight: 800;
 }
 .sentiment-card .sub {
-    font-size: 8.5pt;
-    margin-top: 2px;
+    font-size: 7.5pt;
+    margin-top: 1px;
 }
 
 /* ===== 美林時鐘 ===== */
 .clock-wrapper {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     align-items: center;
-    margin: 15px 0;
-    padding: 15px;
+    margin: 8px 0;
+    padding: 10px;
     background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
     border-radius: 10px;
     border: 1px solid #e8ecef;
@@ -910,7 +910,7 @@ def _gen_fear_greed_gauge(score, rating_zh, color):
         (100, '極度貪婪', 'start'),
     ]
 
-    svg = '<svg viewBox="0 0 400 230" width="320" height="185" style="display:block;margin:0 auto;">\n'
+    svg = '<svg viewBox="0 0 400 230" width="260" height="150" style="display:block;margin:0 auto;">\n'
     svg += '<defs><filter id="ns" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.15"/></filter></defs>\n'
 
     # 底部灰色軌道
@@ -982,8 +982,8 @@ def _gen_fear_greed_gauge(score, rating_zh, color):
 
 def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, historical_context=None):
     """生成市場情緒指標章節，包含 Fear & Greed、VIX、US10Y、DXY、美林時鐘和歷史情境"""
-    html = '<div class="section-new-page"></div>\n'
-    html += '<div class="section-title">七、市場情緒指標</div>\n'
+    html = '<div style="page-break-before:always;"></div>\n'
+    html += '<div class="section-title" style="margin-top:0;">七、市場情緒指標</div>\n'
 
     if sentiment_analysis:
         html += f'<p class="analysis-text">{sentiment_analysis}</p>\n'
@@ -1212,7 +1212,7 @@ def _gen_investment_clock(clock_data, historical_context=None):
 
     html += f'''<div class="clock-wrapper">
   <div class="clock-svg-box">
-    <svg viewBox="0 0 340 340" width="220" height="220">
+    <svg viewBox="0 0 340 340" width="180" height="180">
       {clock_svg}
     </svg>
   </div>
