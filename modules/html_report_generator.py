@@ -81,10 +81,10 @@ body {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 6px;
-    padding: 14px 18px;
-    margin: 16px 0;
+    padding: 10px 14px;
+    margin: 8px 0;
     font-size: 9.5pt;
-    line-height: 1.8;
+    line-height: 1.6;
     color: #2c3e50;
 }
 
@@ -103,8 +103,8 @@ body {
     font-size: 15pt;
     font-weight: 800;
     color: #2c3e50;
-    margin: 18px 0 4px;
-    padding-bottom: 6px;
+    margin: 10px 0 3px;
+    padding-bottom: 4px;
     border-bottom: 2.5px solid #e67e22;
     page-break-after: avoid;
 }
@@ -113,7 +113,7 @@ body {
     font-size: 12pt;
     font-weight: 700;
     color: #2c3e50;
-    margin: 12px 0 5px;
+    margin: 8px 0 3px;
     padding-left: 10px;
     border-left: 3.5px solid #3498db;
     page-break-after: avoid;
@@ -132,7 +132,7 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     font-size: 9.5pt;
 }
 
@@ -140,7 +140,7 @@ table thead th {
     background: #f1f3f5;
     color: #2c3e50;
     font-weight: 700;
-    padding: 8px 8px;
+    padding: 6px 8px;
     text-align: left;
     font-size: 8.5pt;
     border-bottom: 2px solid #dee2e6;
@@ -352,7 +352,7 @@ td.name-cell {
 
 .section-new-page {
     page-break-before: auto;
-    margin-top: 12px;
+    margin-top: 4px;
 }
 
 /* ===== 情緒指標卡片 ===== */
@@ -707,7 +707,7 @@ def _gen_news_section(events):
         border_color, dir_bg, dir_label = colors.get(direction, colors['中性'])
         impact_bg = '#c0392b' if impact == '高' else '#e67e22' if impact == '中' else '#95a5a6'
 
-        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
+        html += f'<div style="border-left:5px solid {border_color};padding:12px 16px;margin:8px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
 
         # 標題行 + badges
         title = event.get('title', '')
@@ -982,7 +982,7 @@ def _gen_fear_greed_gauge(score, rating_zh, color):
 
 def _gen_sentiment_section(sentiment_data, clock_data, sentiment_analysis=None, historical_context=None):
     """生成市場情緒指標章節，包含 Fear & Greed、VIX、US10Y、DXY、美林時鐘和歷史情境"""
-    html = '<div style="page-break-before:always;"></div>\n'
+    html = '<div class="section-new-page"></div>\n'
     html += '<div class="section-title">七、市場情緒指標</div>\n'
 
     if sentiment_analysis:
