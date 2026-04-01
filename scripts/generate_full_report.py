@@ -1262,12 +1262,12 @@ def main():
 
             summary_block = (
                 '<div class="section-new-page"></div>\n'
-                '<div class="section-title">十二、策略師觀點 Strategist\'s View</div>\n'
+                '<div class="section-title">十二、總結分析 Daily Summary</div>\n'
                 '<div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);'
                 'border-left:5px solid #1a365d;padding:20px 24px;margin:14px 0;'
-                'border-radius:0 8px 8px 0;page-break-inside:avoid;">\n'
+                'border-radius:0 8px 8px 0;">\n'
                 f'<p style="margin:6px 0;font-size:10pt;line-height:1.9;color:#2c3e50;">{summary_html}</p>\n'
-                '<div style="margin-top:12px;font-size:7.5pt;color:#aaa;text-align:right;">— AI 分析摘要，僅供參考</div>\n'
+                '<div style="margin-top:12px;font-size:7.5pt;color:#aaa;text-align:right;">— 僅供參考</div>\n'
                 '</div>\n'
             )
             # 插在 </body> 前
