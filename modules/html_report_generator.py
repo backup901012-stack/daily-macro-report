@@ -173,16 +173,16 @@ table tbody tr {
     page-break-inside: avoid;
 }
 
-/* 整張表格不可跨頁切斷 */
+/* 表格允許跨頁（大表格 avoid 會造成整頁空白） */
 table {
-    page-break-inside: avoid;
+    page-break-inside: auto;
 }
 
 thead {
     display: table-header-group;
 }
 
-/* 子區塊（含標題+表格）不可跨頁切斷 */
+/* 小型子區塊防切斷（大區塊不要用這個 class） */
 .sub-section-block {
     page-break-inside: avoid;
 }
@@ -707,7 +707,7 @@ def _gen_news_section(events):
         border_color, dir_bg, dir_label = colors.get(direction, colors['中性'])
         impact_bg = '#c0392b' if impact == '高' else '#e67e22' if impact == '中' else '#95a5a6'
 
-        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;page-break-inside:avoid;break-inside:avoid;">\n'
+        html += f'<div style="border-left:5px solid {border_color};padding:16px 20px;margin:14px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
 
         # 標題行 + badges
         title = event.get('title', '')
@@ -774,7 +774,7 @@ def _gen_news_section(events):
             narrative = event.get('narrative', '')
             news_headlines = event.get('headlines', [])
 
-            html += f'<div style="border-left:4px solid {border_color};padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;">\n'
+            html += f'<div style="border-left:4px solid {border_color};padding:12px 16px;margin:10px 0;background:#fafbfc;border-radius:0 6px 6px 0;page-break-inside:avoid;">\n'
 
             # 標題行
             html += f'<div style="margin-bottom:6px;">'

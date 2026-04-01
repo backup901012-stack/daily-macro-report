@@ -1270,8 +1270,11 @@ def main():
                 '<div style="margin-top:12px;font-size:7.5pt;color:#aaa;text-align:right;">— 僅供參考</div>\n'
                 '</div>\n'
             )
-            # 插在 </body> 前
-            if '</body>' in html:
+            # 插在名片（footer-wrapper）前面
+            footer_marker = '<div class="footer-wrapper">'
+            if footer_marker in html:
+                html = html.replace(footer_marker, summary_block + footer_marker)
+            elif '</body>' in html:
                 html = html.replace('</body>', summary_block + '</body>')
             else:
                 html += summary_block
