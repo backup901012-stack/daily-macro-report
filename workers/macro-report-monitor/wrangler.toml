@@ -8,9 +8,9 @@ binding = "DB"
 database_name = "macro-report-db"
 database_id = "26fc7949-e2b4-4b30-b317-3ccc165d967d"
 
-# 每天 UTC 23:45 = 台北 07:45 檢查是否已發送
+# 每天 UTC 02:00 = 台北 10:00 純監控（不觸發發信）
 [triggers]
-crons = ["45 23 * * *"]
+crons = ["0 2 * * 1-5"]
 
 [vars]
 TZ = "Asia/Taipei"

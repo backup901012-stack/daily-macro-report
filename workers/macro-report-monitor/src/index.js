@@ -1,18 +1,19 @@
 // 宏觀日報監控 Worker
-// 功能：每天 07:45 (台北) 檢查是否已發送報告，沒有則觸發 GitHub Actions 補發
+// 功能：記錄發送狀態 + 提供查詢端點（純監控，不觸發發信）
+// 發信唯一路徑：數據收集完成 → workflow_run → daily-send.yml
 
 export default {
-  // Cron Trigger 入口
+  // Cron Trigger：僅記錄檢查結果，不觸發任何 dispatch
   async scheduled(controller, env, ctx) {
-    ctx.waitUntil(checkAndAlert(env));
+    ctx.waitUntil(checkStatus(env));
   },
 
-  // HTTP 入口（手動測試用）
+  // HTTP 入口
   async fetch(request, env) {
     const url = new URL(request.url);
 
     if (url.pathname === '/check') {
-      const result = await checkAndAlert(env);
+      const result = await checkStatus(env);
       return new Response(JSON.stringify(result, null, 2), {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -42,7 +43,7 @@ export default {
     }
 
     return new Response(JSON.stringify({
-      service: '宏觀日報監控',
+      service: '宏觀日報監控（純監控，不觸發發信）',
       endpoints: ['GET /check', 'GET /status', 'POST /record'],
     }), {
       headers: { 'Content-Type': 'application/json' },
@@ -65,7 +66,7 @@ function isWeekend() {
   const now = new Date();
   const taipei = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
   const day = taipei.getDay();
-  return day === 0 || day === 6; // 週日=0, 週六=6
+  return day === 0 || day === 6;
 }
 
 // 查詢今天的發送記錄
@@ -106,16 +107,14 @@ async function recordSend(env, data) {
   return { date, recorded, total: recipients.length };
 }
 
-// 主���查邏輯
-async function checkAndAlert(env) {
+// 純檢查（不觸發任何動作）— 僅供 cron 和 /check 端點使用
+async function checkStatus(env) {
   const today = getTaipeiDate();
 
-  // 週末不檢查
   if (isWeekend()) {
     return { date: today, action: 'skip', reason: '週末不發報告' };
   }
 
-  // 查 D1 是否有今天的發送記錄
   const result = await env.DB.prepare(
     'SELECT COUNT(*) as cnt FROM send_log WHERE report_date = ? AND status = ?'
   ).bind(today, 'success').first();
@@ -126,39 +125,6 @@ async function checkAndAlert(env) {
     return { date: today, action: 'none', reason: '今天已發送', count: result.cnt };
   }
 
-  // 沒有發送記錄 → 觸發 GitHub Actions 補發
-  const ghToken = env.GH_TOKEN;
-  if (!ghToken) {
-    console.error('GH_TOKEN 未設定，無法觸發補發');
-    return { date: today, action: 'error', reason: 'GH_TOKEN 未設定' };
-  }
-
-  try {
-    const resp = await fetch(
-      'https://api.github.com/repos/backup901012-stack/daily-macro-report/actions/workflows/daily-send.yml/dispatches',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${ghToken}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'macro-report-monitor',
-        },
-        body: JSON.stringify({ ref: 'master' }),
-      }
-    );
-
-    if (resp.status === 204) {
-      // 記錄觸發補發到 D1
-      await env.DB.prepare(
-        'INSERT INTO send_log (report_date, recipient, status, sent_at, error) VALUES (?, ?, ?, datetime("now"), ?)'
-      ).bind(today, 'monitor-trigger', 'triggered', '07:45 未偵測到發送記錄，已觸發補發').run();
-
-      return { date: today, action: 'triggered', reason: '已觸發 GitHub Actions 補發' };
-    } else {
-      const body = await resp.text();
-      return { date: today, action: 'error', reason: `GitHub API 回應 ${resp.status}: ${body.slice(0, 200)}` };
-    }
-  } catch (err) {
-    return { date: today, action: 'error', reason: err.message };
-  }
+  // 僅回報未發送狀態，不自動觸發 dispatch
+  return { date: today, action: 'warning', reason: '今天尚未發送，請手動檢查 workflow' };
 }

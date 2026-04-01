@@ -1,13 +1,11 @@
 name: 每日宏觀資訊報告（生成+發送）
 
 on:
-  # 數據收集完成後自動觸發
+  # 數據收集完成後自動觸發（唯一正常路徑）
   workflow_run:
     workflows: ["每日宏觀資訊報告（數據收集）"]
     types: [completed]
-  # 備用 cron（萬一 workflow_run 沒觸發，台北 08:00 最後防線）
-  schedule:
-    - cron: '0 0 * * 1-5'
+  # 手動觸發（僅限緊急補發）
   workflow_dispatch:
     inputs:
       force_send:
@@ -141,11 +139,20 @@ jobs:
       - name: 防重發檢查（查 D1 是否今天已發）
         id: dedup
         run: |
-          RESP=$(curl -s "https://macro-report-monitor.stock-quant.workers.dev/status" 2>/dev/null || echo '{"sent":false}')
-          SENT=$(echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('sent') and any(r.get('status')=='success' for r in d.get('records',[])) else 'false')")
+          # 重試 3 次，全失敗預設「已發」（寧漏不重）
+          SENT="true"
+          for i in 1 2 3; do
+            RESP=$(curl -s --max-time 10 "https://macro-report-monitor.stock-quant.workers.dev/status" 2>/dev/null)
+            if [ $? -eq 0 ] && [ -n "$RESP" ]; then
+              SENT=$(echo "$RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print('true' if d.get('sent') and any(r.get('status')=='success' for r in d.get('records',[])) else 'false')" 2>/dev/null || echo "true")
+              break
+            fi
+            echo "⚠️ D1 查詢第 $i 次失敗，重試..."
+            sleep 3
+          done
           echo "already_sent=$SENT" >> $GITHUB_OUTPUT
           if [ "$SENT" = "true" ]; then
-            echo "⚠️ 今天已經發過信了，跳過發送"
+            echo "⚠️ 今天已經發過信了（或查詢失敗預設已發），跳過發送"
           else
             echo "✅ 今天尚未發信，繼續"
           fi
