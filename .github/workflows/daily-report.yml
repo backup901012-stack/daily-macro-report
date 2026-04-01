@@ -279,6 +279,28 @@ jobs:
                   elif key in alt:
                       warnings.append(f'替代數據 {key} 有錯誤')
 
+          # 數據新鮮度檢查：US 數據必須是最近一個交易日
+          if md:
+              us = md.get('us_indices', {})
+              sp = us.get('S&P 500', {})
+              ts = sp.get('timestamp')
+              if ts:
+                  from datetime import timezone, timedelta
+                  data_date = datetime.fromtimestamp(ts, tz=timezone.utc).date()
+                  now_utc = datetime.now(timezone.utc)
+                  today = now_utc.date()
+                  # 數據不能超過 2 天（考慮週末）
+                  age_days = (today - data_date).days
+                  print(f'    US 數據日期: {data_date}（距今 {age_days} 天）')
+                  if age_days > 2:
+                      errors.append(f'US 數據過舊: {data_date}（距今 {age_days} 天，超過 2 天限制）')
+                  elif age_days == 0:
+                      print(f'    ✓ US 數據是今天的')
+                  else:
+                      print(f'    ✓ US 數據是 {age_days} 天前的（正常範圍）')
+              else:
+                  warnings.append('US 數據缺少 timestamp，無法驗證新鮮度')
+
           # 結果
           print()
           print('=== 驗證結果 ===')
