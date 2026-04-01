@@ -1096,6 +1096,28 @@ def main():
     index_analysis = gen_index_analysis(md, enh2)
     stock_analysis = gen_stock_analysis(hot_stocks, news)
     news_events = gen_news_events(news, market_data=md, sentiment_data=enh.get('sentiment', {}), alt_data=alt)
+
+    # Kimi AI 新聞增強（失敗時保持規則引擎結果）
+    try:
+        from modules.kimi_enhancer import enhance_all_news, generate_report_summary
+        mkt_snap = _build_market_snapshot(md, enh.get('sentiment', {}), alt)
+        # 準備原始新聞素材（按分類分組）
+        raw_by_group = {}
+        for event in news_events:
+            gname = event.get('title', '')
+            articles_for_group = []
+            for a in news.get('articles', []):
+                t = a.get('title', '')
+                d = a.get('description', '') or ''
+                best_cat = _classify_article(t, d, a.get('source_tier', 3))
+                if best_cat == gname:
+                    articles_for_group.append(a)
+            raw_by_group[gname] = articles_for_group
+        news_events = enhance_all_news(news_events, mkt_snap, raw_by_group)
+        print('✅ Kimi 新聞增強完成')
+    except Exception as e:
+        print(f'⚠️ Kimi 新聞增強失敗（不影響報告）: {e}')
+
     calendar_events = gen_calendar()
     sector_analysis = gen_sector_analysis(enh.get('fund_flows', {}))
     yield_curve_analysis = gen_yield_curve_analysis(enh2)
@@ -1222,6 +1244,42 @@ def main():
         html = insert_before_section(html, '十一、本週經濟日曆', fred_block)
     if alt_blocks:
         html = insert_before_section(html, '十一、本週經濟日曆', alt_blocks)
+
+    # Kimi AI 報告總結（插在 HTML 最後，</body> 之前）
+    try:
+        from modules.kimi_enhancer import generate_report_summary
+        ai_summary = generate_report_summary(
+            news_events, md,
+            sentiment_data=enh.get('sentiment', {}),
+            calendar_events=calendar_events,
+        )
+        if ai_summary:
+            # 處理換行和段落標記
+            summary_html = ai_summary.replace('\n\n', '</p><p style="margin:6px 0;">').replace('\n', '<br>')
+            summary_html = summary_html.replace('【今日重點】', '<strong style="color:#1a365d;">【今日重點】</strong>')
+            summary_html = summary_html.replace('【核心驅動】', '<strong style="color:#2d6a4f;">【核心驅動】</strong>')
+            summary_html = summary_html.replace('【明日關注】', '<strong style="color:#c2185b;">【明日關注】</strong>')
+
+            summary_block = (
+                '<div class="section-new-page"></div>\n'
+                '<div class="section-title">十二、策略師觀點 Strategist\'s View</div>\n'
+                '<div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);'
+                'border-left:5px solid #1a365d;padding:20px 24px;margin:14px 0;'
+                'border-radius:0 8px 8px 0;page-break-inside:avoid;">\n'
+                f'<p style="margin:6px 0;font-size:10pt;line-height:1.9;color:#2c3e50;">{summary_html}</p>\n'
+                '<div style="margin-top:12px;font-size:7.5pt;color:#aaa;text-align:right;">— AI 分析摘要，僅供參考</div>\n'
+                '</div>\n'
+            )
+            # 插在 </body> 前
+            if '</body>' in html:
+                html = html.replace('</body>', summary_block + '</body>')
+            else:
+                html += summary_block
+            print('✅ Kimi 報告總結已生成')
+        else:
+            print('⚠️ Kimi 報告總結未生成（API 失敗），跳過')
+    except Exception as e:
+        print(f'⚠️ Kimi 報告總結失敗（不影響報告）: {e}')
 
     html_path = f'{REPORTS}/daily_report_{DATE}.html'
     with open(html_path, 'w', encoding='utf-8') as f:

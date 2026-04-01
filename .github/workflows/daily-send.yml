@@ -72,6 +72,8 @@ jobs:
           fi
 
       - name: Generate report
+        env:
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: python3 scripts/generate_full_report.py
 
       - name: Generate PDF
