@@ -1,24 +1,33 @@
 # 每日宏觀資訊綜合早報
 
-## 自動化架構（2026-03-31 更新）
+## 自動化架構（2026-04-01 更新）
 
-### 每日流程
+### 每日流程（唯一路徑，不可加備份觸發）
 ```
-UTC 22:00（台北 06:00）  GitHub Actions 數據收集
+UTC 21:00（台北 05:00）  GitHub Actions 數據收集
+  ├─ 以美股收盤（UTC 20:00）為基準，收盤後 1 小時啟動
+  ├─ 此時全球所有市場（亞洲/歐洲/美股/商品/外匯/加密）當日數據已定案
   ├─ 市場數據 / 新聞 / 熱門股 / 情緒 / FRED / 替代數據
   ├─ 新聞標題預翻譯（前 100 篇，continue-on-error）
+  ├─ 數據新鮮度驗證（US 數據超過 2 天 → exit 1 攔截）
   └─ git commit 數據到 repo
 
-收集完成 → workflow_run 自動觸發生成+發送
+收集完成 → workflow_run 自動觸發生成+發送（唯一觸發路徑）
   ├─ 數據驗證（缺失 → exit 1）
   ├─ 生成 HTML 報告
   ├─ Chrome headless 轉 PDF
   ├─ 品質閘門（PDF > 100KB + 新聞中文率）
-  ├─ 等待至台北 07:30
+  ├─ 等待至台北 07:30（上限 10800 秒 = 3 小時）
+  ├─ 防重發（D1 查詢，重試 3 次，失敗預設「已發」寧漏不重）
   └─ Gmail OAuth2 API 逐一發送（隱私保護）
-
-備用 cron: UTC 00:00（台北 08:00）
 ```
+
+### 重要設計原則（2026-04-01 教訓）
+- **發信只有一條路徑**：數據收集完成 → workflow_run → daily-send.yml
+- **不可加備份觸發**：backup cron、Worker auto dispatch 會搶發舊數據
+- **不可在美股收盤前手動觸發數據收集**：會收到前一天的過期數據
+- **防重發必須 fail-safe**：查詢失敗預設「已發」，寧可漏發不可重發
+- **等待邏輯上限**：根據實際流程計算（05:00 到 07:30 = 2.5h），設 3h 上限
 
 ### 發信方式
 - **Gmail OAuth2 API**（不是 SMTP，跟股票量化系統共用同一套）
@@ -26,15 +35,14 @@ UTC 22:00（台北 06:00）  GitHub Actions 數據收集
 - 收件人: `EMAIL_TO`（逗號分隔，目前 2 人測試，正式 34 人在 recipients.json）
 - 逐一發送，每位收件人只看到自己的地址
 
-### Cloudflare 監控架構（2026-03-31 建成）
+### Cloudflare 監控架構（純監控，不觸發發信）
 - **D1 資料庫**：`macro-report-db`（UUID: `26fc7949-e2b4-4b30-b317-3ccc165d967d`）
   - 表 `send_log`：記錄每次發送（report_date, recipient, status, sent_at, pdf_size）
 - **Worker**：`macro-report-monitor`（`https://macro-report-monitor.stock-quant.workers.dev`）
-  - Cron: 每天 UTC 23:45（台北 07:45）自動檢查 D1
+  - Cron: 每天 UTC 02:00（台北 10:00）純監控檢查，**不觸發任何 dispatch**
   - `GET /status`：查看今天發送記錄
-  - `GET /check`：手動觸發檢查（與 Cron 同邏輯）
+  - `GET /check`：檢查狀態（只回報，不動作）
   - `POST /record`：workflow 發完信後記錄到 D1（需 X-API-Key）
-  - 未偵測到發送 → 自動觸發 GitHub Actions `daily-send.yml` 補發
 - **GitHub Secrets**：`MONITOR_RECORD_KEY`（Worker 記錄端點的 API Key）
 
 ### 熱門股量化評分系統（2026-03-31 建成）
