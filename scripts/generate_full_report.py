@@ -510,6 +510,13 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
 
     translated = _translate_titles(all_texts)
 
+    def _is_chinese(text):
+        """判斷文字是否包含足夠的中文字元（>30%）"""
+        if not text:
+            return False
+        cjk = sum(1 for c in text if '\u4e00' <= c <= '\u9fff')
+        return cjk / len(text) > 0.3
+
     def _zh(kind, group_name, orig):
         # 優先用預翻譯結果
         pre = pre_translated.get((kind, group_name, orig))
@@ -519,8 +526,12 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
             idx = text_indices.get((kind, group_name, orig))
             t = translated[idx] if idx is not None and idx < len(translated) else orig
         t = re.sub(r'\s*[-–—]\s*(Bloomberg|Reuters|CNBC|WSJ|BBC|CNN|Investing|TechCrunch|Abcnews|Yahoo|CNA|Mediaite|CoinDesk|Business Insider)[\w.\s]*$', '', t).strip()
-        # 確保繁體中文（預翻譯的 title_zh 也可能含簡體字）
-        return _ensure_traditional(t)
+        # 確保繁體中文
+        t = _ensure_traditional(t)
+        # 如果翻譯失敗（仍是英文），回傳空字串而非英文原文
+        if not _is_chinese(t):
+            return ''
+        return t
 
     # Step 4: 生成事件
     events = []
@@ -605,11 +616,14 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
             if trailing and not trailing.endswith('。'):
                 narrative = narrative[:last_period+1]
 
-        # === 重點標題列表（翻譯後再次過濾垃圾）===
+        # === 重點標題列表（必須是中文，過濾英文和垃圾）===
         seen_titles = set()
         headlines_zh = []
-        for a in sorted(group_articles, key=lambda x: x['tier'])[:10]:
+        for a in sorted(group_articles, key=lambda x: x['tier'])[:15]:
             zh = _zh('title', group_name, a['title'])
+            # 跳過空字串（翻譯失敗/英文）
+            if not zh:
+                continue
             # 過濾垃圾翻譯標題
             if _JUNK_PATTERNS.search(zh):
                 continue
