@@ -172,8 +172,19 @@ def gen_stock_analysis(hot_stocks, news):
     return analysis
 
 
+def _ensure_traditional(text):
+    """確保文字為繁體中文（簡→繁後處理，與 kimi_enhancer 共用對照表）"""
+    if not text:
+        return text
+    try:
+        from modules.kimi_enhancer import _to_traditional
+        return _to_traditional(text)
+    except ImportError:
+        return text
+
+
 def _translate_titles(titles):
-    """批量翻譯英文標題為中文（使用 Google Translate，免費）"""
+    """批量翻譯英文標題為中文（使用 Google Translate，免費）+ 繁體後處理"""
     try:
         from deep_translator import GoogleTranslator
         translator = GoogleTranslator(source='en', target='zh-TW')
@@ -199,6 +210,8 @@ def _translate_titles(titles):
                             results.append(t)
             except Exception:
                 results.extend(batch)  # 翻譯失敗保留原文
+        # 簡體→繁體後處理（Google Translate zh-TW 仍可能漏簡體字）
+        results = [_ensure_traditional(r) for r in results]
         return results
     except ImportError:
         return titles  # 沒裝 deep-translator 就保留原文
@@ -390,7 +403,13 @@ for _cat_name, _cat_config in NEWS_CATEGORIES.items():
 
 
 def _classify_article(title, desc, tier):
-    """評分制分類：標題匹配 3 分，描述匹配 1 分。返回最佳分類或 None"""
+    """評分制分類：標題匹配 3 分，描述匹配 1 分。返回最佳分類或 None
+
+    篩選標準（參考投行晨報）：
+    - Tier-1（Bloomberg/Reuters/FT/WSJ）：1 分即入選
+    - Tier-2（CNBC/CNN/MarketWatch 等）：2 分以上
+    - Tier-3（其他來源）：3 分以上（更嚴格，過濾低質量新聞）
+    """
     title_lower = title.lower()
     desc_lower = (desc or '').lower()
 
@@ -401,8 +420,8 @@ def _classify_article(title, desc, tier):
         title_hits = len(pattern.findall(title_lower))
         desc_hits = len(pattern.findall(desc_lower))
         score = title_hits * 3 + desc_hits
-        # Tier-3 來源要求更高分（避免單一偶然匹配）
-        min_score = 2 if tier >= 3 else 1
+        # 來源越差，門檻越高
+        min_score = 1 if tier == 1 else 2 if tier == 2 else 3
         if score >= min_score:
             scores[cat_name] = score
 
@@ -499,7 +518,9 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
         else:
             idx = text_indices.get((kind, group_name, orig))
             t = translated[idx] if idx is not None and idx < len(translated) else orig
-        return re.sub(r'\s*[-–—]\s*(Bloomberg|Reuters|CNBC|WSJ|BBC|CNN|Investing|TechCrunch|Abcnews|Yahoo|CNA|Mediaite|CoinDesk|Business Insider)[\w.\s]*$', '', t).strip()
+        t = re.sub(r'\s*[-–—]\s*(Bloomberg|Reuters|CNBC|WSJ|BBC|CNN|Investing|TechCrunch|Abcnews|Yahoo|CNA|Mediaite|CoinDesk|Business Insider)[\w.\s]*$', '', t).strip()
+        # 確保繁體中文（預翻譯的 title_zh 也可能含簡體字）
+        return _ensure_traditional(t)
 
     # Step 4: 生成事件
     events = []
@@ -574,6 +595,15 @@ def gen_news_events(news, market_data=None, sentiment_data=None, alt_data=None):
         narrative = '。'.join(narrative_parts)
         if narrative and not narrative.endswith('。'):
             narrative += '。'
+        # 確保敘事是完整句子（不以殘缺文字結尾）
+        narrative = _ensure_traditional(narrative)
+        # 移除末尾殘缺句子（句號後的不完整片段）
+        if narrative and '。' in narrative:
+            last_period = narrative.rfind('。')
+            trailing = narrative[last_period+1:].strip()
+            # 如果句號後還有文字但不以句號結尾，表示被截斷了
+            if trailing and not trailing.endswith('。'):
+                narrative = narrative[:last_period+1]
 
         # === 重點標題列表（翻譯後再次過濾垃圾）===
         seen_titles = set()

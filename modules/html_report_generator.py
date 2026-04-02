@@ -739,20 +739,14 @@ def _gen_news_section(events):
                     html += f'<div style="font-size:9.5pt;line-height:1.6;color:#34495e;padding:2px 0 2px 12px;border-left:2px solid {border_color}40;margin:3px 0;">• {h}</div>\n'
                 html += '</div>\n'
 
-            # 右側：數據 + 標的
-            if data_pts or tickers:
+            # 右側：數據（不顯示股票代碼標籤）
+            if data_pts:
                 html += '<div style="min-width:180px;">\n'
-                if data_pts:
-                    html += '<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>\n'
-                    html += '<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;">'
-                    for dp in data_pts:
-                        html += f'<div><strong>{dp}</strong></div>'
-                    html += '</div>\n'
-                if tickers:
-                    html += '<div style="margin-top:8px;">'
-                    ticker_html = ' '.join([f'<code style="background:#e8e8f8;padding:2px 6px;border-radius:3px;font-size:8pt;color:#4a4a8a;">{t}</code>' for t in tickers])
-                    html += ticker_html
-                    html += '</div>\n'
+                html += '<div style="font-size:8pt;font-weight:700;color:#95a5a6;margin-bottom:4px;letter-spacing:0.5px;">MARKET DATA</div>\n'
+                html += '<div style="background:#f0f4f8;padding:8px 12px;border-radius:4px;font-size:9.5pt;line-height:1.8;">'
+                for dp in data_pts:
+                    html += f'<div><strong>{dp}</strong></div>'
+                html += '</div>\n'
                 html += '</div>\n'
 
             html += '</div>\n'
@@ -783,10 +777,9 @@ def _gen_news_section(events):
             html += f'<span style="font-size:7.5pt;color:#aaa;">{event.get("source_info", "")}</span>'
             html += '</div>\n'
 
-            # 敘事（如果有，限制長度）
+            # 敘事（完整顯示，不截斷）
             if narrative:
-                short_narrative = narrative[:150].rstrip('。，；、 ') + '。' if len(narrative) > 150 else narrative
-                html += f'<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">{short_narrative}</div>\n'
+                html += f'<div style="font-size:9.5pt;color:#444;line-height:1.7;margin-bottom:6px;">{narrative}</div>\n'
 
             # 重點標題（最多2條）
             if news_headlines:
@@ -1356,8 +1349,11 @@ def _gen_gics_sector_section(fund_flows, sector_analysis=None):
 
 # ==================== 熱門股票 ====================
 
-def _gen_stock_table_html(stocks, stock_analysis):
-    """渲染一組股票的 HTML 表格（含量化評分）"""
+def _gen_stock_table_html(stocks, stock_analysis, is_outflow=False):
+    """渲染一組股票的 HTML 表格（含量化評分）
+
+    is_outflow=True 時，綜合分顯示為負數（資金出清 = 負面信號）
+    """
     if not stocks:
         return ""
 
@@ -1408,10 +1404,15 @@ def _gen_stock_table_html(stocks, stock_analysis):
                 html += f'<td style="text-align:right;color:{q_color};font-weight:600;">{q_score}<span style="font-size:7pt;color:#999;"> ({ts_sign}{total_s})</span></td>'
             else:
                 html += '<td style="text-align:right;color:#ccc;font-size:8pt;">—</td>'
-            # 綜合分
+            # 綜合分（outflow 顯示為負數）
             comp = s.get('composite_score', 0)
-            comp_color = '#c0392b' if comp >= 70 else '#e67e22' if comp >= 50 else '#333'
-            html += f'<td style="text-align:right;color:{comp_color};font-weight:700;">{comp:.0f}</td>'
+            if is_outflow:
+                display_comp = -comp
+                comp_color = '#e74c3c'
+                html += f'<td style="text-align:right;color:{comp_color};font-weight:700;">{display_comp:.0f}</td>'
+            else:
+                comp_color = '#c0392b' if comp >= 70 else '#e67e22' if comp >= 50 else '#333'
+                html += f'<td style="text-align:right;color:{comp_color};font-weight:700;">{comp:.0f}</td>'
         else:
             # 無量化數據時顯示成交量
             if volume >= 1_000_000_000:
@@ -1444,8 +1445,14 @@ def _gen_hot_stocks_section(hot_stocks, stock_analysis):
     """生成當日熱門股票章節"""
     html = '<div class="section-new-page"></div>\n'
     html += '<div class="section-title">十、當日熱門股票</div>\n'
-    html += '<div class="filter-note">篩選邏輯：資金追捧（量比 ≥ 1.5x + 上漲）；資金出清（量比 ≥ 2.5x + 下跌）<br/>'
-    html += '綜合排名：量能 30% + 量化評分 40% + 動量 30% | 量化數據來源：股票量化研究系統</div>\n'
+    html += '<div class="filter-note">'
+    html += '<strong>篩選方法論</strong><br/>'
+    html += '本系統透過三層篩選機制識別當日異常資金活動的股票：<br/>'
+    html += '① <strong>放量門檻</strong>：成交量相對 20 日均量的倍數（量比），篩選出成交異常放大的標的<br/>'
+    html += '② <strong>量化驗證</strong>：整合技術面信號（均線/RSI）、均值回歸（Z-Score）、基本面評分（F-Score）及分析師目標價進行多維度驗證<br/>'
+    html += '③ <strong>複合排名</strong>：量能權重 30% + 量化評分 40% + 價格動量 30%，綜合排序<br/>'
+    html += '<span style="color:#888;">量化數據來源：股票量化研究系統（覆蓋美/港/日/台約 4,000+ 支指數成分股）</span>'
+    html += '</div>\n'
 
     for market in ['美股', '港股', '日股', '台股']:
         if market not in hot_stocks or not hot_stocks[market]:
@@ -1459,12 +1466,12 @@ def _gen_hot_stocks_section(hot_stocks, stock_analysis):
         html += f'<div class="sub-section-title">{market}</div>\n'
 
         if inflow:
-            html += '<p class="hot-label buy">🔥 資金追捧（買入放量 ≥ 1.5x + 上漲）</p>\n'
-            html += _gen_stock_table_html(inflow, stock_analysis)
+            html += '<p class="hot-label buy">🔥 資金追捧</p>\n'
+            html += _gen_stock_table_html(inflow, stock_analysis, is_outflow=False)
 
         if outflow:
-            html += '<p class="hot-label sell">⚠️ 資金出清（賣出放量 ≥ 2.5x + 下跌）</p>\n'
-            html += _gen_stock_table_html(outflow, stock_analysis)
+            html += '<p class="hot-label sell">⚠️ 資金出清</p>\n'
+            html += _gen_stock_table_html(outflow, stock_analysis, is_outflow=True)
 
     html += '<hr class="divider">\n'
     return html
