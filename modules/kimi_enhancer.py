@@ -301,9 +301,10 @@ def generate_report_summary(news_events, market_data, sentiment_data=None, calen
 # ========== 批量處理（控制 API 呼叫次數）==========
 
 def enhance_all_news(news_events, market_snapshot=None, raw_articles_by_group=None):
-    """批量增強所有新聞事件的敘事摘要
+    """批量增強所有新聞板塊的敘事摘要
 
-    只對前 4 個頭條主題用 AI，其他保持原樣。
+    每個板塊（地緣政治/關稅、AI/半導體、Fed/央行政策...）收集完相關新聞後，
+    都用 AI 寫一段綜合敘事摘要，不再只限前 4 個頭條。
 
     Args:
         news_events: gen_news_events() 的輸出
@@ -318,10 +319,8 @@ def enhance_all_news(news_events, market_snapshot=None, raw_articles_by_group=No
         return news_events
 
     enhanced_count = 0
+    total = len(news_events)
     for event in news_events:
-        if not event.get('is_headline'):
-            continue  # 只增強頭條（前 4 個）
-
         group_name = event.get('title', '')
         articles = (raw_articles_by_group or {}).get(group_name, [])
 
@@ -336,5 +335,5 @@ def enhance_all_news(news_events, market_snapshot=None, raw_articles_by_group=No
         else:
             print(f'  ⚠️ AI 失敗，保持原摘要: {group_name}')
 
-    print(f'📝 AI 新聞增強: {enhanced_count}/{sum(1 for e in news_events if e.get("is_headline"))} 個頭條')
+    print(f'📝 AI 新聞增強: {enhanced_count}/{total} 個板塊')
     return news_events
