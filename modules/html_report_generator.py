@@ -619,6 +619,17 @@ def _gen_snapshot(market_data, news_events):
 
 # ==================== 指數表格 ====================
 
+def _is_valid_number(val):
+    """檢查值是否為有效數字（非 None、非 NaN、非 inf）"""
+    import math
+    if val is None:
+        return False
+    try:
+        return not (math.isnan(float(val)) or math.isinf(float(val)))
+    except (TypeError, ValueError):
+        return False
+
+
 def _gen_index_table(indices_data):
     """生成單個區域的指數表格"""
     if not indices_data:
@@ -629,10 +640,19 @@ def _gen_index_table(indices_data):
     html += '</tr></thead>\n<tbody>\n'
 
     for name, data in indices_data.items():
+        # 檢查數據是否有效（非 NaN）
+        current = data.get('current')
+        if not _is_valid_number(current):
+            # 數據無效 → 顯示「休市」
+            html += '<tr>'
+            html += f'<td class="name-cell">{name}</td>'
+            html += '<td colspan="5" style="text-align:center;color:#999;font-style:italic;">休市</td>'
+            html += '</tr>\n'
+            continue
+
         cls = _change_class(data['change_pct'])
         ytd_pct = data.get('ytd_pct')
-        ytd_cls = _change_class(ytd_pct) if ytd_pct is not None else 'flat'
-        ytd_str = _format_pct(ytd_pct) if ytd_pct is not None else '<span class="flat">N/A</span>'
+        ytd_str = _format_pct(ytd_pct) if _is_valid_number(ytd_pct) else '<span class="flat">N/A</span>'
         html += '<tr>'
         html += f'<td class="name-cell">{name}</td>'
         html += f'<td>{data["current"]:,.2f}</td>'

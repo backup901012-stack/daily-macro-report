@@ -129,10 +129,11 @@ def fetch_quote(symbol, name=None):
         curr = hist.iloc[-1]
         prev = hist.iloc[-2]
 
+        import math
         curr_close = float(curr['Close'])
         prev_close = float(prev['Close'])
 
-        if curr_close <= 0 or prev_close <= 0:
+        if math.isnan(curr_close) or math.isnan(prev_close) or curr_close <= 0 or prev_close <= 0:
             return None
 
         change = curr_close - prev_close
