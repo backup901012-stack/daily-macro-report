@@ -1,16 +1,16 @@
 {
-  "date": "2026-04-02",
+  "date": "2026-04-03",
   "put_call_ratio": {
-    "volume_pcr": 1.436,
-    "oi_pcr": 1.665,
-    "total_call_volume": 4511653,
-    "total_put_volume": 6477604,
-    "total_call_oi": 780057,
-    "total_put_oi": 1298448,
+    "volume_pcr": 1.599,
+    "oi_pcr": 1.682,
+    "total_call_volume": 3972668,
+    "total_put_volume": 6353218,
+    "total_call_oi": 779431,
+    "total_put_oi": 1311250,
     "expirations_used": [
-      "2026-04-01",
       "2026-04-02",
-      "2026-04-06"
+      "2026-04-06",
+      "2026-04-07"
     ],
     "signal": "極度看跌（反向看多信號）",
     "signal_en": "Extreme Bearish (Contrarian Bullish)"
@@ -21,100 +21,100 @@
         "ticker": "XLE",
         "name": "能源",
         "name_en": "Energy",
-        "close": 58.97,
-        "return_1w": -2.64,
-        "return_1m": 5.02,
-        "momentum": 1.19
+        "close": 59.25,
+        "return_1w": -3.69,
+        "return_1m": 6.13,
+        "momentum": 1.22
       },
       {
         "ticker": "XLU",
         "name": "公用事業",
         "name_en": "Utilities",
-        "close": 46.11,
-        "return_1w": 1.9,
-        "return_1m": -1.35,
-        "momentum": 0.27
+        "close": 46.34,
+        "return_1w": 2.23,
+        "return_1m": -1.28,
+        "momentum": 0.47
       },
       {
         "ticker": "XLB",
         "name": "原材料",
         "name_en": "Materials",
-        "close": 50.46,
-        "return_1w": 2.13,
-        "return_1m": -2.42,
-        "momentum": -0.15
-      },
-      {
-        "ticker": "XLF",
-        "name": "金融",
-        "name_en": "Financials",
-        "close": 49.44,
-        "return_1w": 0.2,
-        "return_1m": -2.96,
-        "momentum": -1.38
+        "close": 50.41,
+        "return_1w": 2.69,
+        "return_1m": -2.48,
+        "momentum": 0.11
       },
       {
         "ticker": "XLK",
         "name": "資訊科技",
         "name_en": "Info Tech",
-        "close": 134.91,
-        "return_1w": -1.35,
-        "return_1m": -1.76,
-        "momentum": -1.56
+        "close": 135.99,
+        "return_1w": 2.63,
+        "return_1m": -2.63,
+        "momentum": 0.0
       },
       {
         "ticker": "XLRE",
         "name": "房地產",
         "name_en": "Real Estate",
-        "close": 40.95,
-        "return_1w": 1.69,
-        "return_1m": -5.66,
-        "momentum": -1.99
+        "close": 41.61,
+        "return_1w": 3.28,
+        "return_1m": -4.27,
+        "momentum": -0.5
       },
       {
-        "ticker": "XLV",
-        "name": "醫療保健",
-        "name_en": "Healthcare",
-        "close": 147.73,
-        "return_1w": 1.02,
-        "return_1m": -5.36,
-        "momentum": -2.17
-      },
-      {
-        "ticker": "XLY",
-        "name": "非必需消費",
-        "name_en": "Cons. Disc.",
-        "close": 109.8,
-        "return_1w": -0.84,
-        "return_1m": -3.79,
-        "momentum": -2.32
+        "ticker": "XLF",
+        "name": "金融",
+        "name_en": "Financials",
+        "close": 49.53,
+        "return_1w": 0.98,
+        "return_1m": -3.33,
+        "momentum": -1.18
       },
       {
         "ticker": "XLC",
         "name": "通訊服務",
         "name_en": "Comm. Svcs",
-        "close": 111.24,
-        "return_1w": -0.18,
-        "return_1m": -5.4,
-        "momentum": -2.79
-      },
-      {
-        "ticker": "XLI",
-        "name": "工業",
-        "name_en": "Industrials",
-        "close": 164.43,
-        "return_1w": -0.41,
-        "return_1m": -6.01,
-        "momentum": -3.21
+        "close": 111.7,
+        "return_1w": 2.66,
+        "return_1m": -5.67,
+        "momentum": -1.51
       },
       {
         "ticker": "XLP",
         "name": "必需消費",
         "name_en": "Cons. Staples",
-        "close": 81.46,
-        "return_1w": -0.06,
-        "return_1m": -6.63,
-        "momentum": -3.35
+        "close": 81.89,
+        "return_1w": 0.92,
+        "return_1m": -5.52,
+        "momentum": -2.3
+      },
+      {
+        "ticker": "XLI",
+        "name": "工業",
+        "name_en": "Industrials",
+        "close": 163.77,
+        "return_1w": 1.55,
+        "return_1m": -6.67,
+        "momentum": -2.56
+      },
+      {
+        "ticker": "XLV",
+        "name": "醫療保健",
+        "name_en": "Healthcare",
+        "close": 146.81,
+        "return_1w": 0.73,
+        "return_1m": -6.14,
+        "momentum": -2.7
+      },
+      {
+        "ticker": "XLY",
+        "name": "非必需消費",
+        "name_en": "Cons. Disc.",
+        "close": 108.15,
+        "return_1w": -0.62,
+        "return_1m": -6.89,
+        "momentum": -3.76
       }
     ],
     "leaders": [
@@ -123,22 +123,22 @@
       "XLB"
     ],
     "laggards": [
-      "XLC",
       "XLI",
-      "XLP"
+      "XLV",
+      "XLY"
     ],
-    "risk_on_avg_momentum": -2.25,
-    "risk_off_avg_momentum": -1.81,
-    "risk_spread": -0.44,
-    "regime": "中性",
-    "regime_en": "Neutral"
+    "risk_on_avg_momentum": -1.8,
+    "risk_off_avg_momentum": -1.26,
+    "risk_spread": -0.54,
+    "regime": "偏 Risk-Off",
+    "regime_en": "Leaning Risk-Off"
   },
   "volatility_term_structure": {
-    "vix": 24.54,
-    "vix3m": 24.86,
-    "ratio": 0.9871,
-    "spread": 0.32,
-    "ratio_1m_avg": 0.9907,
+    "vix": 23.87,
+    "vix3m": 24.72,
+    "ratio": 0.9656,
+    "spread": 0.85,
+    "ratio_1m_avg": 0.9915,
     "ratio_1m_high": 1.07,
     "ratio_1m_low": 0.9194,
     "structure": "正常正價差（Contango）— 市場平靜",
@@ -151,75 +151,75 @@
         "ticker": "ZAR=X",
         "name": "美元/南非蘭特",
         "name_en": "USD/ZAR",
-        "rate": 16.8151,
-        "change_1w_pct": -0.96,
-        "change_1m_pct": 2.03,
-        "vol_20d": 21.06,
-        "stress_score": 7.31
+        "rate": 16.93,
+        "change_1w_pct": -0.87,
+        "change_1m_pct": 3.77,
+        "vol_20d": 20.16,
+        "stress_score": 7.52
       },
       {
         "ticker": "BRL=X",
         "name": "美元/巴西雷亞爾",
         "name_en": "USD/BRL",
-        "rate": 5.1928,
-        "change_1w_pct": -0.76,
-        "change_1m_pct": 0.44,
-        "vol_20d": 17.08,
-        "stress_score": 5.56
+        "rate": 5.1545,
+        "change_1w_pct": -1.57,
+        "change_1m_pct": -2.33,
+        "vol_20d": 16.99,
+        "stress_score": 6.42
       },
       {
         "ticker": "MXN=X",
         "name": "美元/墨西哥披索",
         "name_en": "USD/MXN",
-        "rate": 17.811,
-        "change_1w_pct": 0.19,
-        "change_1m_pct": 0.79,
-        "vol_20d": 14.95,
-        "stress_score": 4.8
+        "rate": 17.8543,
+        "change_1w_pct": -0.33,
+        "change_1m_pct": 1.48,
+        "vol_20d": 14.79,
+        "stress_score": 5.01
       },
       {
         "ticker": "INR=X",
         "name": "美元/印度盧比",
         "name_en": "USD/INR",
-        "rate": 93.4843,
-        "change_1w_pct": -0.86,
-        "change_1m_pct": 2.1,
-        "vol_20d": 9.61,
-        "stress_score": 3.86
+        "rate": 92.6426,
+        "change_1w_pct": -2.17,
+        "change_1m_pct": 0.69,
+        "vol_20d": 10.21,
+        "stress_score": 4.14
       },
       {
         "ticker": "TRY=X",
         "name": "美元/土耳其里拉",
         "name_en": "USD/TRY",
-        "rate": 44.4739,
-        "change_1w_pct": 0.27,
-        "change_1m_pct": 1.2,
-        "vol_20d": 1.46,
-        "stress_score": 0.9
+        "rate": 44.5256,
+        "change_1w_pct": 0.16,
+        "change_1m_pct": 1.33,
+        "vol_20d": 1.35,
+        "stress_score": 0.87
       }
     ],
-    "avg_stress": 4.49,
-    "max_stress": 7.31,
+    "avg_stress": 4.79,
+    "max_stress": 7.52,
     "most_stressed": "USD/ZAR",
     "level": "輕微壓力 — 正常波動範圍",
     "level_en": "Mild Stress — Normal Volatility"
   },
   "market_breadth": {
     "rsp_spy": {
-      "ratio": 0.2938,
-      "change_1m_pct": -0.92,
+      "ratio": 0.2944,
+      "change_1m_pct": -0.42,
       "signal": "市場寬度穩定",
       "signal_en": "Breadth Stable"
     },
     "iwm_spy": {
-      "ratio": 0.3809,
-      "change_1m_pct": -0.14,
+      "ratio": 0.3832,
+      "change_1m_pct": 0.19,
       "signal": "大小型股表現相近",
       "signal_en": "Small/Large-cap Balanced"
     },
     "iwd_iwf": {
-      "ratio": 0.4997,
-      "change_1m_pct": 1.17,
+      "ratio": 0.5012,
+      "change_1m_pct": 2.0,
       "signal": "價值股領先 — 利率/通脹受益",
       "signal_en": "Value Leading — Rate/Inflation Play"
     },
@@ -228,55 +228,55 @@
         "ticker": "RSP",
         "name": "S&P 500 等權重",
         "name_en": "S&P 500 Equal Weight",
-        "close": 192.54,
-        "change_1d_pct": 0.32,
-        "change_1w_pct": -0.16,
-        "change_1m_pct": -4.31
+        "close": 193.09,
+        "change_1d_pct": 0.29,
+        "change_1w_pct": 1.05,
+        "change_1m_pct": -4.42
       },
       {
         "ticker": "SPY",
         "name": "S&P 500 市值加權",
         "name_en": "S&P 500 Cap Weight",
-        "close": 655.24,
-        "change_1d_pct": 0.75,
-        "change_1w_pct": -0.24,
-        "change_1m_pct": -3.42
+        "close": 655.83,
+        "change_1d_pct": 0.09,
+        "change_1w_pct": 1.66,
+        "change_1m_pct": -4.02
       },
       {
         "ticker": "IWM",
         "name": "羅素2000小型股",
         "name_en": "Russell 2000",
-        "close": 249.56,
-        "change_1d_pct": 0.63,
-        "change_1w_pct": -0.9,
-        "change_1m_pct": -3.56
+        "close": 251.29,
+        "change_1d_pct": 0.69,
+        "change_1w_pct": 1.56,
+        "change_1m_pct": -3.83
       },
       {
         "ticker": "MDY",
         "name": "S&P 400中型股",
         "name_en": "S&P MidCap 400",
-        "close": 621.79,
-        "change_1d_pct": 0.82,
-        "change_1w_pct": -0.19,
-        "change_1m_pct": -3.66
+        "close": 622.4,
+        "change_1d_pct": 0.1,
+        "change_1w_pct": 1.41,
+        "change_1m_pct": -3.56
       },
       {
         "ticker": "IWD",
         "name": "羅素1000價值",
         "name_en": "Russell 1000 Value",
-        "close": 214.94,
-        "change_1d_pct": 0.59,
-        "change_1w_pct": 0.03,
-        "change_1m_pct": -2.93
+        "close": 215.52,
+        "change_1d_pct": 0.27,
+        "change_1w_pct": 1.42,
+        "change_1m_pct": -3.1
       },
       {
         "ticker": "IWF",
         "name": "羅素1000成長",
         "name_en": "Russell 1000 Growth",
-        "close": 430.11,
-        "change_1d_pct": 0.87,
-        "change_1w_pct": -0.48,
-        "change_1m_pct": -4.05
+        "close": 430.04,
+        "change_1d_pct": -0.02,
+        "change_1w_pct": 1.82,
+        "change_1m_pct": -5.0
       }
     ]
   }
