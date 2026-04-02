@@ -1333,6 +1333,17 @@ def main():
         f.write(html)
     print(f"HTML saved: {html_path}")
 
+    # 生成簡體中文版 HTML（用 opencc 繁→簡）
+    try:
+        from modules.kimi_enhancer import _to_simplified
+        html_sc = _to_simplified(html)
+        sc_path = f'{REPORTS}/daily_report_{DATE}_sc.html'
+        with open(sc_path, 'w', encoding='utf-8') as f:
+            f.write(html_sc)
+        print(f"HTML (簡體版) saved: {sc_path}")
+    except Exception as e:
+        print(f"⚠️ 簡體版生成失敗: {e}")
+
 
 if __name__ == '__main__':
     main()

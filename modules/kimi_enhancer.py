@@ -95,11 +95,30 @@ _S2T_MAP = {
 
 
 def _to_traditional(text):
-    """簡體中文→繁體中文後處理（處理 Kimi 漏轉的字）"""
+    """簡體中文→繁體中文（使用 opencc 完整轉換，字典為 fallback）"""
     if not text:
         return text
-    for s, t in _S2T_MAP.items():
-        text = text.replace(s, t)
+    try:
+        from opencc import OpenCC
+        cc = OpenCC('s2twp')  # 簡體→繁體（台灣用語偏好）
+        text = cc.convert(text)
+    except ImportError:
+        # opencc 未安裝時退回字典
+        for s, t in _S2T_MAP.items():
+            text = text.replace(s, t)
+    return text
+
+
+def _to_simplified(text):
+    """繁體中文→簡體中文（使用 opencc 完整轉換）"""
+    if not text:
+        return text
+    try:
+        from opencc import OpenCC
+        cc = OpenCC('tw2sp')  # 繁體（台灣）→簡體
+        text = cc.convert(text)
+    except ImportError:
+        pass
     return text
 
 

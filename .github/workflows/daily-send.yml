@@ -42,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install yfinance requests beautifulsoup4 numpy pandas deep-translator
+          pip install yfinance requests beautifulsoup4 numpy pandas deep-translator opencc-python-reimplemented
           sudo apt-get update && sudo apt-get install -y fonts-noto-cjk chromium-browser || true
 
       - name: Verify data exists (必要數據缺失則中止)
@@ -76,9 +76,11 @@ jobs:
           MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
         run: python3 scripts/generate_full_report.py
 
-      - name: Generate PDF
+      - name: Generate PDF (繁體+簡體兩版)
         run: |
           DATE=$(TZ='Asia/Taipei' date +%Y-%m-%d)
+
+          # 繁體版 PDF
           HTML_FILE="reports/daily_report_${DATE}.html"
           PDF_FILE="reports/daily_report_${DATE}.pdf"
           if command -v chromium-browser &>/dev/null; then
@@ -87,14 +89,29 @@ jobs:
               "file://$(pwd)/${HTML_FILE}" || true
           fi
           if [ ! -f "${PDF_FILE}" ] || [ $(stat -c%s "${PDF_FILE}" 2>/dev/null || echo 0) -lt 1000 ]; then
-            echo "❌ PDF 生成失敗"
+            echo "❌ 繁體 PDF 生成失敗"
             exit 1
           fi
           PDF_SIZE=$(stat -c%s "${PDF_FILE}")
-          echo "✅ PDF: ${PDF_SIZE} bytes"
+          echo "✅ 繁體 PDF: ${PDF_SIZE} bytes"
           if [ $PDF_SIZE -lt 100000 ]; then
             echo "❌ PDF 異常偏小 (< 100KB)，可能有問題"
             exit 1
+          fi
+
+          # 簡體版 PDF
+          SC_HTML="reports/daily_report_${DATE}_sc.html"
+          SC_PDF="reports/daily_report_${DATE}_sc.pdf"
+          if [ -f "${SC_HTML}" ] && command -v chromium-browser &>/dev/null; then
+            chromium-browser --headless --no-sandbox --disable-gpu \
+              --print-to-pdf="${SC_PDF}" --print-to-pdf-no-header \
+              "file://$(pwd)/${SC_HTML}" || true
+            if [ -f "${SC_PDF}" ]; then
+              SC_SIZE=$(stat -c%s "${SC_PDF}")
+              echo "✅ 簡體 PDF: ${SC_SIZE} bytes"
+            else
+              echo "⚠️ 簡體 PDF 生成失敗（不影響繁體版發送）"
+            fi
           fi
 
       - name: Quality gate (品質閘門)
@@ -218,12 +235,22 @@ jobs:
           access_token = token_resp.json()['access_token']
           print('✅ OAuth2 token 取得成功')
 
-          # 讀取 PDF
+          # 讀取繁體 PDF
           pdf_data = None
           if os.path.exists(PDF_PATH):
               with open(PDF_PATH, 'rb') as f:
                   pdf_data = f.read()
-              print(f'✅ PDF: {len(pdf_data):,} bytes')
+              print(f'✅ 繁體 PDF: {len(pdf_data):,} bytes')
+
+          # 讀取簡體 PDF
+          SC_PDF_PATH = f'reports/daily_report_{DATE}_sc.pdf'
+          sc_pdf_data = None
+          if os.path.exists(SC_PDF_PATH):
+              with open(SC_PDF_PATH, 'rb') as f:
+                  sc_pdf_data = f.read()
+              print(f'✅ 簡體 PDF: {len(sc_pdf_data):,} bytes')
+          else:
+              print('⚠️ 簡體 PDF 不存在，只發繁體版')
 
           # 逐一發送（隱私保護）
           success = 0
@@ -238,8 +265,13 @@ jobs:
 
               if pdf_data:
                   att = MIMEApplication(pdf_data, _subtype='pdf')
-                  att.add_header('Content-Disposition', 'attachment', filename=f'daily_report_{DATE}.pdf')
+                  att.add_header('Content-Disposition', 'attachment', filename=f'daily_report_{DATE}_繁體.pdf')
                   msg.attach(att)
+
+              if sc_pdf_data:
+                  att_sc = MIMEApplication(sc_pdf_data, _subtype='pdf')
+                  att_sc.add_header('Content-Disposition', 'attachment', filename=f'daily_report_{DATE}_簡體.pdf')
+                  msg.attach(att_sc)
 
               raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
               send_resp = requests.post(
