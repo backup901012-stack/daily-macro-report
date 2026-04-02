@@ -636,12 +636,51 @@ def generate_email_html(json_path):
     return template.format(**template_data)
 
 
+def _check_already_sent_today(report_date):
+    """檢查 D1 當天是否已成功發過信（fail-closed：查不到就不發）
+
+    學自股票量化系統的 dedup 機制：
+    - True: 已發過
+    - False: 未發過
+    - 'unknown': 查詢失敗，為防重複不發信
+    """
+    import requests as _requests
+    monitor_url = "https://macro-report-monitor.stock-quant.workers.dev/status"
+    for attempt in range(3):
+        try:
+            resp = _requests.get(monitor_url, timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get('sent') and any(
+                    r.get('status') == 'success' for r in data.get('records', [])
+                ):
+                    return True
+                return False
+        except Exception as e:
+            print(f"⚠️ 查詢 D1 防重發失敗（第 {attempt+1}/3 次）：{e}")
+            if attempt < 2:
+                import time
+                time.sleep(3)
+    print("❌ D1 防重發查詢三次全部失敗")
+    return "unknown"
+
+
 def send_report_email(report_date, pdf_path, json_path=None, group=None):
     """通過 Gmail API 全自動發送報告郵件
 
     格式：HTML 美編正文 + 純文字備用 + PDF 附件
     逐封發送，每位收件者只看到自己
+    內建 dedup 防重發（fail-closed：查不到就不發）
     """
+    # 防重發檢查（fail-closed，學自股票量化系統）
+    dedup_result = _check_already_sent_today(report_date)
+    if dedup_result is True:
+        print(f"📧 今日（{report_date}）已發過報告，跳過重複發信")
+        return True
+    elif dedup_result == "unknown":
+        print(f"❌ 無法確認今日（{report_date}）是否已發過，為防重複不發信")
+        return False
+
     recipients = load_recipients(group)
 
     # 合併所有收件人，逐封發送
