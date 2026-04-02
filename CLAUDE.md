@@ -1,6 +1,6 @@
 # 每日宏觀資訊綜合早報
 
-## 自動化架構（2026-04-01 更新）
+## 自動化架構（2026-04-02 更新）
 
 ### 每日流程（唯一路徑，不可加備份觸發）
 ```
@@ -22,12 +22,16 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
   └─ Gmail OAuth2 API 逐一發送（隱私保護）
 ```
 
-### 重要設計原則（2026-04-01 教訓）
+### 重要設計原則（2026-04-02 更新）
 - **發信只有一條路徑**：數據收集完成 → workflow_run → daily-send.yml
-- **不可加備份觸發**：backup cron、Worker auto dispatch 會搶發舊數據
+- **不可加備份觸發**：backup cron、Worker auto dispatch、本機 crontab/LaunchAgent 會搶發舊數據
+- **本機觸發器已全部停用**：crontab run_auto.sh 已移除，LaunchAgent 已卸載（2026-04-02）
+- **email_sender.py 內建 dedup**：send_report_email() 自帶 D1 防重發（fail-closed，學自股票量化系統）
 - **不可在美股收盤前手動觸發數據收集**：會收到前一天的過期數據
-- **防重發必須 fail-safe**：查詢失敗預設「已發」，寧可漏發不可重發
+- **防重發必須 fail-closed**：查詢失敗預設「不發」，寧可漏發不可重發
 - **等待邏輯上限**：根據實際流程計算（05:00 到 07:30 = 2.5h），設 3h 上限
+- **報告絕不能出現英文**：翻譯失敗的標題一律丟棄，中文比例 < 30% 的不顯示
+- **報告絕不能混簡體字**：所有文字經 opencc（s2twp）轉換，零洩漏
 
 ### 發信方式
 - **Gmail OAuth2 API**（不是 SMTP，跟股票量化系統共用同一套）
@@ -45,15 +49,29 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
   - `POST /record`：workflow 發完信後記錄到 D1（需 X-API-Key）
 - **GitHub Secrets**：`MONITOR_RECORD_KEY`（Worker 記錄端點的 API Key）
 
-### Kimi AI 新聞增強（2026-04-01 建成）
+### Kimi AI 新聞增強（2026-04-02 升級）
 - **模組**：`modules/kimi_enhancer.py`
-- **API**：Moonshot API（`moonshot-v1-auto`），Secret: `MOONSHOT_API_KEY`
+- **API**：Moonshot API（`moonshot-v1-auto`），Secret: `MOONSHOT_API_KEY`，max_tokens: 2000
 - **功能**：
-  1. 頭條新聞（前 4 個主題）用 Kimi 生成專業中文敘事摘要
+  1. **所有 8 個新聞板塊**都用 Kimi 生成專業中文敘事摘要（不再限前 4 個）
   2. 報告末尾「十二、總結分析」— 三段式（今日重點/核心驅動/明日關注）
 - **Fallback**：Kimi 失敗時退回規則引擎模板，不影響報告生成
-- **繁體中文**：prompt 強制繁體 + `_to_traditional()` 簡→繁後處理
+- **簡繁轉換**：使用 `opencc`（s2twp 台灣偏好），徹底取代字典對照表
+- **簡體版生成**：`_to_simplified()` 用 opencc（tw2sp）繁→簡，生成 `_sc.html`
 - **用詞規則**：客觀陳述、不帶稱呼、不用套話、署名「僅供參考」
+
+### 數據抓取三層防護（2026-04-02 建成）
+- **第一層**：yfinance 重試 5 次，間隔 5 秒
+- **第二層**：Yahoo Finance HTTP API 備用數據源
+- **第三層**：exchange_calendars 判斷休市
+  - 確認休市 → 表格顯示「休市」
+  - 非休市但抓取失敗 → 不顯示（避免錯誤數據）
+  - **絕不使用前一天數據**
+
+### 郵件附件（2026-04-02 升級）
+- 每封信附兩個 PDF：`繁體.pdf` + `簡體.pdf`
+- 繁體版：opencc s2twp（台灣用語偏好）
+- 簡體版：opencc tw2sp（繁→簡）
 
 ### ReportLab PDF 升級（開發中）
 - **檔案**：`modules/pdf_report_generator.py`（初版，尚未切換）
@@ -97,16 +115,20 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
   十一、經濟日曆 + FRED
 ```
 
-## 新聞品質控制
+## 新聞品質控制（2026-04-02 升級，參考投行晨報標準）
 1. 垃圾過濾：正則黑名單
 2. 評分制分類：標題 3 分、描述 1 分，最佳匹配
-3. 敘事摘要：描述需 ≥2 關鍵詞命中，不足用 why_it_matters 模板
-4. 翻譯：數據收集階段預翻譯存入 `title_zh`，報告生成時優先用，不依賴即時 API
+3. **來源分級篩選**：Tier-1（Bloomberg/Reuters）1 分即入選；Tier-2 需 2 分；Tier-3 需 3 分
+4. 敘事摘要：Kimi AI 生成（所有板塊），fallback 用 why_it_matters 模板
+5. **摘要不截斷**：移除 150 字硬截斷，殘缺句子自動清理
+6. 翻譯：數據收集階段預翻譯存入 `title_zh`，報告生成時優先用 + opencc 後處理
+7. **英文過濾**：翻譯結果中文比例 < 30% 的一律丟棄不顯示
+8. **無股票代碼標籤**：新聞卡片不顯示 ticker tag
 
 ## Email 格式
 - **純文字正文**（投行風格，不用 HTML 美工）
 - 包含：市場總覽 / 中文新聞標題 / 指數亮點 / 加密貨幣 / 經濟日曆
-- PDF 作為附件
+- **兩個 PDF 附件**：繁體版 + 簡體版
 
 ## PDF 版面規則
 - Chrome headless 的 `page-break-inside: avoid` 對超過半頁的元素無效
@@ -121,7 +143,8 @@ UTC 21:00（台北 05:00）  GitHub Actions 數據收集
 - `modules/hot_stocks.py` — 熱門股偵測 + 量化評分整合 + 即時評分 fallback
 - `modules/email_sender.py` — Email 摘要生成
 - `modules/news_collector.py` — 新聞收集
-- `modules/kimi_enhancer.py` — Kimi AI 新聞摘要 + 報告總結
+- `modules/kimi_enhancer.py` — Kimi AI 新聞摘要 + 報告總結 + opencc 簡繁轉換
+- `modules/market_data.py` — 市場數據收集（三層防護 + 休市判斷）
 - `modules/pdf_report_generator.py` — ReportLab PDF 引擎（開發中）
-- `modules/email_template_v2.py` — Goldman 風格 HTML 模板（備用）
+- `modules/email_template_v2.py` — Goldman 風格 HTML 模板（備用，本機 run_auto.sh 用）
 - `recipients.json` — 34 人完整收件名單
