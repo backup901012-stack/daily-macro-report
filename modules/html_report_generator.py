@@ -640,14 +640,17 @@ def _gen_index_table(indices_data):
     html += '</tr></thead>\n<tbody>\n'
 
     for name, data in indices_data.items():
-        # 檢查數據是否有效（非 NaN）
-        current = data.get('current')
-        if not _is_valid_number(current):
-            # 數據無效 → 顯示「休市」
+        # 確認休市 → 顯示「休市」
+        if data.get('market_closed'):
             html += '<tr>'
             html += f'<td class="name-cell">{name}</td>'
             html += '<td colspan="5" style="text-align:center;color:#999;font-style:italic;">休市</td>'
             html += '</tr>\n'
+            continue
+
+        # 數據無效（NaN 等） → 跳過不顯示
+        current = data.get('current')
+        if not _is_valid_number(current):
             continue
 
         cls = _change_class(data['change_pct'])

@@ -116,8 +116,99 @@ def _get_ytd_close(symbol):
     return None
 
 
+# 交易所日曆映射（用於判斷休市）
+_EXCHANGE_MAP = {
+    # 亞洲
+    '000001.SS': 'XSHG',   # 上證
+    '399001.SZ': 'XSHG',   # 深證（用上證日曆，兩所同步）
+    '^N225': 'XTKS', '^TOPX': 'XTKS',  # 東京
+    '^HSI': 'XHKG',        # 香港
+    '^TWII': 'XTAI',       # 台灣
+    '^KS11': 'XKRX',       # 韓國
+    '^AXJO': 'XASX',       # 澳洲
+    # 歐洲
+    '^GDAXI': 'XFRA', '^FTSE': 'XLON', '^FCHI': 'XPAR',
+    '^STOXX50E': 'XAMS', '^SSMI': 'XSWX',
+    # 美國
+    '^GSPC': 'XNYS', '^IXIC': 'XNYS', '^DJI': 'XNYS',
+    '^RUT': 'XNYS', '^SOX': 'XNYS',
+}
+
+
+def _is_market_closed_today(symbol):
+    """用 exchange_calendars 判斷今天是否休市"""
+    exchange_code = _EXCHANGE_MAP.get(symbol)
+    if not exchange_code:
+        return False  # 找不到映射，預設非休市
+    try:
+        import exchange_calendars as xcals
+        cal = xcals.get_calendar(exchange_code)
+        today = datetime.now().strftime('%Y-%m-%d')
+        return not cal.is_session(today)
+    except Exception:
+        return False  # 判斷失敗，預設非休市
+
+
+def _fetch_quote_yahoo_direct(symbol, name=None):
+    """備用數據源：直接用 Yahoo Finance HTTP API（繞過 yfinance 套件）"""
+    import requests as _req
+    try:
+        url = f'https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?range=5d&interval=1d'
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        resp = _req.get(url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        result = data.get('chart', {}).get('result', [])
+        if not result:
+            return None
+        quotes = result[0].get('indicators', {}).get('quote', [{}])[0]
+        closes = quotes.get('close', [])
+        volumes = quotes.get('volume', [])
+        highs = quotes.get('high', [])
+        lows = quotes.get('low', [])
+        timestamps = result[0].get('timestamp', [])
+
+        # 過濾 None 值
+        valid = [(c, v, h, l, t) for c, v, h, l, t in zip(closes, volumes, highs, lows, timestamps) if c is not None]
+        if len(valid) < 2:
+            return None
+
+        curr_close, curr_vol, curr_high, curr_low, curr_ts = valid[-1]
+        prev_close = valid[-2][0]
+
+        import math
+        if math.isnan(curr_close) or math.isnan(prev_close) or curr_close <= 0 or prev_close <= 0:
+            return None
+
+        change = curr_close - prev_close
+        change_pct = (change / prev_close * 100) if prev_close else 0
+
+        ytd_close = _get_ytd_close(symbol)
+        ytd_pct = None
+        if ytd_close is not None and ytd_close != 0:
+            ytd_pct = round((curr_close - ytd_close) / ytd_close * 100, 2)
+
+        return {
+            'name': name or symbol,
+            'symbol': symbol,
+            'current': round(curr_close, 4),
+            'previous': round(prev_close, 4),
+            'change': round(change, 4),
+            'change_pct': round(change_pct, 2),
+            'ytd_pct': ytd_pct,
+            'volume': int(curr_vol) if curr_vol else 0,
+            'high': round(float(curr_high), 4) if curr_high else None,
+            'low': round(float(curr_low), 4) if curr_low else None,
+            'timestamp': int(curr_ts),
+        }
+    except Exception as e:
+        print(f"  [WARN] yahoo_direct({symbol}) failed: {e}")
+    return None
+
+
 def fetch_quote(symbol, name=None):
-    """獲取單個標的的最新行情數據（純 yfinance 版本）"""
+    """獲取單個標的的最新行情數據（yfinance 主要 + Yahoo HTTP 備用）"""
     try:
         ticker = yf.Ticker(symbol)
         hist = ticker.history(period='5d')
@@ -163,23 +254,45 @@ def fetch_quote(symbol, name=None):
     return None
 
 
-def fetch_batch(symbols_dict, max_retries=3):
-    """批量獲取行情數據，失敗時自動重試"""
+def fetch_batch(symbols_dict, max_retries=5):
+    """批量獲取行情數據
+
+    三層防護：
+    1. yfinance 重試 5 次（間隔 5 秒）
+    2. 全失敗 → Yahoo Finance HTTP API 備用
+    3. 仍失敗 → 用 exchange_calendars 判斷：休市→標記休市，非休市→不顯示
+    """
     import time
     results = {}
     for name, symbol in symbols_dict.items():
         data = None
+        # 第一層：yfinance 重試
         for attempt in range(1, max_retries + 1):
             data = fetch_quote(symbol, name)
             if data:
                 break
             if attempt < max_retries:
-                print(f"  [RETRY] {name}({symbol}) attempt {attempt}/{max_retries} failed, retrying in 2s...")
-                time.sleep(2)
-            else:
-                print(f"  [FAIL] {name}({symbol}) failed after {max_retries} attempts, skipping")
+                print(f"  [RETRY] {name}({symbol}) attempt {attempt}/{max_retries}, waiting 5s...")
+                time.sleep(5)
+
+        # 第二層：Yahoo HTTP API 備用
+        if not data:
+            print(f"  [FALLBACK] {name}({symbol}) trying Yahoo HTTP API...")
+            data = _fetch_quote_yahoo_direct(symbol, name)
+            if data:
+                print(f"  [FALLBACK] {name}({symbol}) ✅ Yahoo HTTP succeeded")
+
+        # 第三層：判斷休市 vs 抓取失敗
         if data:
             results[name] = data
+        else:
+            if _is_market_closed_today(symbol):
+                # 確認休市 → 標記休市
+                results[name] = {'name': name, 'symbol': symbol, 'market_closed': True}
+                print(f"  [CLOSED] {name}({symbol}) 今日休市")
+            else:
+                # 非休市但抓取失敗 → 不顯示（避免顯示錯誤數據）
+                print(f"  [FAIL] {name}({symbol}) 抓取失敗且非休市，不顯示")
     return results
 
 
