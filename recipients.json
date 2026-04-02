@@ -3,40 +3,146 @@
     "default": {
       "description": "預設收件群組",
       "to": [
-        {"name": "Jamie Ho", "email": "jamieho@htsc.com"},
-        {"name": "Jasper", "email": "Kone13852476@gmail.com"},
-        {"name": "何宣逸", "email": "backup901012@gmail.com"},
-        {"name": "Philip", "email": "shihchunkuang@arkwealth.hk"},
-        {"name": "Philip", "email": "philip100.tw@gmail.com"},
-        {"name": "Jake", "email": "jchien@mba20.rsm.nl"},
-        {"name": "Elton Wong", "email": "elton.wong@arkwealth.hk"},
-        {"name": "Abel Lin", "email": "abellin.cs@annum.com.hk"},
-        {"name": "Franklin Yeung", "email": "franklinyeung@htsc.com"},
-        {"name": "Kimi Luo", "email": "kimiluo@htsc.com"},
-        {"name": "Luke Jiang", "email": "lukejiang@htsc.com"},
-        {"name": "Derek Li", "email": "derekli@htsc.com"},
-        {"name": "Rongru Xiang", "email": "rongruxiang@htsc.com"},
-        {"name": "Jinhong Mao", "email": "maojinhong@htsc.com"},
-        {"name": "Branden Zhang", "email": "brandenzhang@htsc.com"},
-        {"name": "Jabez Leung", "email": "JabezLeung@htsc.com"},
-        {"name": "Krystal Zhang", "email": "krystalzhang@htsc.com"},
-        {"name": "Michael Ma", "email": "michaelma1997122@gmail.com"},
-        {"name": "Neo", "email": "notchien@gmail.com"},
-        {"name": "David", "email": "Davidyu0207@gmail.com"},
-        {"name": "徐中韓", "email": "2561391171@qq.com"},
-        {"name": "Kenny", "email": "Soperegg@gmail.com"},
-        {"name": "龍哥", "email": "Kevin_t053312@yahoo.com.tw"},
-        {"name": "Andy", "email": "andywongyue@gmail.com"},
-        {"name": "薛惠文", "email": "vivian600604@gmail.com"},
-        {"name": "張特助", "email": "wennie@sung-yang.com.tw"},
-        {"name": "Andy總", "email": "Andy.yin168@hotmail.com"},
-        {"name": "戎博", "email": "rongrx@outlook.com"},
-        {"name": "Summer", "email": "z08129@yahoo.com.tw"},
-        {"name": "Calvin", "email": "calvin.fang@terawisehk.com"},
-        {"name": "戚元嘉", "email": "qyj1907@me.com"},
-        {"name": "陸家輝", "email": "710323958@qq.com"},
-        {"name": "成柳", "email": "chengliu@htsc.com"},
-        {"name": "吳筱", "email": "wu_faanhing@outlook.com"}
+        {
+          "name": "Jamie Ho",
+          "email": "jamieho@htsc.com"
+        },
+        {
+          "name": "Jasper",
+          "email": "Kone13852476@gmail.com"
+        },
+        {
+          "name": "何宣逸",
+          "email": "backup901012@gmail.com"
+        },
+        {
+          "name": "Philip",
+          "email": "shihchunkuang@arkwealth.hk"
+        },
+        {
+          "name": "Philip",
+          "email": "philip100.tw@gmail.com"
+        },
+        {
+          "name": "Jake",
+          "email": "jchien@mba20.rsm.nl"
+        },
+        {
+          "name": "Elton Wong",
+          "email": "elton.wong@arkwealth.hk"
+        },
+        {
+          "name": "Abel Lin",
+          "email": "abellin.cs@annum.com.hk"
+        },
+        {
+          "name": "Franklin Yeung",
+          "email": "franklinyeung@htsc.com"
+        },
+        {
+          "name": "Kimi Luo",
+          "email": "kimiluo@htsc.com"
+        },
+        {
+          "name": "Luke Jiang",
+          "email": "lukejiang@htsc.com"
+        },
+        {
+          "name": "Derek Li",
+          "email": "derekli@htsc.com"
+        },
+        {
+          "name": "Rongru Xiang",
+          "email": "rongruxiang@htsc.com"
+        },
+        {
+          "name": "Jinhong Mao",
+          "email": "maojinhong@htsc.com"
+        },
+        {
+          "name": "Branden Zhang",
+          "email": "brandenzhang@htsc.com"
+        },
+        {
+          "name": "Jabez Leung",
+          "email": "JabezLeung@htsc.com"
+        },
+        {
+          "name": "Krystal Zhang",
+          "email": "krystalzhang@htsc.com"
+        },
+        {
+          "name": "Michael Ma",
+          "email": "michaelma1997122@gmail.com"
+        },
+        {
+          "name": "Neo",
+          "email": "notchien@gmail.com"
+        },
+        {
+          "name": "David",
+          "email": "Davidyu0207@gmail.com"
+        },
+        {
+          "name": "徐中韓",
+          "email": "2561391171@qq.com"
+        },
+        {
+          "name": "Kenny",
+          "email": "Soperegg@gmail.com"
+        },
+        {
+          "name": "龍哥",
+          "email": "Kevin_t053312@yahoo.com.tw"
+        },
+        {
+          "name": "Andy",
+          "email": "andywongyue@gmail.com"
+        },
+        {
+          "name": "薛惠文",
+          "email": "vivian600604@gmail.com"
+        },
+        {
+          "name": "張特助",
+          "email": "wennie@sung-yang.com.tw"
+        },
+        {
+          "name": "Andy總",
+          "email": "Andy.yin168@hotmail.com"
+        },
+        {
+          "name": "戎博",
+          "email": "rongrx@outlook.com"
+        },
+        {
+          "name": "Summer",
+          "email": "z08129@yahoo.com.tw"
+        },
+        {
+          "name": "Calvin",
+          "email": "calvin.fang@terawisehk.com"
+        },
+        {
+          "name": "戚元嘉",
+          "email": "qyj1907@me.com"
+        },
+        {
+          "name": "陸家輝",
+          "email": "710323958@qq.com"
+        },
+        {
+          "name": "成柳",
+          "email": "chengliu@htsc.com"
+        },
+        {
+          "name": "吳筱",
+          "email": "wu_faanhing@outlook.com"
+        },
+        {
+          "name": "張琛",
+          "email": "13858855609@139.com"
+        }
       ],
       "cc": [],
       "bcc": []
